@@ -43,7 +43,7 @@ class _LoginButtonState extends State<LoginButton> {
         onTap: () {
           if(widget.formKey.currentState!.validate()){
             // HTTP request to login
-            login(widget.emailController.text, widget.passwordController.text);
+            login(widget.emailController.text, widget.passwordController.text, context);
           }
         },
         child: Opacity(
