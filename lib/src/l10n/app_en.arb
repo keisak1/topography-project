@@ -7,5 +7,5 @@
   "emptyPassword": "Please enter a password",
   "failedTitle": "Bad credentials",
   "failed1": "Your email/password are wrong.",
-  "failed2": "Please try filling in your credentials again."
+  "failed2": "Please fill in your credentials again."
 }
