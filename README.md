@@ -9,3 +9,5 @@ A project to help topographers
 - [x] Localization
 - [ ] Homepage (Map)
 - [ ] API Integration
+- [ ] Multiplatform
+- [ ] User Roles
