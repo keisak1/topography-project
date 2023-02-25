@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PasswordField extends StatefulWidget {
   final TextEditingController passwordController;
@@ -6,8 +7,8 @@ class PasswordField extends StatefulWidget {
 
   const PasswordField(
       {super.key,
-        required this.passwordController,
-        required this.fadePassword});
+      required this.passwordController,
+      required this.fadePassword});
 
   @override
   State<PasswordField> createState() => _PasswordFieldState();
@@ -19,6 +20,7 @@ class _PasswordFieldState extends State<PasswordField> {
   late TextEditingController passwordController;
   bool obscure = true;
   FocusNode node = FocusNode();
+
   @override
   void initState() {
     passwordController = widget.passwordController;
@@ -51,29 +53,35 @@ class _PasswordFieldState extends State<PasswordField> {
           duration: Duration(milliseconds: 300),
           tween: Tween(begin: 0, end: widget.fadePassword ? 0 : 1),
           builder: ((_, value, __) => Opacity(
-            opacity: value,
-            child: TextFormField(
-              controller: passwordController,
-              focusNode: node,
-              decoration: InputDecoration(hintText: "Password"),
-              obscureText: obscure,
-              onChanged: (value) {
-                if (value.isEmpty) {
-                  setState(() {
-                    bottomAnimationValue = 0;
-                    opacityAnimationValue = 0;
-                  });
-                } else {
-                  if (bottomAnimationValue == 0) {
-                    setState(() {
-                      bottomAnimationValue = 1;
-                      opacityAnimationValue = 1;
-                    });
-                  }
-                }
-              },
-            ),
-          )),
+                opacity: value,
+                child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return AppLocalizations.of(context)!.emptyPassword;
+                    }
+                    return null;
+                  },
+                  controller: passwordController,
+                  focusNode: node,
+                  decoration: InputDecoration(hintText: "Password"),
+                  obscureText: obscure,
+                  onChanged: (value) {
+                    if (value.isEmpty) {
+                      setState(() {
+                        bottomAnimationValue = 0;
+                        opacityAnimationValue = 0;
+                      });
+                    } else {
+                      if (bottomAnimationValue == 0) {
+                        setState(() {
+                          bottomAnimationValue = 1;
+                          opacityAnimationValue = 1;
+                        });
+                      }
+                    }
+                  },
+                ),
+              )),
         ),
         Positioned.fill(
           child: Align(
@@ -86,10 +94,10 @@ class _PasswordFieldState extends State<PasswordField> {
                 curve: Curves.easeIn,
                 duration: Duration(milliseconds: 500),
                 builder: ((context, value, child) => LinearProgressIndicator(
-                  value: value,
-                  backgroundColor: Colors.grey.withOpacity(0.5),
-                  color: Colors.black,
-                )),
+                      value: value,
+                      backgroundColor: Colors.grey.withOpacity(0.5),
+                      color: Colors.black,
+                    )),
               ),
             ),
           ),
@@ -101,31 +109,31 @@ class _PasswordFieldState extends State<PasswordField> {
                 end: opacityAnimationValue == 0
                     ? 0
                     : widget.fadePassword
-                    ? 0
-                    : 1),
+                        ? 0
+                        : 1),
             duration: Duration(milliseconds: 700),
             builder: ((context, value, child) => Opacity(
-              opacity: value,
-              child: Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12.0)
-                      .copyWith(bottom: 0),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        obscure = !obscure;
-                      });
-                    },
-                    child: Icon(
-                      obscure ? Icons.visibility : Icons.visibility_off,
-                      size: 27,
-                      color: Colors.black,
+                  opacity: value,
+                  child: Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12.0)
+                          .copyWith(bottom: 0),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            obscure = !obscure;
+                          });
+                        },
+                        child: Icon(
+                          obscure ? Icons.visibility : Icons.visibility_off,
+                          size: 27,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            )),
+                )),
           ),
         )
       ],

@@ -1,9 +1,11 @@
 import 'package:topography_project/src/styles/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EmailField extends StatefulWidget {
   final bool fadeEmail;
   final TextEditingController emailController;
+
   const EmailField(
       {super.key, required this.emailController, required this.fadeEmail});
 
@@ -22,6 +24,7 @@ class _EmailFieldState extends State<EmailField>
   late Animation<Color?> _animation;
 
   FocusNode node = FocusNode();
+
   @override
   void initState() {
     emailController = widget.emailController;
@@ -56,37 +59,43 @@ class _EmailFieldState extends State<EmailField>
           duration: Duration(milliseconds: 300),
           tween: Tween(begin: 0, end: widget.fadeEmail ? 0 : 1),
           builder: ((_, value, __) => Opacity(
-            opacity: value,
-            child: TextFormField(
-              controller: emailController,
-              focusNode: node,
-              decoration: InputDecoration(hintText: "Email"),
-              keyboardType: TextInputType.emailAddress,
-              onChanged: (value) async {
-                if (value.isNotEmpty) {
-                  if (isValidEmail(value)) {
-                    setState(() {
-                      bottomAnimationValue = 0;
-                      opacityAnimationValue = 1;
-                      paddingAnimationValue = EdgeInsets.only(top: 0);
-                    });
-                    _animationController.forward();
-                  } else {
-                    _animationController.reverse();
-                    setState(() {
-                      bottomAnimationValue = 1;
-                      opacityAnimationValue = 0;
-                      paddingAnimationValue = EdgeInsets.only(top: 22);
-                    });
-                  }
-                } else {
-                  setState(() {
-                    bottomAnimationValue = 0;
-                  });
-                }
-              },
-            ),
-          )),
+                opacity: value,
+                child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return AppLocalizations.of(context)!.emptyEmail;
+                    }
+                    return null;
+                  },
+                  controller: emailController,
+                  focusNode: node,
+                  decoration: InputDecoration(hintText: "Email"),
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) async {
+                    if (value.isNotEmpty) {
+                      if (isValidEmail(value)) {
+                        setState(() {
+                          bottomAnimationValue = 0;
+                          opacityAnimationValue = 1;
+                          paddingAnimationValue = EdgeInsets.only(top: 0);
+                        });
+                        _animationController.forward();
+                      } else {
+                        _animationController.reverse();
+                        setState(() {
+                          bottomAnimationValue = 1;
+                          opacityAnimationValue = 0;
+                          paddingAnimationValue = EdgeInsets.only(top: 22);
+                        });
+                      }
+                    } else {
+                      setState(() {
+                        bottomAnimationValue = 0;
+                      });
+                    }
+                  },
+                ),
+              )),
         ),
         Positioned.fill(
           child: Align(
@@ -99,10 +108,10 @@ class _EmailFieldState extends State<EmailField>
                 curve: Curves.easeIn,
                 duration: Duration(milliseconds: 500),
                 builder: ((context, value, child) => LinearProgressIndicator(
-                  value: value,
-                  backgroundColor: Colors.grey.withOpacity(0.5),
-                  color: Colors.black,
-                )),
+                      value: value,
+                      backgroundColor: Colors.grey.withOpacity(0.5),
+                      color: Colors.black,
+                    )),
               ),
             ),
           ),
@@ -116,19 +125,19 @@ class _EmailFieldState extends State<EmailField>
               tween: Tween(begin: 0, end: widget.fadeEmail ? 0 : 1),
               duration: Duration(milliseconds: 700),
               builder: ((context, value, child) => Opacity(
-                opacity: value,
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0)
-                        .copyWith(bottom: 0),
-                    child: Icon(Icons.check_rounded,
-                        size: 27,
-                        color: _animation.value // _animation.value,
+                    opacity: value,
+                    child: Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.0)
+                            .copyWith(bottom: 0),
+                        child: Icon(Icons.check_rounded,
+                            size: 27,
+                            color: _animation.value // _animation.value,
+                            ),
+                      ),
                     ),
-                  ),
-                ),
-              )),
+                  )),
             ),
           ),
         ),
@@ -138,7 +147,7 @@ class _EmailFieldState extends State<EmailField>
 
   bool isValidEmail(String email) {
     return RegExp(
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
         .hasMatch(email);
   }
 }

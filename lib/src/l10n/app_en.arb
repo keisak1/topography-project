@@ -2,5 +2,7 @@
   "welcome": "Welcome,",
   "sign": "Sign in to continue",
   "language": "PT",
-  "login": "Login"
+  "login": "Login",
+  "emptyEmail": "Please enter an email address",
+  "emptyPassword": "Please enter a password"
 }

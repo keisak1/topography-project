@@ -1,6 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:topography_project/src/Authentication/presentation/widgets/email_field.dart';
-import 'package:topography_project/src/Authentication/presentation/widgets/get_started_button.dart';
+import 'package:topography_project/src/Authentication/presentation/widgets/login_button.dart';
 import 'package:topography_project/src/Authentication/presentation/widgets/password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,15 +11,16 @@ class LoginScreen extends StatefulWidget {
   final Locale locale;
   final void Function(Locale? newLocale) onLocaleChange;
 
-  const LoginScreen({Key? key, required this.locale, required this.onLocaleChange}) : super(key: key);
-
+  const LoginScreen(
+      {Key? key, required this.locale, required this.onLocaleChange})
+      : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
+  final _formKey = GlobalKey<FormState>();
   late TextEditingController emailController;
   late TextEditingController passwordController;
   double _elementsOpacity = 1;
@@ -47,97 +48,115 @@ class _LoginScreenState extends State<LoginScreen> {
         bottom: false,
         child: loadingBallAppear
             ? Padding(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30.0),
-            child: MyHomePage(title: 'TESTE TESTE',))
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30.0),
+                child: MyHomePage(
+                  title: 'TESTE TESTE',
+                )
+        )
             : Padding(
-          padding: EdgeInsets.symmetric(horizontal: 50.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: [
-                  SizedBox(width: 240),
-                  // add some spacing between text and button
-                  TextButton(
-                      onPressed: () async {
-                        if (Provider.of<LocaleProvider>(context, listen: false).locale.toString() == 'en_EN') {
-                          _changeLocale(Locale('pt','PT'));
-                        } else if(Provider.of<LocaleProvider>(context, listen: false).locale.toString() =='pt_PT') {
-                          _changeLocale(Locale('en','EN'));
-                        }
-                        await AppLocalizations.delegate.load(Provider.of<LocaleProvider>(context, listen: false).locale);
-                        setState(() {
-                        });
-                      },
-                    child: Text(
-                        AppLocalizations.of(context)!.language,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ]),
-                SizedBox(height: 70),
-                TweenAnimationBuilder<double>(
-                  duration: Duration(milliseconds: 300),
-                  tween: Tween(begin: 1, end: _elementsOpacity),
-                  builder: (_, value, __) =>
-                      Opacity(
-                        opacity: value,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(Icons.flutter_dash,
-                                size: 60, color: Color(0xff21579C)),
-                            SizedBox(height: 25),
-                            Text(
-                              AppLocalizations.of(context)!.welcome,
-                              style: TextStyle(
-                                  color: Colors.black, fontSize: 35),
-                            ),
-                            Text(
-                              AppLocalizations.of(context)!.sign,
-                              style: TextStyle(
-                                  color: Colors.black.withOpacity(0.7),
-                                  fontSize: 35),
-                            ),
-                          ],
+                padding: EdgeInsets.symmetric(horizontal: 50.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        SizedBox(width: 240),
+                        // add some spacing between text and button
+                        TextButton(
+                          onPressed: () async {
+                            if (Provider.of<LocaleProvider>(context,
+                                        listen: false)
+                                    .locale
+                                    .toString() ==
+                                'en_EN') {
+                              _changeLocale(Locale('pt', 'PT'));
+                            } else if (Provider.of<LocaleProvider>(context,
+                                        listen: false)
+                                    .locale
+                                    .toString() ==
+                                'pt_PT') {
+                              _changeLocale(Locale('en', 'EN'));
+                            }
+                            await AppLocalizations.delegate.load(
+                                Provider.of<LocaleProvider>(context,
+                                        listen: false)
+                                    .locale);
+                            setState(() {});
+                          },
+                          child: Text(
+                            AppLocalizations.of(context)!.language,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ]),
+                      SizedBox(height: 70),
+                      TweenAnimationBuilder<double>(
+                        duration: Duration(milliseconds: 300),
+                        tween: Tween(begin: 1, end: _elementsOpacity),
+                        builder: (_, value, __) => Opacity(
+                          opacity: value,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.flutter_dash,
+                                  size: 60, color: Color(0xff21579C)),
+                              SizedBox(height: 25),
+                              Text(
+                                AppLocalizations.of(context)!.welcome,
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 35),
+                              ),
+                              Text(
+                                AppLocalizations.of(context)!.sign,
+                                style: TextStyle(
+                                    color: Colors.black.withOpacity(0.7),
+                                    fontSize: 35),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                ),
-                SizedBox(height: 50),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    children: [
-                      EmailField(
-                          fadeEmail: _elementsOpacity == 0,
-                          emailController: emailController),
-                      SizedBox(height: 40),
-                      PasswordField(
-                          fadePassword: _elementsOpacity == 0,
-                          passwordController: passwordController),
-                      SizedBox(height: 60),
-                      GetStartedButton(
-                        elementsOpacity: _elementsOpacity,
-                        onTap: () {
-                          setState(() {
-                            _elementsOpacity = 0;
-                          });
-                        },
-                        onAnimatinoEnd: () async {
-                          await Future.delayed(
-                              Duration(milliseconds: 500));
-                          setState(() {
-                            loadingBallAppear = true;
-                          });
-                        },
+                      SizedBox(height: 50),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              EmailField(
+                                  fadeEmail: _elementsOpacity == 0,
+                                  emailController: emailController),
+                              SizedBox(height: 40),
+                              PasswordField(
+                                  fadePassword: _elementsOpacity == 0,
+                                  passwordController: passwordController),
+                              SizedBox(height: 60),
+                              LoginButton(
+                                elementsOpacity: _elementsOpacity,
+                                onTap: () {
+                                  setState(() {
+                                    _elementsOpacity = 0;
+                                  });
+                                },
+                                onAnimatinoEnd: () async {
+                                  await Future.delayed(
+                                      Duration(milliseconds: 500));
+                                  setState(() {
+                                    loadingBallAppear = true;
+                                  });
+                                },
+                                formKey: _formKey,
+                                emailController: emailController,
+                                passwordController: passwordController,
+                              )
+                            ],
+                          ),
+                        ),
                       )
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }

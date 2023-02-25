@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:topography_project/src/Authentication/application/login_request.dart';
 
-class GetStartedButton extends StatefulWidget {
+class LoginButton extends StatefulWidget {
   final Function onTap;
   final Function onAnimatinoEnd;
   final double elementsOpacity;
-  const GetStartedButton(
+  final GlobalKey<FormState> formKey;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
+
+
+  const LoginButton(
       {super.key,
-        required this.onTap,
-        required this.onAnimatinoEnd,
-        required this.elementsOpacity});
+      required this.onTap,
+      required this.onAnimatinoEnd,
+      required this.elementsOpacity,
+      required this.formKey,
+      required this.emailController,
+      required this.passwordController});
 
   @override
-  State<GetStartedButton> createState() => _GetStartedButtonState();
+  State<LoginButton> createState() => _LoginButtonState();
 }
 
-class _GetStartedButtonState extends State<GetStartedButton> {
+class _LoginButtonState extends State<LoginButton> {
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
@@ -23,10 +37,14 @@ class _GetStartedButtonState extends State<GetStartedButton> {
       tween: Tween(begin: 1, end: widget.elementsOpacity),
       onEnd: () async {
         widget.onAnimatinoEnd();
+
       },
       builder: (_, value, __) => GestureDetector(
         onTap: () {
-          widget.onTap();
+          if(widget.formKey.currentState!.validate()){
+            // HTTP request to login
+            login(widget.emailController.text, widget.passwordController.text);
+          }
         },
         child: Opacity(
           opacity: value,

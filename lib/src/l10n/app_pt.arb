@@ -2,5 +2,8 @@
   "welcome": "Bem-vindo,",
   "sign": "Faça login para continuar",
   "language": "EN",
-  "login": "Entrar"
+  "login": "Entrar",
+  "emptyEmail": "Por favor insira um email",
+  "emptyPassword": "Por favor insira a password"
+
 }
