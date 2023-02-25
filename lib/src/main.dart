@@ -1,32 +1,55 @@
 import 'package:topography_project/src/Authentication/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
-import 'Authentication/presentation/widgets/messages_list.dart';
+
+class LocaleProvider extends ChangeNotifier {
+  Locale _locale = const Locale('en_EN');
+
+  Locale get locale => _locale;
+
+  void changeLocale(Locale? newLocale) {
+    _locale = newLocale ?? const Locale('en_EN');
+    notifyListeners();
+  }
+}
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => LocaleProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          textSelectionTheme: TextSelectionThemeData(cursorColor: Colors.black),
-          textTheme: TextTheme(
-            subtitle1: TextStyle(color: Colors.black), //<-- SEE HERE
-          ),
-          inputDecorationTheme: InputDecorationTheme(
-            hintStyle: TextStyle(color: Colors.black.withOpacity(0.7)),
-            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            border: OutlineInputBorder(borderSide: BorderSide.none),
-          ),
-        ),
-        home: const LoginScreen());
+    return Consumer<LocaleProvider>(
+        builder: (context, provider, child) {
+          return MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'), // English
+              Locale('pt'), // Portuguese
+            ],
+            locale: provider.locale,
+            home: LoginScreen(
+                locale: provider.locale,
+                onLocaleChange: (newLocale) =>
+                    provider.changeLocale(newLocale)),
+          );
+        }
+    );
   }
 }

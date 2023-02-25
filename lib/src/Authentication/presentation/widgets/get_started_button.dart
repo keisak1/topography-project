@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GetStartedButton extends StatefulWidget {
   final Function onTap;
@@ -40,7 +41,7 @@ class _GetStartedButtonState extends State<GetStartedButton> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Get Started",
+                  AppLocalizations.of(context)!.login,
                   style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
