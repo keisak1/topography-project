@@ -4,6 +4,8 @@
   "language": "EN",
   "login": "Entrar",
   "emptyEmail": "Por favor insira um email",
-  "emptyPassword": "Por favor insira a password"
-
+  "emptyPassword": "Por favor insira a password",
+  "failedTitle": "Credenciais erradas",
+  "failed1": "O seu e-mail/password estão errados.",
+  "failed2": "Por favor, tente preencher novamente as suas credenciais."
 }
