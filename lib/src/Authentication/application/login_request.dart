@@ -14,7 +14,7 @@ Future<void> login(String username, String password, context) async {
   if (response.statusCode == 200) {
     print('POST request successful');
     print(response.body);
-    Navigator.push(
+    Navigator.pushReplacement(
       context!,
       MaterialPageRoute(builder: (context) => MyHomePage(title: 'Logged in',)),
     );
