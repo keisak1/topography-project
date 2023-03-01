@@ -43,11 +43,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: Builder(
           builder: (context){
             return IconButton(
-              icon: Icon(Icons.menu),
+              icon: Icon(Icons.menu,size: 40.0,),
+              color: Colors.black,
               onPressed: (){
                 Scaffold.of(context).openDrawer();
               },
@@ -58,7 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
           Builder(
             builder: (context){
               return IconButton(
-                icon: Icon(Icons.settings_outlined),
+                icon: Icon(Icons.settings_outlined,size: 40.0,),
+                color: Colors.black,
                 onPressed: (){
                   Scaffold.of(context).openEndDrawer();
                 },
@@ -66,15 +70,19 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           )
         ],
+          backgroundColor: Colors.transparent,
+          elevation: 0.0
       ),
       drawer: Drawer(
         child: ListView(children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: Colors.black,
             ),
             child: Text(
               AppLocalizations.of(context)!.zones,
+              style: TextStyle(
+                  color: Colors.white, fontSize: 20),
             ), //dar add ao file |10n
           ),
           ListTile(
@@ -98,35 +106,73 @@ class _MyHomePageState extends State<MyHomePage> {
         ],),
       ),
       endDrawer: Drawer(
-        child: ListView(children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text(
-              AppLocalizations.of(context)!.definitions,
-            ), //dar add ao file |10n
-          ),
-          ListTile(
-            /*leading: Icon(
+        child: Column(children: [
+          Expanded(
+            child: ListView(
+              children: <Widget>[
+                DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.definitions,
+                    style: TextStyle(
+                        color: Colors.white, fontSize: 20),
+                  ), //dar add ao file |10n
+                ),
+                ListTile(
+                  /*leading: Icon(
               Icons.home,
             ),*/
-            title: const Text('Something'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            /*leading: Icon(
+                  title: const Text('Something'),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                /*ListTile(
+                  /*leading: Icon(
               Icons.train,
             ),*/
-            title: Text(
-              AppLocalizations.of(context)!.logout,
+                  title: Text(
+                    AppLocalizations.of(context)!.logout,
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),*/
+              ],
             ),
-            onTap: () {
-              Navigator.pop(context);
-            },
           ),
+          Container(
+            // This align moves the children to the bottom
+              child: Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  // This container holds all the children that will be aligned
+                  // on the bottom and should not scroll with the above ListView
+                  child: Container(
+                      child: Column(
+                        children: <Widget>[
+                          ListTile(
+                              leading: Icon(Icons.logout),
+                              title: Text(
+                                AppLocalizations.of(context)!.logout,
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              onTap: () => Navigator.pushReplacementNamed(context, '/')
+                          ),
+                        ],
+                      )
+                  )
+              )
+          )
+          /*Expanded(child: Container()),
+          Column(
+            children: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () => Navigator.pushReplacementNamed(context, '/'))
+            ],
+          ),*/
         ],),
       ),
       body:
@@ -185,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
         label: Text(
           AppLocalizations.of(context)!.buildings,
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
