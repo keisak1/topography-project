@@ -4,6 +4,7 @@ import 'package:topography_project/src/HomePage/presentation/widgets/sidebar_but
 import 'package:topography_project/src/HomePage/presentation/widgets/map.dart';
 import 'package:topography_project/src/HomePage/presentation/widgets/settings_button.dart';
 import 'package:topography_project/src/SettingsPage/settingspage_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -42,13 +43,39 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
+      appBar: AppBar(
+        leading: Builder(
+          builder: (context){
+            return IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: (){
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
+        actions: <Widget>[
+          Builder(
+            builder: (context){
+              return IconButton(
+                icon: Icon(Icons.settings_outlined),
+                onPressed: (){
+                  Scaffold.of(context).openEndDrawer();
+                },
+              );
+            },
+          )
+        ],
+      ),
       drawer: Drawer(
         child: ListView(children: [
-          const DrawerHeader(
+          DrawerHeader(
             decoration: BoxDecoration(
               color: Colors.blue,
             ),
-            child: Text('Sidebar'),
+            child: Text(
+              AppLocalizations.of(context)!.zones,
+            ), //dar add ao file |10n
           ),
           ListTile(
             /*leading: Icon(
@@ -70,8 +97,41 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],),
       ),
-      body: Stack(
-        children: <Widget>[
+      endDrawer: Drawer(
+        child: ListView(children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Text(
+              AppLocalizations.of(context)!.definitions,
+            ), //dar add ao file |10n
+          ),
+          ListTile(
+            /*leading: Icon(
+              Icons.home,
+            ),*/
+            title: const Text('Something'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            /*leading: Icon(
+              Icons.train,
+            ),*/
+            title: Text(
+              AppLocalizations.of(context)!.logout,
+            ),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],),
+      ),
+      body:
+      //Stack(
+        /*children: <Widget>[
           Positioned(
             left: 10,
             top: 20,
@@ -79,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
               icon: Icon(Icons.menu),
               onPressed: () => scaffoldKey.currentState?.openDrawer(),
             ),
-          ),
+          ),*/
           Center(
             child: OSMFlutter(
               controller: controller,
@@ -116,12 +176,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   )),
             ),
           ),
-        ],
+        //],
+      //),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: (){
+
+        },
+        label: Text(
+          AppLocalizations.of(context)!.buildings,
+        ),
+        backgroundColor: Colors.blue,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _settingsPage,
-        child: new Icon(Icons.settings_outlined, ),
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
