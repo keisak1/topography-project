@@ -3,9 +3,13 @@
   "sign": "Faça login para continuar",
   "language": "EN",
   "login": "Entrar",
+  "logout": "Sair",
   "emptyEmail": "Por favor insira um email",
   "emptyPassword": "Por favor insira a password",
   "failedTitle": "Credenciais erradas",
   "failed1": "O seu e-mail/password estão errados.",
-  "failed2": "Por favor, preencha novamente as suas credenciais."
+  "failed2": "Por favor, preencha novamente as suas credenciais.",
+  "zones": "Zonas",
+  "definitions": "Definições",
+  "buildings": "Edifícios mais próximos"
 }

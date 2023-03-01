@@ -3,9 +3,13 @@
   "sign": "Sign in to continue",
   "language": "PT",
   "login": "Login",
+  "logout": "Logout",
   "emptyEmail": "Please enter an email address",
   "emptyPassword": "Please enter a password",
   "failedTitle": "Bad credentials",
   "failed1": "Your email/password are wrong.",
-  "failed2": "Please fill in your credentials again."
+  "failed2": "Please fill in your credentials again.",
+  "zones": "Zones",
+  "definitions": "Definitions",
+  "buildings": "Nearest Buildings"
 }
