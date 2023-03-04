@@ -10,6 +10,6 @@
   "failed1": "Your email/password are wrong.",
   "failed2": "Please fill in your credentials again.",
   "zones": "Zones",
-  "definitions": "Definitions",
+  "settings": "Settings",
   "buildings": "Nearest Buildings"
 }

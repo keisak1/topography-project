@@ -16,7 +16,7 @@ Future<void> login(String username, String password, context) async {
     print(response.body);
     Navigator.pushReplacement(
       context!,
-      MaterialPageRoute(builder: (context) => MyHomePage(title: 'Logged in',)),
+      MaterialPageRoute(builder: (context) => MyHomePage()),
     );
   } else {
     showDialog(

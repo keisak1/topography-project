@@ -50,7 +50,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ? Padding(
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30.0),
                 child: MyHomePage(
-                  title: 'TESTE TESTE',
                 )
         )
             : Padding(
