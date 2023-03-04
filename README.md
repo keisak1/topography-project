@@ -7,7 +7,10 @@ A project to help topographers
 
 - [x] Authentication
 - [x] Localization
-- [ ] Homepage (Map)
+- [x] Homepage (Map)
+  - [x] Highlighted areas shown/hidden on Zoom
+  - [x] Highlighted markers shown/hidden on Zoom
+  - [x] Clickable Markers
 - [ ] API Integration
 - [ ] Multiplatform
 - [ ] User Roles
