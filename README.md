@@ -9,7 +9,7 @@ Finally, the building footprint from OSM, the estimated structural parameters an
 
 ## Mobile App
 
-This mobile app is meant to aid the project AI4DRR 
+This mobile app is meant to aid the project AI4DRR by sending data (forms and images) with user input to feed the AI.
 
 ## To-do list
 
