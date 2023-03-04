@@ -11,6 +11,7 @@ A project to help topographers
   - [x] Highlighted areas shown/hidden on Zoom
   - [x] Highlighted markers shown/hidden on Zoom
   - [x] Clickable Markers
+  - [ ] GPS
 - [ ] API Integration
 - [ ] Multiplatform
 - [ ] User Roles
