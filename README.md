@@ -19,7 +19,7 @@ This mobile app is meant to aid the project AI4DRR by sending data (forms and im
   - [x] Highlighted areas shown/hidden on Zoom
   - [x] Highlighted markers shown/hidden on Zoom
   - [x] Clickable Markers
-  - [ ] GPS
+  - [x] GPS
 - [ ] API Integration
 - [ ] Multiplatform
 - [ ] User Roles
