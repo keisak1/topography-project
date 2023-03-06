@@ -8,6 +8,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class MyHomePage extends StatefulWidget {
   static const String route = '/live_location';
@@ -29,11 +32,14 @@ class _MyHomePageState extends State<MyHomePage> {
     LatLng(41.174702746609, -8.608401561850052)
   ];
 
-/* LocationData? _currentLocation;
+  bool isButtonOn = false;
+
+  LocationData? _currentLocation;
   bool _liveUpdate = false;
   bool _permission = false;
   String? _serviceError = '';
-  final Location _locationService = Location();*/
+  final Location _locationService = Location();
+  StreamSubscription<LocationData>? locationSubscription;
 
   void _settingsPage() {
     Navigator.push(
@@ -52,11 +58,47 @@ class _MyHomePageState extends State<MyHomePage> {
     bool shouldShowMarker() {
       return currentZoom >= 13;
     }
-    /*  initLocationService();*/
+    initLocationService();
   }
 
-  /*
   void initLocationService() async {
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    double? latitude = prefs.getDouble('latitude');
+    double? longitude = prefs.getDouble('longitude');
+
+    _serviceEnabled = await _locationService.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await _locationService.requestService();
+      if (!_serviceEnabled) {
+        // Location services are not enabled on the device.
+        return;
+      }
+    }
+
+    _permissionGranted = await _locationService.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await _locationService.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        // Location permission not granted.
+        return;
+      }
+    }
+
+    if (latitude != null && longitude != null) {
+      _locationService.onLocationChanged.listen((LocationData currentLocation) async {
+        _currentLocation = currentLocation;
+        await prefs.setDouble('latitude', currentLocation.latitude ?? 0.0);
+        await prefs.setDouble('longitude', currentLocation.longitude ?? 0.0);
+      });
+    }else{
+      _currentLocation = LatLng(latitude!, longitude!) as LocationData?;
+    }
+  }
+
+  /*void initLocationService() async {
     await _locationService.changeSettings(
       accuracy: LocationAccuracy.high,
       interval: 1000,
@@ -108,18 +150,34 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       location = null;
     }
+  }*/
+
+  void onButtonToggle(int index) {
+    setState(() {
+      isButtonOn = !isButtonOn;
+    });
+    if (isButtonOn) {
+      locationSubscription =
+          _locationService.onLocationChanged.listen((LocationData locationData) {
+            setState(() {
+              _currentLocation = locationData;
+            });
+          });
+    } else {
+      locationSubscription?.cancel();
+    }
   }
-*/
+
   @override
   Widget build(BuildContext context) {
-    /* LatLng currentLatLng;
+    LatLng currentLatLng;
 
     if (_currentLocation != null) {
       currentLatLng =
           LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
     } else {
       currentLatLng = LatLng(0, 0);
-    }*/
+    }
 
     final markers = <Marker>[
       Marker(
@@ -151,7 +209,18 @@ class _MyHomePageState extends State<MyHomePage> {
           size: 20,
         ),
       ),
+      Marker(
+        width: 80.0,
+        height: 80.0,
+        point: currentLatLng,
+        builder: (context) => const Icon(
+          Icons.navigation,
+          color: Colors.blue,
+          size: 30,
+        ),
+      ),
     ];
+
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: Colors.transparent,
@@ -204,7 +273,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: const Text('Zona 1'),
               onTap: () {
-                Navigator.pop(context);
+                _mapController.move(LatLng(41.17209721775161, -8.611916195059322), 17);
               },
             ),
             ListTile(
@@ -232,11 +301,47 @@ class _MyHomePageState extends State<MyHomePage> {
                     ), //dar add ao file |10n
                   ),
                   ListTile(
+                    title: Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Row(
+                        //crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            isButtonOn ? 'GPS On' : 'GPS Off',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              //fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8.0),
+                          ToggleButtons(
+                            children: [
+                              Icon(isButtonOn ? Icons.location_on : Icons.location_off),
+                            ],
+                            isSelected: [isButtonOn],
+                            onPressed: (int index) {
+                              onButtonToggle(index);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  ListTile(
                     title: const Text('Something'),
                     onTap: () {
                       Navigator.pop(context);
                     },
-                  ),
+                  )
+                  /*ToggleButtons(
+                    children: [
+                      Icon(isButtonOn ? Icons.location_on : Icons.location_off),
+                    ],
+                    isSelected: [isButtonOn],
+                    onPressed: (int index) {
+                      onButtonToggle(index);
+                    },
+                  ),*/
                 ],
               ),
             ),
@@ -296,18 +401,24 @@ class _MyHomePageState extends State<MyHomePage> {
               MarkerLayer(
                 markers: shouldShowMarker(currentZoom) ? markers : [],
               ),
+
+              //MarkerLayerOptions(markers: [userMarker]),
+              //flutterMapLocation,
             ]),
       ),
       //],
       //),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        label: Text(
-          AppLocalizations.of(context)!.buildings,
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _mapController.move(currentLatLng, 17);
+        },
+        child: const Icon(Icons.my_location_outlined),
+        //label: Text(
+          //AppLocalizations.of(context)!.buildings,
+        //),
         backgroundColor: Colors.black,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      //floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
