@@ -21,7 +21,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   var scaffoldKey = GlobalKey<ScaffoldState>();
   late final MapController _mapController;
   bool showMarker = true;
@@ -31,6 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
     LatLng(41.16909398838012, -8.608095350489625),
     LatLng(41.174702746609, -8.608401561850052)
   ];
+  late SharedPreferences _prefs;
 
   bool isButtonOn = false;
 
@@ -52,23 +53,51 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _mapController = MapController();
+    WidgetsBinding.instance.addObserver(this);
 
-    double currentZoom = 13;
 
-    bool shouldShowMarker() {
-      return currentZoom >= 13;
-    }
     initLocationService();
+  }
+
+  Future<void> _saveData(double? lat, double? longi) async {
+
+    if (lat != null) {
+      await _prefs.setDouble('Latitude', lat);
+    }
+    if (longi != null) {
+      await _prefs.setDouble('Longitude', longi);
+    }
+  }
+
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      double? lat = _currentLocation!.latitude;
+      double? long = _currentLocation?.longitude;
+      print("Saving");
+      _saveData(lat,long); // save data when app is paused
+    }
   }
 
   void initLocationService() async {
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
+    _prefs = await SharedPreferences.getInstance();
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    double? latitude = prefs.getDouble('latitude');
-    double? longitude = prefs.getDouble('longitude');
+    double? latitude = _prefs.getDouble('Latitude');
+    double? longitude = _prefs.getDouble('Longitude');
 
+    print("LATITUDE E LONGITUDE");
+    print(latitude);
+    print(longitude);
     _serviceEnabled = await _locationService.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await _locationService.requestService();
@@ -87,70 +116,18 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    if (latitude != null && longitude != null) {
+    if (latitude == null && longitude == null) {
       _locationService.onLocationChanged.listen((LocationData currentLocation) async {
         _currentLocation = currentLocation;
-        await prefs.setDouble('latitude', currentLocation.latitude ?? 0.0);
-        await prefs.setDouble('longitude', currentLocation.longitude ?? 0.0);
+        await _prefs.setDouble('latitude', currentLocation.latitude ?? 0.0);
+        await _prefs.setDouble('longitude', currentLocation.longitude ?? 0.0);
       });
     }else{
+      print("im setting the location");
       _currentLocation = LatLng(latitude!, longitude!) as LocationData?;
     }
   }
 
-  /*void initLocationService() async {
-    await _locationService.changeSettings(
-      accuracy: LocationAccuracy.high,
-      interval: 1000,
-    );
-
-    LocationData? location;
-    bool serviceEnabled;
-    bool serviceRequestResult;
-    try {
-      serviceEnabled = await _locationService.serviceEnabled();
-
-      if (serviceEnabled) {
-        final permission = await _locationService.requestPermission();
-        _permission = permission == PermissionStatus.granted;
-
-        if (_permission) {
-          location = await _locationService.getLocation();
-          _currentLocation = location;
-          _locationService.onLocationChanged
-              .listen((LocationData result) async {
-            if (mounted) {
-              setState(() {
-                _currentLocation = result;
-
-                // If Live Update is enabled, move map center
-                if (_liveUpdate) {
-                  _mapController.move(
-                      LatLng(_currentLocation!.latitude!,
-                          _currentLocation!.longitude!),
-                      _mapController.zoom);
-                }
-              });
-            }
-          });
-        }
-      } else {
-        serviceRequestResult = await _locationService.requestService();
-        if (serviceRequestResult) {
-          initLocationService();
-          return;
-        }
-      }
-    } on PlatformException catch (e) {
-      debugPrint(e.toString());
-      if (e.code == 'PERMISSION_DENIED') {
-        _serviceError = e.message;
-      } else if (e.code == 'SERVICE_STATUS_ERROR') {
-        _serviceError = e.message;
-      }
-      location = null;
-    }
-  }*/
 
   void onButtonToggle(int index) {
     setState(() {
@@ -373,7 +350,7 @@ class _MyHomePageState extends State<MyHomePage> {
             options: MapOptions(
               center: LatLng(41.17209721775161, -8.611916195059322),
               zoom: 10,
-              maxZoom: 20,
+              maxZoom: 18.499999,
               minZoom: 0,
               onPositionChanged: (position, _) {
                 setState(() {
