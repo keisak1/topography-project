@@ -10,6 +10,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math' as math;
+
 
 
 class MyHomePage extends StatefulWidget {
@@ -23,6 +25,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  late LatLng savedLocation = LatLng(0.0, 0.0);
   late final MapController _mapController;
   bool showMarker = true;
   List<LatLng> polygonPoints = [
@@ -36,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   bool isButtonOn = false;
 
   LocationData? _currentLocation;
+  late double heading = 0.0;
   bool _liveUpdate = false;
   bool _permission = false;
   String? _serviceError = '';
@@ -119,12 +123,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
     if (latitude == null && longitude == null) {
       _locationService.onLocationChanged.listen((LocationData currentLocation) async {
         _currentLocation = currentLocation;
+        heading = await currentLocation.heading!;
         await _prefs.setDouble('latitude', currentLocation.latitude ?? 0.0);
         await _prefs.setDouble('longitude', currentLocation.longitude ?? 0.0);
       });
     }else{
       print("im setting the location");
-      _currentLocation = LatLng(latitude!, longitude!) as LocationData?;
+      savedLocation = LatLng(latitude!, longitude!);
     }
   }
 
@@ -138,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
           _locationService.onLocationChanged.listen((LocationData locationData) {
             setState(() {
               _currentLocation = locationData;
+              heading = locationData.heading!;
             });
           });
     } else {
@@ -149,11 +155,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     LatLng currentLatLng;
 
-    if (_currentLocation != null) {
-      currentLatLng =
-          LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
+    if (_currentLocation != null && isButtonOn == true) {
+      currentLatLng = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
     } else {
-      currentLatLng = LatLng(0, 0);
+      currentLatLng = savedLocation;
     }
 
     final markers = <Marker>[
@@ -190,11 +195,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
         width: 80.0,
         height: 80.0,
         point: currentLatLng,
-        builder: (context) => const Icon(
-          Icons.navigation,
-          color: Colors.blue,
-          size: 30,
+        builder: (context) => Transform.rotate(
+          angle: heading * (pi / 180),
+          child: const Icon(
+            Icons.navigation,
+            color: Colors.blue,
+            size: 30,
+          ),
         ),
+
       ),
     ];
 
