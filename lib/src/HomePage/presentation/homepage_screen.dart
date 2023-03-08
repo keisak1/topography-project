@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:topography_project/src/FormPage/formpage_screen.dart';
-import 'package:topography_project/src/HomePage/presentation/widgets/sidebar_button.dart';
-import 'package:topography_project/src/HomePage/presentation/widgets/settings_button.dart';
-import 'package:topography_project/src/SettingsPage/settingspage_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 class MyHomePage extends StatefulWidget {
   static const String route = '/live_location';
@@ -18,8 +19,9 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  late LatLng savedLocation = LatLng(0.0, 0.0);
   late final MapController _mapController;
   bool showMarker = true;
   List<LatLng> polygonPoints = [
@@ -28,98 +30,119 @@ class _MyHomePageState extends State<MyHomePage> {
     LatLng(41.16909398838012, -8.608095350489625),
     LatLng(41.174702746609, -8.608401561850052)
   ];
+  late SharedPreferences _prefs;
 
-/* LocationData? _currentLocation;
-  bool _liveUpdate = false;
-  bool _permission = false;
-  String? _serviceError = '';
-  final Location _locationService = Location();*/
+  bool isButtonOn = false;
 
-  void _settingsPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SettingsPage()),
-    );
-  }
+  LocationData? _currentLocation;
+  late double heading = 0.0;
+  final Location _locationService = Location();
+  StreamSubscription<LocationData>? locationSubscription;
+
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
 
-    double currentZoom = 13;
+    WidgetsBinding.instance.addObserver(this);
 
-    bool shouldShowMarker() {
-      return currentZoom >= 13;
-    }
-    /*  initLocationService();*/
+
+    initLocationService();
   }
 
-  /*
+  Future<void> _saveData(double? lat, double? longi) async {
+
+    if (lat != null) {
+      await _prefs.setDouble('Latitude', lat);
+    }
+    if (longi != null) {
+      await _prefs.setDouble('Longitude', longi);
+    }
+  }
+
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      double? lat = _currentLocation!.latitude;
+      double? long = _currentLocation?.longitude;
+      _saveData(lat,long); // save data when app is paused
+    }
+  }
+
   void initLocationService() async {
-    await _locationService.changeSettings(
-      accuracy: LocationAccuracy.high,
-      interval: 1000,
-    );
-
-    LocationData? location;
     bool serviceEnabled;
-    bool serviceRequestResult;
-    try {
-      serviceEnabled = await _locationService.serviceEnabled();
+    PermissionStatus permissionGranted;
+    _prefs = await SharedPreferences.getInstance();
 
-      if (serviceEnabled) {
-        final permission = await _locationService.requestPermission();
-        _permission = permission == PermissionStatus.granted;
+    double? latitude = _prefs.getDouble('Latitude');
+    double? longitude = _prefs.getDouble('Longitude');
 
-        if (_permission) {
-          location = await _locationService.getLocation();
-          _currentLocation = location;
-          _locationService.onLocationChanged
-              .listen((LocationData result) async {
-            if (mounted) {
-              setState(() {
-                _currentLocation = result;
-
-                // If Live Update is enabled, move map center
-                if (_liveUpdate) {
-                  _mapController.move(
-                      LatLng(_currentLocation!.latitude!,
-                          _currentLocation!.longitude!),
-                      _mapController.zoom);
-                }
-              });
-            }
-          });
-        }
-      } else {
-        serviceRequestResult = await _locationService.requestService();
-        if (serviceRequestResult) {
-          initLocationService();
-          return;
-        }
+    serviceEnabled = await _locationService.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _locationService.requestService();
+      if (!serviceEnabled) {
+        // Location services are not enabled on the device.
+        return;
       }
-    } on PlatformException catch (e) {
-      debugPrint(e.toString());
-      if (e.code == 'PERMISSION_DENIED') {
-        _serviceError = e.message;
-      } else if (e.code == 'SERVICE_STATUS_ERROR') {
-        _serviceError = e.message;
+    }
+
+    permissionGranted = await _locationService.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _locationService.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        // Location permission not granted.
+        return;
       }
-      location = null;
+    }
+
+    if (latitude == null && longitude == null) {
+      _locationService.onLocationChanged.listen((LocationData currentLocation) async {
+        _currentLocation = currentLocation;
+        heading = currentLocation.heading!;
+        await _prefs.setDouble('latitude', currentLocation.latitude ?? 0.0);
+        await _prefs.setDouble('longitude', currentLocation.longitude ?? 0.0);
+      });
+    }else{
+      savedLocation = LatLng(latitude!, longitude!);
     }
   }
-*/
+
+
+  void onButtonToggle(int index) {
+    setState(() {
+      isButtonOn = !isButtonOn;
+    });
+    if (isButtonOn) {
+      locationSubscription =
+          _locationService.onLocationChanged.listen((LocationData locationData) {
+            setState(() {
+              _currentLocation = locationData;
+              heading = locationData.heading!;
+            });
+          });
+    } else {
+      locationSubscription?.cancel();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    /* LatLng currentLatLng;
+    LatLng currentLatLng;
 
-    if (_currentLocation != null) {
-      currentLatLng =
-          LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
+    if (_currentLocation != null && isButtonOn == true) {
+      currentLatLng = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
     } else {
-      currentLatLng = LatLng(0, 0);
-    }*/
+      currentLatLng = savedLocation;
+    }
 
     final markers = <Marker>[
       Marker(
@@ -134,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 MaterialPageRoute(
                     builder: (context) => MyFormPage(markerId: 123)));
           },
-          child: Icon(
+          child: const Icon(
             Icons.circle,
             color: Colors.redAccent,
             size: 20,
@@ -152,6 +175,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     ];
+
+
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: Colors.transparent,
@@ -160,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
           leading: Builder(
             builder: (context) {
               return IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.menu,
                   size: 40.0,
                 ),
@@ -175,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Builder(
               builder: (context) {
                 return IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.settings_outlined,
                     size: 40.0,
                   ),
@@ -193,18 +218,18 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.black,
               ),
               child: Text(
                 AppLocalizations.of(context)!.zones,
-                style: TextStyle(color: Colors.white, fontSize: 20),
+                style: const TextStyle(color: Colors.white, fontSize: 20),
               ), //dar add ao file |10n
             ),
             ListTile(
               title: const Text('Zona 1'),
               onTap: () {
-                Navigator.pop(context);
+                _mapController.move(LatLng(41.17209721775161, -8.611916195059322), 17);
               },
             ),
             ListTile(
@@ -223,42 +248,66 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListView(
                 children: <Widget>[
                   DrawerHeader(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.black,
                     ),
                     child: Text(
                       AppLocalizations.of(context)!.settings,
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      style: const TextStyle(color: Colors.white, fontSize: 20),
                     ), //dar add ao file |10n
+                  ),
+                  ListTile(
+                    title: Container(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        //crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            isButtonOn ? 'GPS On' : 'GPS Off',
+                            style: const TextStyle(
+                              fontSize: 20.0,
+                              //fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8.0),
+                          ToggleButtons(
+                            isSelected: [isButtonOn],
+                            onPressed: (int index) {
+                              onButtonToggle(index);
+                            },
+                            children: [
+                              Icon(isButtonOn ? Icons.location_on : Icons.location_off),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   ListTile(
                     title: const Text('Something'),
                     onTap: () {
                       Navigator.pop(context);
                     },
-                  ),
+                  )
                 ],
               ),
             ),
-            Container(
-                // This align moves the children to the bottom
-                child: Align(
-                    alignment: FractionalOffset.bottomCenter,
-                    // This container holds all the children that will be aligned
-                    // on the bottom and should not scroll with the above ListView
-                    child: Container(
-                        child: Column(
-                      children: <Widget>[
-                        ListTile(
-                            leading: Icon(Icons.logout),
-                            title: Text(
-                              AppLocalizations.of(context)!.logout,
-                              style: TextStyle(fontSize: 20),
-                            ),
-                            onTap: () =>
-                                Navigator.pushReplacementNamed(context, '/')),
-                      ],
-                    ))))
+            Align(
+                alignment: FractionalOffset.bottomCenter,
+                // This container holds all the children that will be aligned
+                // on the bottom and should not scroll with the above ListView
+                child: Column(
+                  children: <Widget>[
+                ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: Text(
+                      AppLocalizations.of(context)!.logout,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    onTap: () =>
+                        Navigator.pushReplacementNamed(context, '/')),
+                  ],
+                ))
           ],
         ),
       ),
@@ -268,12 +317,11 @@ class _MyHomePageState extends State<MyHomePage> {
             options: MapOptions(
               center: LatLng(41.17209721775161, -8.611916195059322),
               zoom: 10,
-              maxZoom: 20,
+              maxZoom: 18.499999,
               minZoom: 0,
               onPositionChanged: (position, _) {
                 setState(() {
                   currentZoom = position.zoom!;
-                  print(currentZoom);
                 });
               },
             ),
@@ -283,6 +331,28 @@ class _MyHomePageState extends State<MyHomePage> {
                     'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
                 userAgentPackageName: 'dev.fleaflet.flutter_map.example',
               ),
+              if (currentLatLng != null)
+                AnimatedMarkerLayer(
+                  options: AnimatedMarkerLayerOptions(
+                    duration: const Duration(
+                      milliseconds: 1000,
+                    ),
+                    marker: Marker(
+                      width: 80.0,
+                      height: 80.0,
+                      point: currentLatLng,
+                      builder: (context) => Transform.rotate(
+                        angle: heading * (pi / 180),
+                        child: const Icon(
+                          Icons.navigation,
+                          color: Colors.blue,
+                          size: 30,
+                        ),
+                      ),
+
+                    ),
+                  ),
+                ),
               PolygonLayer(
                 polygonCulling: false,
                 polygons: [
@@ -296,18 +366,24 @@ class _MyHomePageState extends State<MyHomePage> {
               MarkerLayer(
                 markers: shouldShowMarker(currentZoom) ? markers : [],
               ),
+
+              //MarkerLayerOptions(markers: [userMarker]),
+              //flutterMapLocation,
             ]),
       ),
       //],
       //),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        label: Text(
-          AppLocalizations.of(context)!.buildings,
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _mapController.move(currentLatLng, 17);
+        },
+        //label: Text(
+          //AppLocalizations.of(context)!.buildings,
+        //),
         backgroundColor: Colors.black,
+        child: const Icon(Icons.my_location_outlined),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      //floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
