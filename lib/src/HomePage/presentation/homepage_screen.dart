@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:topography_project/src/FormPage/formpage_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
@@ -21,6 +22,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   var scaffoldKey = GlobalKey<ScaffoldState>();
+
   late LatLng savedLocation = LatLng(0.0, 0.0);
   late final MapController _mapController;
   bool showMarker = true;
@@ -30,6 +32,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
     LatLng(41.16909398838012, -8.608095350489625),
     LatLng(41.174702746609, -8.608401561850052)
   ];
+
+  final region = RectangleRegion(
+    LatLngBounds(
+      LatLng(41.169555000318596, -8.622181073069193), // North West
+      LatLng(41.16909398838012, -8.608095350489625), // South East
+    ),
+  );
+
+ /* final downloadable = region.toDownloadable(
+    1, // Minimum Zoom
+    18, // Maximum Zoom
+    TileLayer(
+      urlTemplate: '',
+    ),
+    // Additional Parameters
+  );*/
+
   late SharedPreferences _prefs;
 
   bool isButtonOn = false;
@@ -327,6 +346,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
             ),
             children: [
               TileLayer(
+                tileProvider: FMTC.instance('savedTiles').getTileProvider(),
                 urlTemplate:
                     'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
                 userAgentPackageName: 'dev.fleaflet.flutter_map.example',

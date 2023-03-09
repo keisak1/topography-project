@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topography_project/src/Authentication/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +9,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:topography_project/src/shared/state/download_provider.dart';
 import 'package:topography_project/src/shared/state/general_provider.dart';
-import 'package:path_provider/path_provider.dart';
 
 
 class LocaleProvider extends ChangeNotifier {
@@ -25,19 +24,14 @@ class LocaleProvider extends ChangeNotifier {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final directory = await getApplicationDocumentsDirectory();
-  final path = directory.path;
-
+  await FlutterMapTileCaching.initialise();
+  final store = FlutterMapTileCaching.instance('savedTiles');
+  //store.manage.ready;
+  store.manage.create();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   bool damagedDatabaseDeleted = false;
-  await FlutterMapTileCaching.initialise(
-    rootDirectory: path,
-    errorHandler: (error) => damagedDatabaseDeleted = error.wasFatal,
-    debugMode: true,
-  );
 
-  await FMTC.instance.rootDirectory.migrator.fromV6(urlTemplates: []);
 
 
   runApp(
@@ -58,6 +52,7 @@ class AppContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MultiProvider(
+
           providers: [
             ChangeNotifierProvider<GeneralProvider>(
               create: (context) => GeneralProvider(),
@@ -85,5 +80,6 @@ class AppContainer extends StatelessWidget {
                   onLocaleChange: (newLocale) =>
                       provider.changeLocale(newLocale)),
             );
-          }));
+          })
+  );
 }

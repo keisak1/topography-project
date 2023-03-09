@@ -40,7 +40,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
-  flutter_cache_manager: ^3.1.2
+  flutter_cache_manager: ^3.3.0
   provider: ^5.0.0
   flutter_map: ^3.1.0
   location: ^4.4.0
