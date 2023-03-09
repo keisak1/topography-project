@@ -6,17 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:topography_project/main.dart';
 import 'package:topography_project/src/HomePage/presentation/homepage_screen.dart';
-import '../../shared/state/download_provider.dart';
-import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
 
 class LoginScreen extends StatefulWidget {
   final Locale locale;
   final void Function(Locale? newLocale) onLocaleChange;
-  final bool damagedDatabaseDeleted;
 
   const LoginScreen(
       {Key? key,
-      required this.damagedDatabaseDeleted,
       required this.locale,
       required this.onLocaleChange})
       : super(key: key);

@@ -52,26 +52,37 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _mapController = MapController();
-    WidgetsBinding.instance.addObserver(this);
     downloadZones();
+    WidgetsBinding.instance.addObserver(this);
     initLocationService();
   }
 
-  void downloadZones() async{
+  void downloadZones() async {
     final downloadable = region.toDownloadable(
       15, // Minimum Zoom
       18, // Maximum Zoom
       TileLayer(
         urlTemplate:
-        'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
+            'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
       ),
       seaTileRemoval: true,
       preventRedownload: true,
     );
+
     numbTiles = await FMTC.instance('savedTiles').download.check(downloadable);
-    await FMTC.instance('savedTiles').download.startBackground(region: downloadable);
-    print("Download finished");
+    AndroidResource notificationIcon = AndroidResource(name: 'ic_notification_icon', defType: 'drawable');
+    try {
+      await FMTC
+          .instance('savedTiles')
+          .download
+          .startBackground(region: downloadable, progressNotificationIcon: "@drawable/ic_launcher", backgroundNotificationIcon: notificationIcon
+      );
+      print("Download finished");
+    }catch(e){
+      print(e);
+    }
   }
+
 
   Future<void> _saveData(double? lat, double? longi) async {
     if (lat != null) {
@@ -157,8 +168,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     LatLng currentLatLng;
-    print(numbTiles);
-    print(currentZoom);
+
     if (_currentLocation != null && isButtonOn == true) {
       currentLatLng =
           LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
@@ -198,7 +208,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       ),
     ];
 
-    return Scaffold(
+    return FMTCBackgroundDownload(
+        child: Scaffold(
       key: scaffoldKey,
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
@@ -408,7 +419,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         child: const Icon(Icons.my_location_outlined),
       ),
       //floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
+    ));
   }
 
   double currentZoom = 13;
