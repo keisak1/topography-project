@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
+import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
 import 'package:topography_project/src/FormPage/formpage_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
@@ -8,8 +9,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
 
 class MyHomePage extends StatefulWidget {
   static const String route = '/live_location';
@@ -20,7 +19,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
   late LatLng savedLocation = LatLng(0.0, 0.0);
@@ -35,22 +34,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
 
   final region = RectangleRegion(
     LatLngBounds(
-      LatLng(41.169555000318596, -8.622181073069193), // North West
-      LatLng(41.16909398838012, -8.608095350489625), // South East
+      LatLng(41.17380930243528, -8.613922487178936), // North West
+      LatLng(41.17031240259549, -8.61030686985005), // South East
     ),
   );
 
- /* final downloadable = region.toDownloadable(
-    1, // Minimum Zoom
-    18, // Maximum Zoom
-    TileLayer(
-      urlTemplate: '',
-    ),
-    // Additional Parameters
-  );*/
-
   late SharedPreferences _prefs;
-
+  late int numbTiles = 0;
   bool isButtonOn = false;
 
   LocationData? _currentLocation;
@@ -58,20 +48,32 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   final Location _locationService = Location();
   StreamSubscription<LocationData>? locationSubscription;
 
-
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
-
     WidgetsBinding.instance.addObserver(this);
-
-
+    downloadZones();
     initLocationService();
   }
 
-  Future<void> _saveData(double? lat, double? longi) async {
+  void downloadZones() async{
+    final downloadable = region.toDownloadable(
+      15, // Minimum Zoom
+      18, // Maximum Zoom
+      TileLayer(
+        urlTemplate:
+        'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
+      ),
+      seaTileRemoval: true,
+      preventRedownload: true,
+    );
+    numbTiles = await FMTC.instance('savedTiles').download.check(downloadable);
+    await FMTC.instance('savedTiles').download.startBackground(region: downloadable);
+    print("Download finished");
+  }
 
+  Future<void> _saveData(double? lat, double? longi) async {
     if (lat != null) {
       await _prefs.setDouble('Latitude', lat);
     }
@@ -79,7 +81,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
       await _prefs.setDouble('Longitude', longi);
     }
   }
-
 
   @override
   void dispose() {
@@ -93,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
     if (state == AppLifecycleState.paused) {
       double? lat = _currentLocation!.latitude;
       double? long = _currentLocation?.longitude;
-      _saveData(lat,long); // save data when app is paused
+      _saveData(lat, long); // save data when app is paused
     }
   }
 
@@ -124,30 +125,30 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
     }
 
     if (latitude == null && longitude == null) {
-      _locationService.onLocationChanged.listen((LocationData currentLocation) async {
+      _locationService.onLocationChanged
+          .listen((LocationData currentLocation) async {
         _currentLocation = currentLocation;
         heading = currentLocation.heading!;
         await _prefs.setDouble('latitude', currentLocation.latitude ?? 0.0);
         await _prefs.setDouble('longitude', currentLocation.longitude ?? 0.0);
       });
-    }else{
+    } else {
       savedLocation = LatLng(latitude!, longitude!);
     }
   }
-
 
   void onButtonToggle(int index) {
     setState(() {
       isButtonOn = !isButtonOn;
     });
     if (isButtonOn) {
-      locationSubscription =
-          _locationService.onLocationChanged.listen((LocationData locationData) {
-            setState(() {
-              _currentLocation = locationData;
-              heading = locationData.heading!;
-            });
-          });
+      locationSubscription = _locationService.onLocationChanged
+          .listen((LocationData locationData) {
+        setState(() {
+          _currentLocation = locationData;
+          heading = locationData.heading!;
+        });
+      });
     } else {
       locationSubscription?.cancel();
     }
@@ -156,9 +157,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     LatLng currentLatLng;
-
+    print(numbTiles);
+    print(currentZoom);
     if (_currentLocation != null && isButtonOn == true) {
-      currentLatLng = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
+      currentLatLng =
+          LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
     } else {
       currentLatLng = savedLocation;
     }
@@ -194,7 +197,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
         ),
       ),
     ];
-
 
     return Scaffold(
       key: scaffoldKey,
@@ -248,7 +250,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
             ListTile(
               title: const Text('Zona 1'),
               onTap: () {
-                _mapController.move(LatLng(41.17209721775161, -8.611916195059322), 17);
+                _mapController.move(
+                    LatLng(41.17209721775161, -8.611916195059322), 17);
               },
             ),
             ListTile(
@@ -295,7 +298,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
                               onButtonToggle(index);
                             },
                             children: [
-                              Icon(isButtonOn ? Icons.location_on : Icons.location_off),
+                              Icon(isButtonOn
+                                  ? Icons.location_on
+                                  : Icons.location_off),
                             ],
                           ),
                         ],
@@ -317,14 +322,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
                 // on the bottom and should not scroll with the above ListView
                 child: Column(
                   children: <Widget>[
-                ListTile(
-                    leading: const Icon(Icons.logout),
-                    title: Text(
-                      AppLocalizations.of(context)!.logout,
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    onTap: () =>
-                        Navigator.pushReplacementNamed(context, '/')),
+                    ListTile(
+                        leading: const Icon(Icons.logout),
+                        title: Text(
+                          AppLocalizations.of(context)!.logout,
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        onTap: () =>
+                            Navigator.pushReplacementNamed(context, '/')),
                   ],
                 ))
           ],
@@ -369,7 +374,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
                           size: 30,
                         ),
                       ),
-
                     ),
                   ),
                 ),
@@ -398,7 +402,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
           _mapController.move(currentLatLng, 17);
         },
         //label: Text(
-          //AppLocalizations.of(context)!.buildings,
+        //AppLocalizations.of(context)!.buildings,
         //),
         backgroundColor: Colors.black,
         child: const Icon(Icons.my_location_outlined),
