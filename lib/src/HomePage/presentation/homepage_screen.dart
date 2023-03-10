@@ -52,12 +52,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _mapController = MapController();
-    downloadZones();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
   }
 
-  void downloadZones() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _downloadZones();
+  }
+
+  Future<void> _downloadZones() async {
     final downloadable = region.toDownloadable(
       15, // Minimum Zoom
       18, // Maximum Zoom
@@ -70,19 +75,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
 
     numbTiles = await FMTC.instance('savedTiles').download.check(downloadable);
-    AndroidResource notificationIcon = AndroidResource(name: 'ic_notification_icon', defType: 'drawable');
-    try {
-      await FMTC
-          .instance('savedTiles')
-          .download
-          .startBackground(region: downloadable, progressNotificationIcon: "@drawable/ic_launcher", backgroundNotificationIcon: notificationIcon
-      );
-      print("Download finished");
-    }catch(e){
-      print(e);
-    }
-  }
+    AndroidResource notificationIcon =
+        AndroidResource(name: 'ic_notification_icon', defType: 'drawable');
 
+    await FMTC.instance('savedTiles').download.startBackground(
+        region: downloadable,
+        progressNotificationIcon: "@drawable/ic_launcher",
+        backgroundNotificationIcon: notificationIcon);
+  }
 
   Future<void> _saveData(double? lat, double? longi) async {
     if (lat != null) {
