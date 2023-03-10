@@ -23,7 +23,7 @@ This mobile app is meant to aid the project AI4DRR by sending data (forms and im
     - [x] Rotation
     - [x] Smoothen the animation
 - [ ] Offline Map
-  - [ ] Map predownloaded to Cache
+  - [x] Map predownloaded to Cache
   - [ ] Markers presaved to Cache
 - [ ] API Integration
 - [ ] Multiplatform
