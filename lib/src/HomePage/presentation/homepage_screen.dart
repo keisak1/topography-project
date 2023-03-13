@@ -36,21 +36,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
-    saveMarkers();
-
+    //saveMarkers();
   }
-
-
 
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
     downloadZones();
+
     latitude = prefs.getDouble('latitude')!;
     longitude = prefs.getDouble('longitude')!;
+
     strMarkers = prefs.getString("markers")!;
     Map<String, dynamic> markersMap = jsonDecode(strMarkers);
-    formMarkers(markersMap);
+    markersToJson(markersMap);
   }
 
   @override
@@ -289,7 +288,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ],
               ),
               MarkerLayer(
-                markers: shouldShowMarker(currentZoom) ? savedMarkers : [],
+                markers: shouldShowMarker(currentZoom) ? markers : [],
               ),
 
               //MarkerLayerOptions(markers: [userMarker]),

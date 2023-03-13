@@ -16,7 +16,7 @@ List<LatLng> polygonPoints = [
   LatLng(41.174702746609, -8.608401561850052)
 ];
 String strMarkers = "";
-List<Marker> savedMarkers = [];
+List<Marker> markers = [];
 late SharedPreferences prefs;
 LocationData? currentLocation;
 final Location locationService = Location();
@@ -101,7 +101,7 @@ Future<void> loadPrefs() async {
   prefs = await SharedPreferences.getInstance();
 }
 
-Map<String, dynamic> toJson() {
+Future<void> markersToJson(Map<String, dynamic> savedMarkers) async {
   /***************************************
    *
    *  SUBSTITUIR ISTO POR API CALL PARA
@@ -109,7 +109,7 @@ Map<String, dynamic> toJson() {
    *  MARKER
    *
    ***************************************/
-  final markers = <Marker>[
+  final jsonMarkers = <Marker>[
     Marker(
       width: 80,
       height: 80,
@@ -141,30 +141,23 @@ Map<String, dynamic> toJson() {
     ),
   ];
 
-  List<Map<String, dynamic>> markerList = [];
-  for (Marker marker in markers) {
-    Map<String, dynamic> markerMap = {
-      'latitude': marker.point.latitude, // API LATITUDE
-      'longitude': marker.point.longitude, // API LONGITUDE
-    };
-    markerList.add(markerMap);
+  /*for (Marker marker in jsonMarkers) {
+    bool markersAdded = false;
+    //bool variavel = ... comparar os valores recebidos do json com os valores das shared preferences e dentro verificar se todos os markers existem nos ja guardados
+    //if(!variavel){
+    //  savedMarkers.add(marker);
+    //  markersAdded = true;
+    // }
+    //}
   }
-  return {
-    'markers': markerList,
-  };
-}
 
-Future<void> saveMarkers() async {
+  if(markersAdded){
+    await _prefs.setString('markers', jsonEncode(savedMarkers);
+  }
+   */
 
-}
-
-void formMarkers(Map<String, dynamic> markers){
-  for(var markerData in markers['markers']){
-    bool markerExists = savedMarkers.any(
-            (savedMarker) => savedMarker.point.latitude == markerData['point']['latitude']
-            && savedMarker.point.longitude == markerData['point']['longitude']);
-    if (!markerExists) {
-      savedMarkers.add(Marker(
+  for(var markerData in savedMarkers['markers']){
+    markers.add(Marker(
         width: 20,
         height: 20,
         point: LatLng(markerData['point']['latitude'],
@@ -186,6 +179,5 @@ void formMarkers(Map<String, dynamic> markers){
               ),
             ),
       ));
-    }
   }
 }
