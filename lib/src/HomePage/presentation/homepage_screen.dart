@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
@@ -22,7 +23,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late LatLng savedLocation = LatLng(0.0, 0.0);
+
   late final MapController _mapController;
   bool showMarker = true;
   List<LatLng> polygonPoints = [
@@ -43,10 +44,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late int numbTiles = 0;
   bool isButtonOn = false;
 
+  double? latitude;
+  double? longitude;
+  late LatLng savedLocation = LatLng(0.0, 0.0);
   LocationData? _currentLocation;
   late double heading = 0.0;
   final Location _locationService = Location();
   StreamSubscription<LocationData>? locationSubscription;
+
+  String strMarkers = "";
+  List<Marker> savedMarkers = [];
+  final markers = <Marker>[
+    Marker(
+      width: 80,
+      height: 80,
+      point: LatLng(41.168517, -8.608559),
+      builder: (context) => GestureDetector(
+        onTap: () {
+          // Replace 123 with the actual ID of the marker
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MyFormPage(markerId: 123)));
+        },
+        child: const Icon(
+          Icons.circle,
+          color: Colors.redAccent,
+          size: 20,
+        ),
+      ),
+    ),
+    Marker(
+      width: 80,
+      height: 80,
+      point: LatLng(41.17227747164333, -8.618397446786263),
+      builder: (context) => const Icon(
+        Icons.circle,
+        color: Colors.green,
+        size: 20,
+      ),
+    ),
+  ];
 
   @override
   void initState() {
@@ -54,12 +92,53 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
+    saveMarkers();
   }
 
   @override
-  void didChangeDependencies() {
+  Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
     _downloadZones();
+
+    _prefs = await SharedPreferences.getInstance();
+    latitude = _prefs.getDouble('latitude')!;
+    longitude = _prefs.getDouble('longitude')!;
+
+    strMarkers = _prefs.getString("markers")!;
+    Map<String, dynamic> markersMap = jsonDecode(strMarkers);
+    formMarkers(markersMap);
+  }
+
+  void formMarkers(Map<String, dynamic> markers){
+    for(var markerData in markers['markers']){
+      bool markerExists = savedMarkers.any(
+              (savedMarker) => savedMarker.point.latitude == markerData['point']['latitude']
+                  && savedMarker.point.longitude == markerData['point']['longitude']);
+      if (!markerExists) {
+        savedMarkers.add(Marker(
+          width: 20,
+          height: 20,
+          point: LatLng(markerData['point']['latitude'],
+              markerData['point']['longitude']),
+          builder: (context) =>
+              GestureDetector(
+                onTap: () {
+                  // Replace 123 with the actual ID of the marker
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MyFormPage(markerId: 123)));
+                },
+                child: const Icon(
+                  Icons.circle,
+                  color: Colors.redAccent,
+                  //replace color with the color or specification from API
+                  size: 20,
+                ),
+              ),
+        ));
+      }
+    }
   }
 
   Future<void> _downloadZones() async {
@@ -112,10 +191,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void initLocationService() async {
     bool serviceEnabled;
     PermissionStatus permissionGranted;
-    _prefs = await SharedPreferences.getInstance();
-
-    double? latitude = _prefs.getDouble('Latitude');
-    double? longitude = _prefs.getDouble('Longitude');
 
     serviceEnabled = await _locationService.serviceEnabled();
     if (!serviceEnabled) {
@@ -165,6 +240,43 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
+  Map<String, dynamic> toJson() {
+    List<Map<String, dynamic>> markerList = [];
+    for (Marker marker in markers) {
+      Map<String, dynamic> markerMap = {
+        'latitude': marker.point.latitude,
+        'longitude': marker.point.longitude,
+      };
+      markerList.add(markerMap);
+    }
+    return {
+      'markers': markerList,
+    };
+  }
+
+  Future<void> saveMarkers() async {
+    bool markersAdded = false;
+    for (final Marker marker in markers) {
+      bool markerExists = savedMarkers.any((savedMarker) => savedMarker.point == marker.point);
+      if (!markerExists) {
+        savedMarkers.add(marker);
+        markersAdded = true;
+      }
+    }
+
+    if (markersAdded) {
+      await _prefs.setString('markers', jsonEncode(toJson()));
+    }
+  }
+
+  /*List<Marker> MarkersExist(){
+    if(savedMarkers.isEmpty){
+      return markers;
+    }else{
+      return savedMarkers;
+    }
+  }*/
+
   @override
   Widget build(BuildContext context) {
     LatLng currentLatLng;
@@ -175,38 +287,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     } else {
       currentLatLng = savedLocation;
     }
-
-    final markers = <Marker>[
-      Marker(
-        width: 80,
-        height: 80,
-        point: LatLng(41.168517, -8.608559),
-        builder: (context) => GestureDetector(
-          onTap: () {
-            // Replace 123 with the actual ID of the marker
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => MyFormPage(markerId: 123)));
-          },
-          child: const Icon(
-            Icons.circle,
-            color: Colors.redAccent,
-            size: 20,
-          ),
-        ),
-      ),
-      Marker(
-        width: 80,
-        height: 80,
-        point: LatLng(41.17227747164333, -8.618397446786263),
-        builder: (context) => const Icon(
-          Icons.circle,
-          color: Colors.green,
-          size: 20,
-        ),
-      ),
-    ];
 
     return FMTCBackgroundDownload(
         child: Scaffold(
@@ -399,7 +479,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ],
               ),
               MarkerLayer(
-                markers: shouldShowMarker(currentZoom) ? markers : [],
+                markers: shouldShowMarker(currentZoom) ? savedMarkers : [],
               ),
 
               //MarkerLayerOptions(markers: [userMarker]),
