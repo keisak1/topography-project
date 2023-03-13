@@ -43,13 +43,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
     downloadZones();
-
-    latitude = prefs.getDouble('latitude')!;
-    longitude = prefs.getDouble('longitude')!;
-
-    strMarkers = prefs.getString("markers")!;
-    Map<String, dynamic> markersMap = jsonDecode(strMarkers);
-    markersToJson(markersMap);
   }
 
   @override
@@ -62,9 +55,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.paused) {
-      double? lat = currentLocation!.latitude;
-      double? long = currentLocation?.longitude;
-      saveData(lat, long); // save data when app is paused
+      saveData(currentLocationGlobal!.latitude, currentLocationGlobal?.longitude); // save data when app is paused
     }
   }
 
@@ -77,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       locationSubscription = _locationService.onLocationChanged
           .listen((LocationData locationData) {
         setState(() {
-          currentLocation = locationData;
+          currentLocationGlobal = locationData;
           heading = locationData.heading!;
         });
       });
@@ -90,9 +81,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     LatLng currentLatLng;
 
-    if (currentLocation != null && isButtonOn == true) {
+    if (currentLocationGlobal != null && isButtonOn == true) {
       currentLatLng =
-          LatLng(currentLocation!.latitude!, currentLocation!.longitude!);
+          LatLng(currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
     } else {
       currentLatLng = savedLocation;
     }
