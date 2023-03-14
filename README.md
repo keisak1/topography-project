@@ -11,7 +11,7 @@ Finally, the building footprint from OSM, the estimated structural parameters an
 
 This mobile app is meant to aid the project AI4DRR by sending data (forms and images) with user input to feed the AI.
 
-## To-do list
+## Requeriments
 
 - [ ] Authentication
   - [ ] Admin and User roles
