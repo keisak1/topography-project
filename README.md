@@ -13,8 +13,12 @@ This mobile app is meant to aid the project AI4DRR by sending data (forms and im
 
 ## To-do list
 
-- [x] Authentication
+- [ ] Authentication
+  - [ ] Admin and User roles
+  - [x] Login
 - [x] Localization
+  - [x] Portuguese
+  - [x] English
 - [x] Homepage (Map)
   - [x] Highlighted areas shown/hidden on Zoom
   - [x] Highlighted markers shown/hidden on Zoom
@@ -27,7 +31,10 @@ This mobile app is meant to aid the project AI4DRR by sending data (forms and im
   - [ ] Markers presaved to Cache
 - [ ] API Integration
 - [ ] Multiplatform
-- [ ] Classify objects
+- [ ] Classification form
+  - [ ] Adding filled forms to a favorites list
+  - [ ] Pick favorite forms to fill a different form.
+  - [ ] Share favorite forms to other users 
   - [ ] Saving that classification locally in case there's no internet connection.
 
 ## Packages
