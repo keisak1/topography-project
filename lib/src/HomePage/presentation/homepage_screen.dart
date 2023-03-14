@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
@@ -21,8 +20,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
-
-
+  late bool _isLoading;
   late final MapController _mapController;
   bool showMarker = true;
   bool isButtonOn = false;
@@ -31,6 +29,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    _isLoading = true;
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
     super.initState();
     loadPrefs();
     _mapController = MapController();
@@ -55,10 +59,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.paused) {
-      saveData(currentLocationGlobal!.latitude, currentLocationGlobal?.longitude); // save data when app is paused
+      saveData(currentLocationGlobal!.latitude,
+          currentLocationGlobal?.longitude); // save data when app is paused
     }
   }
-
 
   void onButtonToggle(int index) {
     setState(() {
@@ -73,7 +77,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         });
       });
     } else {
-      savedLocation = LatLng(currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
+      savedLocation = LatLng(
+          currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
       locationSubscription?.cancel();
     }
   }
@@ -83,9 +88,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     LatLng currentLatLng;
 
     if (currentLocationGlobal != null && isButtonOn == true) {
-      currentLatLng =
-          LatLng(currentLocationGlobal!.latitude!,
-              currentLocationGlobal!.longitude!);
+      currentLatLng = LatLng(
+          currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
+
+      currentLatLng = LatLng(
+          currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
     } else {
       currentLatLng = savedLocation;
     }
@@ -228,66 +235,75 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           ],
         ),
       ),
-      body: Center(
-        child: FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              center: LatLng(41.17209721775161, -8.611916195059322),
-              zoom: 10,
-              maxZoom: 18.499999,
-              minZoom: 0,
-              onPositionChanged: (position, _) {
-                setState(() {
-                  currentZoom = position.zoom!;
-                });
-              },
-            ),
-            children: [
-              TileLayer(
-                tileProvider: FMTC.instance('savedTiles').getTileProvider(),
-                urlTemplate:
-                    'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
-                userAgentPackageName: 'dev.fleaflet.flutter_map.example',
-              ),
-              if (currentLatLng != null)
-                AnimatedMarkerLayer(
-                  options: AnimatedMarkerLayerOptions(
-                    duration: const Duration(
-                      milliseconds: 1000,
-                    ),
-                    marker: Marker(
-                      width: 80.0,
-                      height: 80.0,
-                      point: currentLatLng,
-                      builder: (context) => Transform.rotate(
-                        angle: heading * (pi / 180),
-                        child: const Icon(
-                          Icons.navigation,
-                          color: Colors.blue,
-                          size: 30,
-                        ),
-                      ),
-                    ),
+      body: Stack(
+        children: [
+          _isLoading
+              ? Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(child: CircularProgressIndicator()))
+              : FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    center: LatLng(41.17209721775161, -8.611916195059322),
+                    zoom: 10,
+                    maxZoom: 18.499999,
+                    minZoom: 0,
+                    onPositionChanged: (position, _) {
+                      setState(() {
+                        currentZoom = position.zoom!;
+                      });
+                    },
                   ),
-                ),
-              PolygonLayer(
-                polygonCulling: false,
-                polygons: [
-                  Polygon(
-                      points: polygonPoints,
-                      color: Colors.redAccent.withOpacity(0.5),
-                      isFilled: shouldHideHighlight(currentZoom),
-                      isDotted: false),
-                ],
-              ),
-              MarkerLayer(
-                markers: shouldShowMarker(currentZoom) ? markers : [],
-              ),
+                  children: [
+                      TileLayer(
+                        tileProvider:
+                            FMTC.instance('savedTiles').getTileProvider(),
+                        urlTemplate:
+                            'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
+                        userAgentPackageName:
+                            'dev.fleaflet.flutter_map.example',
+                      ),
+                      if (currentLatLng != null)
+                        AnimatedMarkerLayer(
+                          options: AnimatedMarkerLayerOptions(
+                            duration: const Duration(
+                              milliseconds: 1000,
+                            ),
+                            marker: Marker(
+                              width: 80.0,
+                              height: 80.0,
+                              point: currentLatLng,
+                              builder: (context) => Transform.rotate(
+                                angle: heading * (pi / 180),
+                                child: const Icon(
+                                  Icons.navigation,
+                                  color: Colors.blue,
+                                  size: 30,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      PolygonLayer(
+                        polygonCulling: false,
+                        polygons: [
+                          Polygon(
+                              points: polygonPoints,
+                              color: Colors.redAccent.withOpacity(0.5),
+                              isFilled: shouldHideHighlight(currentZoom),
+                              isDotted: false),
+                        ],
+                      ),
+                      MarkerLayer(
+                        markers: shouldShowMarker(currentZoom) ? markers : [],
+                      ),
 
-              //MarkerLayerOptions(markers: [userMarker]),
-              //flutterMapLocation,
-            ]),
+                      //MarkerLayerOptions(markers: [userMarker]),
+                      //flutterMapLocation,
+                    ])
+        ],
       ),
+
       //],
       //),
       floatingActionButton: FloatingActionButton(
