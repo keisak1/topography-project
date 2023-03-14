@@ -13,6 +13,7 @@ This mobile app is meant to aid the project AI4DRR by sending data (forms and im
 
 ## Requeriments
 
+- [ ] Configuration file with zoom, center and server
 - [ ] Authentication
   - [ ] Admin and User roles
   - [x] Login
