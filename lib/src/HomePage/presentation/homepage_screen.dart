@@ -73,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         });
       });
     } else {
+      savedLocation = LatLng(currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
       locationSubscription?.cancel();
     }
   }
@@ -83,7 +84,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     if (currentLocationGlobal != null && isButtonOn == true) {
       currentLatLng =
-          LatLng(currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
+          LatLng(currentLocationGlobal!.latitude!,
+              currentLocationGlobal!.longitude!);
     } else {
       currentLatLng = savedLocation;
     }
