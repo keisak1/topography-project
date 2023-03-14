@@ -1,14 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
-import 'package:topography_project/src/FormPage/formpage_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../application/homepage_utilities.dart';
 
 class MyHomePage extends StatefulWidget {
   static const String route = '/live_location';
@@ -22,75 +22,27 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late LatLng savedLocation = LatLng(0.0, 0.0);
+
   late final MapController _mapController;
   bool showMarker = true;
-  List<LatLng> polygonPoints = [
-    LatLng(41.169555000318596, -8.622181073069193),
-    LatLng(41.16586681398453, -8.615138211779408),
-    LatLng(41.16909398838012, -8.608095350489625),
-    LatLng(41.174702746609, -8.608401561850052)
-  ];
-
-  final region = RectangleRegion(
-    LatLngBounds(
-      LatLng(41.17380930243528, -8.613922487178936), // North West
-      LatLng(41.17031240259549, -8.61030686985005), // South East
-    ),
-  );
-
-  late SharedPreferences _prefs;
-  late int numbTiles = 0;
   bool isButtonOn = false;
-
-  LocationData? _currentLocation;
-  late double heading = 0.0;
   final Location _locationService = Location();
   StreamSubscription<LocationData>? locationSubscription;
 
   @override
   void initState() {
     super.initState();
+    loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
+    //saveMarkers();
   }
 
   @override
-  void didChangeDependencies() {
+  Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
-    _downloadZones();
-  }
-
-  Future<void> _downloadZones() async {
-    final downloadable = region.toDownloadable(
-      15, // Minimum Zoom
-      18, // Maximum Zoom
-      TileLayer(
-        urlTemplate:
-            'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
-      ),
-      seaTileRemoval: true,
-      preventRedownload: true,
-    );
-
-    numbTiles = await FMTC.instance('savedTiles').download.check(downloadable);
-    AndroidResource notificationIcon =
-        AndroidResource(name: 'ic_notification_icon', defType: 'drawable');
-
-    await FMTC.instance('savedTiles').download.startBackground(
-        region: downloadable,
-        progressNotificationIcon: "@drawable/ic_launcher",
-        backgroundNotificationIcon: notificationIcon);
-  }
-
-  Future<void> _saveData(double? lat, double? longi) async {
-    if (lat != null) {
-      await _prefs.setDouble('Latitude', lat);
-    }
-    if (longi != null) {
-      await _prefs.setDouble('Longitude', longi);
-    }
+    downloadZones();
   }
 
   @override
@@ -103,50 +55,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.paused) {
-      double? lat = _currentLocation!.latitude;
-      double? long = _currentLocation?.longitude;
-      _saveData(lat, long); // save data when app is paused
+      saveData(currentLocationGlobal!.latitude, currentLocationGlobal?.longitude); // save data when app is paused
     }
   }
 
-  void initLocationService() async {
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-    _prefs = await SharedPreferences.getInstance();
-
-    double? latitude = _prefs.getDouble('Latitude');
-    double? longitude = _prefs.getDouble('Longitude');
-
-    serviceEnabled = await _locationService.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _locationService.requestService();
-      if (!serviceEnabled) {
-        // Location services are not enabled on the device.
-        return;
-      }
-    }
-
-    permissionGranted = await _locationService.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _locationService.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        // Location permission not granted.
-        return;
-      }
-    }
-
-    if (latitude == null && longitude == null) {
-      _locationService.onLocationChanged
-          .listen((LocationData currentLocation) async {
-        _currentLocation = currentLocation;
-        heading = currentLocation.heading!;
-        await _prefs.setDouble('latitude', currentLocation.latitude ?? 0.0);
-        await _prefs.setDouble('longitude', currentLocation.longitude ?? 0.0);
-      });
-    } else {
-      savedLocation = LatLng(latitude!, longitude!);
-    }
-  }
 
   void onButtonToggle(int index) {
     setState(() {
@@ -156,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       locationSubscription = _locationService.onLocationChanged
           .listen((LocationData locationData) {
         setState(() {
-          _currentLocation = locationData;
+          currentLocationGlobal = locationData;
           heading = locationData.heading!;
         });
       });
@@ -169,44 +81,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     LatLng currentLatLng;
 
-    if (_currentLocation != null && isButtonOn == true) {
+    if (currentLocationGlobal != null && isButtonOn == true) {
       currentLatLng =
-          LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
+          LatLng(currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
     } else {
       currentLatLng = savedLocation;
     }
-
-    final markers = <Marker>[
-      Marker(
-        width: 80,
-        height: 80,
-        point: LatLng(41.168517, -8.608559),
-        builder: (context) => GestureDetector(
-          onTap: () {
-            // Replace 123 with the actual ID of the marker
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => MyFormPage(markerId: 123)));
-          },
-          child: const Icon(
-            Icons.circle,
-            color: Colors.redAccent,
-            size: 20,
-          ),
-        ),
-      ),
-      Marker(
-        width: 80,
-        height: 80,
-        point: LatLng(41.17227747164333, -8.618397446786263),
-        builder: (context) => const Icon(
-          Icons.circle,
-          color: Colors.green,
-          size: 20,
-        ),
-      ),
-    ];
 
     return FMTCBackgroundDownload(
         child: Scaffold(
