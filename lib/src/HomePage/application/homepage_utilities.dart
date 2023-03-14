@@ -103,8 +103,10 @@ Future<void> loadPrefs() async {
     longitude = prefs.getDouble('longitude')!;
   }
   savedLocation = LatLng(latitude!, longitude!);
-  Map<String, dynamic> markersMap = jsonDecode(strMarkers);
-  markersToJson(markersMap);
+  if(strMarkers != "") {
+    Map<String, dynamic> markersMap = jsonDecode(strMarkers);
+    markersToJson(markersMap);
+  }
   print("SAVED LOCATION : ");
   print(savedLocation.latitude);
 }
