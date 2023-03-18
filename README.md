@@ -28,16 +28,16 @@ This mobile app is meant to aid the project AI4DRR by sending data (forms and im
     - [x] Rotation
     - [x] Smoothen the animation
   - [ ] Route to closest Marker
-- [ ] Offline Map
+- [x] Offline Map
   - [x] Map predownloaded to Cache
-  - [ ] Markers presaved to Cache
+  - [x] Markers presaved to Cache
 - [ ] API Integration
 - [ ] Multiplatform
 - [ ] Classification form
-  - [ ] Adding filled forms to a favorites list
-  - [ ] Pick favorite forms to fill a different form.
+  - [x] Adding filled forms to a favorites list
+  - [ x Pick favorite forms to fill a different form.
   - [ ] Share favorite forms to other users 
-  - [ ] Saving that classification locally in case there's no internet connection.
+  - [x] Saving that classification locally in case there's no internet connection.
 
 ## Packages
   ### Localization
