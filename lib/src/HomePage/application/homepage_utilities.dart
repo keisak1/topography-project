@@ -9,6 +9,10 @@ import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../FormPage/application/form_request.dart';
 import '../../FormPage/presentation/formpage_screen.dart';
+import 'package:topography_project/Models/Project.dart';
+import 'package:topography_project/Models/Zone.dart';
+import '../../../Models/User.dart';
+import 'package:http/http.dart' as http;
 
 List<LatLng> polygonPoints = [
   LatLng(41.169555000318596, -8.622181073069193),
@@ -25,6 +29,8 @@ double? latitude;
 double? longitude;
 double heading = 0.0;
 LatLng savedLocation = LatLng(0.0, 0.0);
+
+
 
 final region = RectangleRegion(
   LatLngBounds(
@@ -165,7 +171,7 @@ Future<void> markersToJson(Map<String, dynamic> savedMarkers) async {
   if(markersAdded){
     await _prefs.setString('markers', jsonEncode(savedMarkers);
   }
-   */
+
 
   for (var markerData in savedMarkers['markers']) {
     markers.add(Marker(
@@ -189,5 +195,93 @@ Future<void> markersToJson(Map<String, dynamic> savedMarkers) async {
         ),
       ),
     ));
-  }
+  }*/
+}
+
+Future<User> fetchUser() async {
+  /*final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/user/1'));
+
+  if (response.statusCode == 200) {
+    return User.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to load user');
+  }*/
+  Zone zone1 = const Zone(name: "Zone 1", centerLat: 38.74032, centerLong: -9.13785, zoom: 13, form: 1);
+  Zone zone2 = const Zone(name: "Zone 2", centerLat: 38.756931, centerLong: -9.15358, zoom: 13, form: 1);
+  List<Zone> zones = [];
+  zones.add(zone1);
+  zones.add(zone2);
+
+  Project project1 = Project(name: "Areeiro", zones: zones);
+  Project project2 = Project(name: "Alvalade", zones: zones);
+
+  List<Project> projects = [];
+  projects.add(project1);
+  projects.add(project2);
+
+  User user = User(name: "Nicolis Earthfield", projects: projects);
+  return user;
+}
+
+Future<Project> fetchProject() async {
+  /*var connectivityResult = await (Connectivity().checkConnectivity());
+
+  if (connectivityResult == ConnectivityResult.none) {
+    // no internet connection, load data from shared preferences
+    List<dynamic> projectsData = prefs.getStringList('projects');
+    if (projectsData != null) {
+      List<Project> projects = projectsData.map((data) => Project.fromJson(jsonDecode(data))).toList();
+      return projects;
+    }
+    return null;
+  } else {
+    // internet connection available, load data from API
+    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/projects/1'));
+    if (response.statusCode == 200) {
+      List<Project> projects = Project.fromJson(jsonDecode(response.body));
+      List<String> projectsData = projects.map((project) => jsonEncode(project.toJson())).toList();
+      await prefs.setStringList('projects', projectsData);
+      return projects;
+    } else {
+      throw Exception('Failed to load project');
+    }
+    return null;
+  }*/
+  Zone zone1 = const Zone(name: "Zone 1", centerLat: 38.74032, centerLong: -9.13785, zoom: 13, form: 1);
+  Zone zone2 = const Zone(name: "Zone 2", centerLat: 38.756931, centerLong: -9.15358, zoom: 13, form: 1);
+  List<Zone> zones = [];
+  zones.add(zone1);
+  zones.add(zone2);
+
+  Project project = Project(name: "Areeiro", zones: zones);
+  return project;
+}
+
+Future<Zone> fetchZone() async {
+  /*var connectivityResult = await (Connectivity().checkConnectivity());
+
+  if (connectivityResult == ConnectivityResult.none) {
+    // no internet connection, load data from shared preferences
+    List<dynamic> zonesData = prefs.getStringList('zones');
+    if (projectsData != null) {
+      List<Zone> zones = zonesData.map((data) => Zone.fromJson(jsonDecode(data))).toList();
+      return zones;
+    }
+    return null;
+  } else {
+    // internet connection available, load data from API
+    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/zones/1'));
+    if (response.statusCode == 200) {
+      List<Zone> zones = Zone.fromJson(jsonDecode(response.body));
+      List<String> zonesData = zones.map((zone) => jsonEncode(zone.toJson())).toList();
+      await prefs.setStringList('zones', zonesData);
+      return zones;
+    } else {
+      throw Exception('Failed to load project');
+    }
+    return null;
+  }*/
+
+  Zone zone = const Zone(name: "Areeiro", centerLat: 38.74032, centerLong: -9.13785, zoom: 13, form: 1);
+  return zone;
 }
