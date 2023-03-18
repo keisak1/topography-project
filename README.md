@@ -35,7 +35,7 @@ This mobile app is meant to aid the project AI4DRR by sending data (forms and im
 - [ ] Multiplatform
 - [ ] Classification form
   - [x] Adding filled forms to a favorites list
-  - [ x Pick favorite forms to fill a different form.
+  - [x] Pick favorite forms to fill a different form.
   - [ ] Share favorite forms to other users 
   - [x] Saving that classification locally in case there's no internet connection.
 
