@@ -9,7 +9,7 @@
   "failedTitle": "Bad credentials",
   "failed1": "Your email/password are wrong.",
   "failed2": "Please fill in your credentials again.",
-  "zones": "Zones",
+  "projects": "Projects",
   "settings": "Settings",
   "buildings": "Nearest Buildings"
 }

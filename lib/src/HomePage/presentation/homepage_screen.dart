@@ -8,6 +8,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'dart:async';
+import '../../../Models/Project.dart';
+import '../../../Models/User.dart';
+import '../../../Models/Zone.dart';
 import '../application/homepage_utilities.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -29,14 +32,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final Location _locationService = Location();
   StreamSubscription<LocationData>? locationSubscription;
 
+  late Future<Project> project;
+  late Future<User> user;
+  late Future<Zone> zone;
+
   @override
   void initState() {
     super.initState();
+    user = fetchUser();
+    project = fetchProject();
+    zone = fetchZone();
     loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
-    //saveMarkers();
   }
 
   @override
@@ -130,29 +139,54 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           elevation: 0.0),
       drawer: Drawer(
         child: ListView(
-          children: [
+          children: <Widget>[
             DrawerHeader(
               decoration: const BoxDecoration(
                 color: Colors.black,
+                image: DecorationImage(
+                    image: AssetImage("./lib/resources/topographic_regions1.png"),
+                    fit: BoxFit.cover
+                )
               ),
               child: Text(
-                AppLocalizations.of(context)!.zones,
+                AppLocalizations.of(context)!.projects,
                 style: const TextStyle(color: Colors.white, fontSize: 20),
               ), //dar add ao file |10n
             ),
-            ListTile(
+            FutureBuilder<User>(
+              future: user,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final user = snapshot.data!;
+                  return Column(
+                    children: user.projects.map((project) {
+                      return ExpansionTile(
+                        title: Text(project.name),
+                        children: project.zones.map((zone) {
+                          return ListTile(
+                            title: Text(zone.name),
+                            onTap: () {
+                              _mapController.move(LatLng(zone.centerLat, zone.centerLong), zone.zoom);
+                            },
+                          );
+                        }).toList(),
+                      );
+                    }).toList(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error loading user data');
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+            /*ListTile(
               title: const Text('Zona 1'),
               onTap: () {
                 _mapController.move(
                     LatLng(41.17209721775161, -8.611916195059322), 17);
               },
-            ),
-            ListTile(
-              title: const Text('Zona 2'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
+            ),*/
           ],
         ),
       ),
@@ -164,7 +198,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 children: <Widget>[
                   DrawerHeader(
                     decoration: const BoxDecoration(
-                      color: Colors.black,
+                        color: Colors.black,
+                        image: DecorationImage(
+                            image: AssetImage("./lib/resources/topographic_regions1.png"),
+                            fit: BoxFit.cover
+                        )
                     ),
                     child: Text(
                       AppLocalizations.of(context)!.settings,
