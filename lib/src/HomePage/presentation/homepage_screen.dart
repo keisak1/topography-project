@@ -7,6 +7,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'dart:async';
+import '../../FormPage/application/form_request.dart';
+import '../../FormPage/presentation/formpage_screen.dart';
 import '../application/homepage_utilities.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -295,7 +297,28 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         ],
                       ),
                       MarkerLayer(
-                        markers: shouldShowMarker(currentZoom) ? markers : [],
+                        markers: [ Marker(
+                          width: 80,
+                          height: 80,
+                          point: LatLng(41.168517, -8.608559),
+                          builder: (context) => GestureDetector(
+                            onTap: () {
+                              // Replace 123 with the actual ID of the marker
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DynamicForm(questions: questions)));
+                            },
+                            child: const Icon(
+                              Icons.circle,
+                              color: Colors.redAccent,
+                              size: 20,
+                            ),
+                          ),
+                        )]
+                        /**
+                         * //shouldShowMarker(currentZoom) ? markers : [],
+                         */
                       ),
 
                       //MarkerLayerOptions(markers: [userMarker]),

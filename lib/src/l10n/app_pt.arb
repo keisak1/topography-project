@@ -11,5 +11,16 @@
   "failed2": "Por favor, preencha novamente as suas credenciais.",
   "zones": "Zonas",
   "settings": "Definições",
-  "buildings": "Edifícios mais próximos"
+  "buildings": "Edifícios mais próximos",
+  "submit": "Enviar",
+  "locally": "Guardar localmente",
+  "fetchError": "Erro ao buscar formulários salvos",
+  "savedForms": "Formulários Guardados",
+  "form" : "Formulário",
+  "fieldRequired" : "Campo necessário",
+  "valueBetween": "Insira um valor entre",
+  "and": "e",
+  "savedLocally": "Formulário guardado localmente como"
+
+
 }

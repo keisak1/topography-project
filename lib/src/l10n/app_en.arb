@@ -11,5 +11,15 @@
   "failed2": "Please fill in your credentials again.",
   "zones": "Zones",
   "settings": "Settings",
-  "buildings": "Nearest Buildings"
+  "buildings": "Nearest Buildings",
+  "submit": "Submit",
+  "locally": "Save locally",
+  "fetchError": "Error fetching saved forms",
+  "savedForms": "Saved Forms",
+  "form" : "Form",
+  "fieldRequired" : "This field is required",
+  "valueBetween": "Please enter a value between",
+  "and": "and",
+  "savedLocally": "'Form saved locally as"
+
 }

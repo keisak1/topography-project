@@ -7,7 +7,8 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../FormPage/formpage_screen.dart';
+import '../../FormPage/application/form_request.dart';
+import '../../FormPage/presentation/formpage_screen.dart';
 
 List<LatLng> polygonPoints = [
   LatLng(41.169555000318596, -8.622181073069193),
@@ -130,7 +131,7 @@ Future<void> markersToJson(Map<String, dynamic> savedMarkers) async {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => MyFormPage(markerId: 123)));
+                  builder: (context) => DynamicForm(questions: questions)));
         },
         child: const Icon(
           Icons.circle,
@@ -178,7 +179,7 @@ Future<void> markersToJson(Map<String, dynamic> savedMarkers) async {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => MyFormPage(markerId: 123)));
+                  builder: (context) => DynamicForm(questions: questions)));
         },
         child: const Icon(
           Icons.circle,

@@ -48,6 +48,7 @@ dependencies:
   flutter_map_animated_marker: ^1.0.1
   flutter_map_tile_caching: ^7.2.0
   fmtc_plus_background_downloading: ^7.0.0
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:
