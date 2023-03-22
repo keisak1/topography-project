@@ -20,6 +20,6 @@
   "fieldRequired" : "This field is required",
   "valueBetween": "Please enter a value between",
   "and": "and",
-  "savedLocally": "'Form saved locally as"
-
+  "savedLocally": "'Form saved locally as",
+  "locallySavedMarkers": "Locally saved markers"
 }

@@ -6,6 +6,7 @@ import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarkers.dart';
 import 'dart:async';
 import '../../FormPage/application/form_request.dart';
 import '../../FormPage/presentation/formpage_screen.dart';
@@ -147,57 +148,74 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           backgroundColor: Colors.transparent,
           elevation: 0.0),
       drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.black,
-                image: DecorationImage(
-                    image: AssetImage("./lib/resources/topographic_regions1.png"),
-                    fit: BoxFit.cover
-                )
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.projects,
-                style: const TextStyle(color: Colors.white, fontSize: 20),
-              ), //dar add ao file |10n
-            ),
-            FutureBuilder<User>(
-              future: user,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final user = snapshot.data!;
-                  return Column(
-                    children: user.projects.map((project) {
-                      return ExpansionTile(
-                        title: Text(project.name),
-                        children: project.zones.map((zone) {
-                          return ListTile(
-                            title: Text(zone.name),
-                            onTap: () {
-                              _mapController.move(LatLng(zone.centerLat, zone.centerLong), zone.zoom);
-                            },
+        child: Column(
+          children: [
+            Expanded(child: ListView(
+              children: <Widget>[
+                DrawerHeader(
+                  decoration: const BoxDecoration(
+                      color: Colors.black,
+                      image: DecorationImage(
+                          image: AssetImage("./lib/resources/topographic_regions1.png"),
+                          fit: BoxFit.cover
+                      )
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.projects,
+                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                  ), //dar add ao file |10n
+                ),
+                FutureBuilder<User>(
+                  future: user,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final user = snapshot.data!;
+                      return Column(
+                        children: user.projects.map((project) {
+                          return ExpansionTile(
+                            title: Text(project.name),
+                            children: project.zones.map((zone) {
+                              return ListTile(
+                                title: Text(zone.name),
+                                onTap: () {
+                                  _mapController.move(LatLng(zone.centerLat, zone.centerLong), zone.zoom);
+                                },
+                              );
+                            }).toList(),
                           );
                         }).toList(),
                       );
-                    }).toList(),
-                  );
-                } else if (snapshot.hasError) {
-                  return Text('Error loading user data');
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-            /*ListTile(
-              title: const Text('Zona 1'),
-              onTap: () {
-                _mapController.move(
-                    LatLng(41.17209721775161, -8.611916195059322), 17);
-              },
-            ),*/
+                    } else if (snapshot.hasError) {
+                      return Text('Error loading user data');
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+
+              ],
+            ),),
+            Align(
+                alignment: FractionalOffset.bottomCenter,
+                // This container holds all the children that will be aligned
+                // on the bottom and should not scroll with the above ListView
+                child: Column(
+                  children: <Widget>[
+                    ListTile(
+                        leading: const Icon(Icons.cloud_upload),
+                        title: Text(
+                          AppLocalizations.of(context)!.locallySavedMarkers,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        onTap: () =>
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => locallySavedMarkers()),
+                            )),
+                  ],
+                ))
           ],
-        ),
+        )
       ),
       endDrawer: Drawer(
         child: Column(
@@ -227,11 +245,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           Text(
                             isButtonOn ? 'GPS On' : 'GPS Off',
                             style: const TextStyle(
-                              fontSize: 20.0,
+                              fontSize: 14,
                               //fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 8.0),
+                          //const SizedBox(height: 8.0),
                           ToggleButtons(
                             isSelected: [isButtonOn],
                             onPressed: (int index) {
@@ -252,7 +270,37 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                  )
+                  ),
+                  /*Row(children: [
+                    SizedBox(width: 240),
+                    // add some spacing between text and button
+                    TextButton(
+                      onPressed: () async {
+                        if (Provider.of<LocaleProvider>(context,
+                            listen: false)
+                            .locale
+                            .toString() ==
+                            'en_EN') {
+                          _changeLocale(Locale('pt', 'PT'));
+                        } else if (Provider.of<LocaleProvider>(context,
+                            listen: false)
+                            .locale
+                            .toString() ==
+                            'pt_PT') {
+                          _changeLocale(Locale('en', 'EN'));
+                        }
+                        await AppLocalizations.delegate.load(
+                            Provider.of<LocaleProvider>(context,
+                                listen: false)
+                                .locale);
+                        setState(() {});
+                      },
+                      child: Text(
+                        AppLocalizations.of(context)!.language,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ]),*/
                 ],
               ),
             ),
@@ -266,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         leading: const Icon(Icons.logout),
                         title: Text(
                           AppLocalizations.of(context)!.logout,
-                          style: const TextStyle(fontSize: 20),
+                          style: const TextStyle(fontSize: 14),
                         ),
                         onTap: () =>
                             Navigator.pushReplacementNamed(context, '/')),

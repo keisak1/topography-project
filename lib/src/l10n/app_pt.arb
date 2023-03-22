@@ -20,7 +20,6 @@
   "fieldRequired" : "Campo necessário",
   "valueBetween": "Insira um valor entre",
   "and": "e",
-  "savedLocally": "Formulário guardado localmente como"
-
-
+  "savedLocally": "Formulário guardado localmente como",
+  "locallySavedMarkers": "Marcadores guardados localmente"
 }
