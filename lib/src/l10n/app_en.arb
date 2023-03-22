@@ -11,5 +11,6 @@
   "failed2": "Please fill in your credentials again.",
   "projects": "Projects",
   "settings": "Settings",
-  "buildings": "Nearest Buildings"
+  "buildings": "Nearest Buildings",
+  "locallySavedMarkers": "Locally saved markers"
 }

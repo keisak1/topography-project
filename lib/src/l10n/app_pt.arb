@@ -11,5 +11,6 @@
   "failed2": "Por favor, preencha novamente as suas credenciais.",
   "projects": "Projetos",
   "settings": "Definições",
-  "buildings": "Edifícios mais próximos"
+  "buildings": "Edifícios mais próximos",
+  "locallySavedMarkers": "Marcadores guardados localmente"
 }
