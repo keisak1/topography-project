@@ -1,10 +1,11 @@
 import 'dart:convert';
-
+import 'dart:io';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topography_project/src/FormPage/presentation/widgets/save_form_popup.dart';
-
+import 'package:image_picker/image_picker.dart';
 import 'widgets/dynamic_translation.dart';
 
 class Question {
@@ -22,7 +23,6 @@ class Question {
     this.range = const [],
   });
 }
-
 class DynamicForm extends StatefulWidget {
   final List<Question> questions;
 
@@ -33,6 +33,11 @@ class DynamicForm extends StatefulWidget {
 }
 
 class _DynamicFormState extends State<DynamicForm> {
+  XFile? _imageFile;
+  XFile? _imageFile1;
+  XFile? _imageFile2;
+
+  final ImagePicker _picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
   Map<int, dynamic> _formValues = {};
 
@@ -47,6 +52,7 @@ class _DynamicFormState extends State<DynamicForm> {
       }
     }
   }
+
 
   Future<void> _saveFormLocally(String name, Map<int, dynamic> formData) async {
     // convert form data to Map<String, dynamic>
@@ -303,31 +309,37 @@ class _DynamicFormState extends State<DynamicForm> {
                     child: _buildQuestion(question),
                   ),
                 ),
+                image(),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                  if(_imageFile != null) Image(image: FileImage(File(_imageFile!.path)), height: 90,width: 50,),
+                  if(_imageFile1 != null) Image(image: FileImage(File(_imageFile1!.path)), height: 90,width: 50,),
+                  if(_imageFile2 != null) Image(image: FileImage(File(_imageFile2!.path)), height: 90,width: 50,),
+                ],),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // SEND DATA TO THE SERVER
-                            // OR SAVE LOCALLY
-                            print(_formValues);
+                            if(await checkInternetConnectivity()) {
+                              /**
+                               * SEND TO THE API IF IT HAS INTERNET
+                               *
+                               */
+                              print(_formValues);
+                            }else{
+                              /**
+                               *  SAVE LOCALLY IF IT DOESN'T HAVE INTERNET
+                               *
+                               */
+                            }
                           }
                         },
                         child: Text(AppLocalizations.of(context)!.submit),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // SAVE FORM LOCALLY
-                          if (_formKey.currentState!.validate()) {
-                            // SEND DATA TO THE SERVER
-                            // OR SAVE LOCALLY
-                            print(_formValues[3]);
-                          }
-                        },
-                        child: Text(AppLocalizations.of(context)!.locally),
                       ),
                     ],
                   ),
@@ -339,4 +351,63 @@ class _DynamicFormState extends State<DynamicForm> {
       ),
     );
   }
+
+  Widget image(){
+    return Column(
+      children:  <Widget>[
+        const Text("Image 1"),
+      GestureDetector(
+        onTap: () {
+          takePhoto(ImageSource.camera);
+        },
+        child: const Icon(Icons.camera_alt, color: Colors.teal, size: 28.0,),
+        ),
+        const Text("Image 2"),
+
+        GestureDetector(
+          onTap: () {
+            takePhoto1(ImageSource.camera);
+          },
+          child: const Icon(Icons.camera_alt, color: Colors.teal, size: 28.0,),
+        ),
+        const Text("Image 3"),
+        GestureDetector(
+          onTap: () {
+            takePhoto2(ImageSource.camera);
+          },
+          child: const Icon(Icons.camera_alt, color: Colors.teal, size: 28.0,),
+        ),
+      ]
+    );
+  }
+
+  void takePhoto(ImageSource source) async{
+    final pickedFile = await _picker.pickImage(source: source);
+    setState(() {
+      _imageFile = pickedFile!;
+    });
+  }
+
+  void takePhoto1(ImageSource source) async{
+    final pickedFile = await _picker.pickImage(source: source);
+    setState(() {
+      _imageFile1 = pickedFile!;
+    });
+  }
+
+  void takePhoto2(ImageSource source) async{
+    final pickedFile = await _picker.pickImage(source: source);
+    setState(() {
+      _imageFile2 = pickedFile!;
+    });
+  }
+  Future<bool> checkInternetConnectivity() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }
+

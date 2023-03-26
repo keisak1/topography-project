@@ -273,36 +273,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       Navigator.pop(context);
                     },
                   ),
-                  /*Row(children: [
-                    SizedBox(width: 240),
-                    // add some spacing between text and button
-                    TextButton(
-                      onPressed: () async {
-                        if (Provider.of<LocaleProvider>(context,
-                            listen: false)
-                            .locale
-                            .toString() ==
-                            'en_EN') {
-                          _changeLocale(Locale('pt', 'PT'));
-                        } else if (Provider.of<LocaleProvider>(context,
-                            listen: false)
-                            .locale
-                            .toString() ==
-                            'pt_PT') {
-                          _changeLocale(Locale('en', 'EN'));
-                        }
-                        await AppLocalizations.delegate.load(
-                            Provider.of<LocaleProvider>(context,
-                                listen: false)
-                                .locale);
-                        setState(() {});
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.language,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ]),*/
                 ],
               ),
             ),
@@ -325,27 +295,26 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           ],
         ),
       ),
-      body: Stack(
-        children: [
-          _isLoading
-              ? Container(
-                  color: Colors.black.withOpacity(0.5),
-                  child: const Center(child: CircularProgressIndicator()))
-              : FlutterMap(
-                  mapController: _mapController,
-                  options: MapOptions(
-                    center: LatLng(41.17209721775161, -8.611916195059322),
-                    zoom: 10,
-                    maxZoom: 18.499999,
-                    minZoom: 0,
-                    onPositionChanged: (position, _) {
-                      setState(() {
-                        currentZoom = position.zoom!;
-
-                      });
-                    },
-                  ),
-                  children: [
+      body: _isLoading
+          ? Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(child: CircularProgressIndicator()))
+          : Stack(
+              children: [
+                FlutterMap(
+                    mapController: _mapController,
+                    options: MapOptions(
+                      center: LatLng(41.17209721775161, -8.611916195059322),
+                      zoom: 10,
+                      maxZoom: 18.499999,
+                      minZoom: 0,
+                      onPositionChanged: (position, _) {
+                        setState(() {
+                          currentZoom = position.zoom!;
+                        });
+                      },
+                    ),
+                    children: [
                       TileLayer(
                         tileProvider:
                             FMTC.instance('savedTiles').getTileProvider(),
@@ -415,31 +384,33 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       //MarkerLayerOptions(markers: [userMarker]),
                       //flutterMapLocation,
                     ]),
-
-          ClosestMarkerWidget(userLocation: currentLatLng, markers: [
-            Marker(
-              width: 80,
-              height: 80,
-              point: LatLng(41.168517, -8.608559),
-              builder: (context) => GestureDetector(
-                onTap: () {
-                  // Replace 123 with the actual ID of the marker
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              DynamicForm(questions: questions)));
-                },
-                child: const Icon(
-                  Icons.circle,
-                  color: Colors.redAccent,
-                  size: 20,
+                ClosestMarkerWidget(
+                  userLocation: currentLatLng,
+                  markers: [
+                    Marker(
+                      width: 80,
+                      height: 80,
+                      point: LatLng(41.168517, -8.608559),
+                      builder: (context) => GestureDetector(
+                        onTap: () {
+                          // Replace 123 with the actual ID of the marker
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      DynamicForm(questions: questions)));
+                        },
+                        child: const Icon(
+                          Icons.circle,
+                          color: Colors.redAccent,
+                          size: 20,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              ),
-            )
-          ],),
-        ],
-      ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _mapController.move(currentLatLng, 17);
