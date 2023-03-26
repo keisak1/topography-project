@@ -5,6 +5,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topography_project/src/FormPage/presentation/widgets/save_form_popup.dart';
 
+import 'widgets/dynamic_translation.dart';
+
 class Question {
   final int qid;
   final String label;
@@ -112,7 +114,7 @@ class _DynamicFormState extends State<DynamicForm> {
               (item) => DropdownMenuItem<String>(
                 key: UniqueKey(),
                 value: item['value'],
-                child: Text(item['value']),
+                child: Text(getLocalizedValue(item['value'], context)),
               ),
             )
             .toList();
@@ -125,12 +127,13 @@ class _DynamicFormState extends State<DynamicForm> {
             });
           },
           decoration: InputDecoration(
-            labelText: question.label,
+            labelText: getLocalizedLabel(question.label, context),
             border: const OutlineInputBorder(),
           ),
         );
       case "largetext":
-        final controller = TextEditingController(text: _formValues[question.qid].toString());
+        final controller =
+            TextEditingController(text: _formValues[question.qid].toString());
         return TextFormField(
           controller: controller,
           maxLines: null,
@@ -140,7 +143,22 @@ class _DynamicFormState extends State<DynamicForm> {
             });
           },
           decoration: InputDecoration(
-            labelText: question.label,
+            labelText: getLocalizedLabel(question.label, context),
+            border: const OutlineInputBorder(),
+          ),
+        );
+      case "smalltext":
+        final controller =
+            TextEditingController(text: _formValues[question.qid].toString());
+        return TextFormField(
+          controller: controller,
+          onChanged: (value) {
+            setState(() {
+              _formValues[question.qid] = value;
+            });
+          },
+          decoration: InputDecoration(
+            labelText: getLocalizedLabel(question.label, context),
             border: const OutlineInputBorder(),
           ),
         );
@@ -157,7 +175,7 @@ class _DynamicFormState extends State<DynamicForm> {
             });
           },
           decoration: InputDecoration(
-            labelText: question.label,
+            labelText: getLocalizedLabel(question.label, context),
             border: const OutlineInputBorder(),
           ),
           validator: (value) {
@@ -168,7 +186,10 @@ class _DynamicFormState extends State<DynamicForm> {
             if (intVal == null ||
                 intVal < question.range[0] ||
                 intVal > question.range[1]) {
-              return AppLocalizations.of(context)!.valueBetween + '${question.range[0]}' + AppLocalizations.of(context)!.and + '${question.range[1]}';
+              return AppLocalizations.of(context)!.valueBetween +
+                  '${question.range[0]}' +
+                  AppLocalizations.of(context)!.and +
+                  '${question.range[1]}';
             }
             return null;
           },
@@ -188,8 +209,8 @@ class _DynamicFormState extends State<DynamicForm> {
         actions: [
           IconButton(
             icon: _isFavorite
-                ? Icon(Icons.star, color: Colors.yellow)
-                : Icon(Icons.star_border),
+                ? const Icon(Icons.star, color: Colors.yellow)
+                : const Icon(Icons.star_border),
             onPressed: () {
               setState(() {
                 _isFavorite = !_isFavorite;
@@ -202,7 +223,9 @@ class _DynamicFormState extends State<DynamicForm> {
                         setState(() {});
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(AppLocalizations.of(context)!.savedLocally + '$value'),
+                            content: Text(
+                                AppLocalizations.of(context)!.savedLocally +
+                                    value),
                           ),
                         );
                       },
@@ -242,7 +265,7 @@ class _DynamicFormState extends State<DynamicForm> {
                             Navigator.of(context).pop();
                           },
                           trailing: IconButton(
-                            icon: Icon(Icons.delete),
+                            icon: const Icon(Icons.delete),
                             onPressed: () {
                               _deleteSavedForm(form['name']);
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -259,7 +282,7 @@ class _DynamicFormState extends State<DynamicForm> {
                   } else if (snapshot.hasError) {
                     return Text(AppLocalizations.of(context)!.fetchError);
                   } else {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                 },
               ),
