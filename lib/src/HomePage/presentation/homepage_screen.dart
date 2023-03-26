@@ -6,6 +6,7 @@ import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'package:topography_project/src/HomePage/presentation/widgets/distance_direction.dart';
 import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarkers.dart';
 import 'dart:async';
 import '../../FormPage/application/form_request.dart';
@@ -148,18 +149,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           backgroundColor: Colors.transparent,
           elevation: 0.0),
       drawer: Drawer(
-        child: Column(
-          children: [
-            Expanded(child: ListView(
+          child: Column(
+        children: [
+          Expanded(
+            child: ListView(
               children: <Widget>[
                 DrawerHeader(
                   decoration: const BoxDecoration(
                       color: Colors.black,
                       image: DecorationImage(
-                          image: AssetImage("./lib/resources/topographic_regions1.png"),
-                          fit: BoxFit.cover
-                      )
-                  ),
+                          image: AssetImage(
+                              "./lib/resources/topographic_regions1.png"),
+                          fit: BoxFit.cover)),
                   child: Text(
                     AppLocalizations.of(context)!.projects,
                     style: const TextStyle(color: Colors.white, fontSize: 20),
@@ -178,7 +179,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               return ListTile(
                                 title: Text(zone.name),
                                 onTap: () {
-                                  _mapController.move(LatLng(zone.centerLat, zone.centerLong), zone.zoom);
+                                  _mapController.move(
+                                      LatLng(zone.centerLat, zone.centerLong),
+                                      zone.zoom);
                                 },
                               );
                             }).toList(),
@@ -186,37 +189,37 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         }).toList(),
                       );
                     } else if (snapshot.hasError) {
-                      return Text('Error loading user data');
+                      return const Text('Error loading user data');
                     } else {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
                   },
                 ),
-
               ],
-            ),),
-            Align(
-                alignment: FractionalOffset.bottomCenter,
-                // This container holds all the children that will be aligned
-                // on the bottom and should not scroll with the above ListView
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                        leading: const Icon(Icons.cloud_upload),
-                        title: Text(
-                          AppLocalizations.of(context)!.locallySavedMarkers,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        onTap: () =>
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => locallySavedMarkers()),
-                            )),
-                  ],
-                ))
-          ],
-        )
-      ),
+            ),
+          ),
+          Align(
+              alignment: FractionalOffset.bottomCenter,
+              // This container holds all the children that will be aligned
+              // on the bottom and should not scroll with the above ListView
+              child: Column(
+                children: <Widget>[
+                  ListTile(
+                      leading: const Icon(Icons.cloud_upload),
+                      title: Text(
+                        AppLocalizations.of(context)!.locallySavedMarkers,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      onTap: () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const locallySavedMarkers()),
+                          )),
+                ],
+              ))
+        ],
+      )),
       endDrawer: Drawer(
         child: Column(
           children: [
@@ -227,10 +230,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     decoration: const BoxDecoration(
                         color: Colors.black,
                         image: DecorationImage(
-                            image: AssetImage("./lib/resources/topographic_regions1.png"),
-                            fit: BoxFit.cover
-                        )
-                    ),
+                            image: AssetImage(
+                                "./lib/resources/topographic_regions1.png"),
+                            fit: BoxFit.cover)),
                     child: Text(
                       AppLocalizations.of(context)!.settings,
                       style: const TextStyle(color: Colors.white, fontSize: 20),
@@ -339,6 +341,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     onPositionChanged: (position, _) {
                       setState(() {
                         currentZoom = position.zoom!;
+
                       });
                     },
                   ),
@@ -382,8 +385,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               isDotted: false),
                         ],
                       ),
-                      MarkerLayer(
-                        markers: [ Marker(
+                      MarkerLayer(markers: [
+                        Marker(
                           width: 80,
                           height: 80,
                           point: LatLng(41.168517, -8.608559),
@@ -393,7 +396,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => DynamicForm(questions: questions)));
+                                      builder: (context) =>
+                                          DynamicForm(questions: questions)));
                             },
                             child: const Icon(
                               Icons.circle,
@@ -401,20 +405,41 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               size: 20,
                             ),
                           ),
-                        )]
-                        /**
-                         * //shouldShowMarker(currentZoom) ? markers : [],
-                         */
-                      ),
+                        )
+                      ]
+                          /**
+                       * //shouldShowMarker(currentZoom) ? markers : [],
+                       */
+                          ),
 
                       //MarkerLayerOptions(markers: [userMarker]),
                       //flutterMapLocation,
-                    ])
+                    ]),
+
+          ClosestMarkerWidget(userLocation: currentLatLng, markers: [
+            Marker(
+              width: 80,
+              height: 80,
+              point: LatLng(41.168517, -8.608559),
+              builder: (context) => GestureDetector(
+                onTap: () {
+                  // Replace 123 with the actual ID of the marker
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              DynamicForm(questions: questions)));
+                },
+                child: const Icon(
+                  Icons.circle,
+                  color: Colors.redAccent,
+                  size: 20,
+                ),
+              ),
+            )
+          ],),
         ],
       ),
-
-      //],
-      //),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _mapController.move(currentLatLng, 17);

@@ -71,5 +71,6 @@
   "flat": "Flat",
   "inclined_ceramic": "Inclined ceramic",
   "inclined_sandwich": "Inclined sandwich",
-  "oth": "other"
+  "oth": "other",
+  "close": "Closest building within:"
 }

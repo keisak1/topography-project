@@ -71,5 +71,7 @@
   "flat": "Plano",
   "inclined_ceramic": "Inclinado cerâmico",
   "inclined_sandwich": "Inclinado sanduíche",
-  "oth": "Outro"
+  "oth": "Outro",
+  "close": "Edíficio mais próximo a:"
+
 }
