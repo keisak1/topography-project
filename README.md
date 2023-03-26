@@ -20,14 +20,14 @@ This mobile app is meant to aid the project AI4DRR by sending data (forms and im
 - [x] Localization
   - [x] Portuguese
   - [x] English
-- [ ] Homepage (Map)
+- [x] Homepage (Map)
   - [x] Highlighted areas shown/hidden on Zoom
   - [x] Highlighted markers shown/hidden on Zoom
   - [x] Clickable Markers
   - [x] GPS
     - [x] Rotation
     - [x] Smoothen the animation
-  - [ ] Route to closest Marker
+  - [x] Route to closest Marker
 - [x] Offline Map
   - [x] Map predownloaded to Cache
   - [x] Markers presaved to Cache
