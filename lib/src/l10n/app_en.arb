@@ -72,5 +72,9 @@
   "inclined_ceramic": "Inclined ceramic",
   "inclined_sandwich": "Inclined sandwich",
   "oth": "other",
-  "close": "Closest building within:"
+  "close": "Closest building within:",
+  "gallery": "Gallery",
+  "camera": "Camera",
+  "images": "Select Images",
+  "selectOne": "Please select at least one image."
 }

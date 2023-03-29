@@ -137,7 +137,7 @@ Future<void> markersToJson(Map<String, dynamic> savedMarkers) async {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DynamicForm(questions: questions)));
+                  builder: (context) => DynamicForm(marker: 1, questions: questions)));
         },
         child: const Icon(
           Icons.circle,

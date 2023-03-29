@@ -23,21 +23,21 @@ class Question {
     this.range = const [],
   });
 }
+
 class DynamicForm extends StatefulWidget {
   final List<Question> questions;
+  final int marker;
 
-  const DynamicForm({super.key, required this.questions});
+  const DynamicForm({super.key, required this.questions, required this.marker});
 
   @override
   _DynamicFormState createState() => _DynamicFormState();
 }
 
 class _DynamicFormState extends State<DynamicForm> {
-  XFile? _imageFile;
-  XFile? _imageFile1;
-  XFile? _imageFile2;
+  List<XFile> _imageFiles = [];
+  List<Widget> _imageWidgets = [];
 
-  final ImagePicker _picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
   Map<int, dynamic> _formValues = {};
 
@@ -54,7 +54,26 @@ class _DynamicFormState extends State<DynamicForm> {
   }
 
 
-  Future<void> _saveFormLocally(String name, Map<int, dynamic> formData) async {
+  Future<void> _saveFormLocally(String markerID, Map<int, dynamic> formData, List<XFile> imageFiles) async {
+    // convert form data to Map<String, dynamic>
+    final Map<String, dynamic> data = {};
+    formData.forEach((key, value) {
+      data[key.toString()] = value;
+    });
+
+    // save the form data, image file paths, and the given name to the shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    final forms = prefs.getStringList('localForm') ?? [];
+    forms.add(markerID);
+    await prefs.setStringList('localForm', forms);
+    await prefs.setString(markerID, json.encode(data));
+
+    // save image file paths
+    final imagePaths = imageFiles.map((file) => file.path).toList();
+    await prefs.setStringList('${markerID}_images', imagePaths);
+  }
+
+  Future<void> _addToFavorites(String name, Map<int, dynamic> formData) async {
     // convert form data to Map<String, dynamic>
     final Map<String, dynamic> data = {};
     formData.forEach((key, value) {
@@ -225,7 +244,7 @@ class _DynamicFormState extends State<DynamicForm> {
                     context: context,
                     builder: (context) => SaveFormPopup(
                       onConfirm: (String value) {
-                        _saveFormLocally(value, _formValues);
+                        _addToFavorites(value, _formValues);
                         setState(() {});
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -309,14 +328,18 @@ class _DynamicFormState extends State<DynamicForm> {
                     child: _buildQuestion(question),
                   ),
                 ),
-                image(),
-                Row(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                  if(_imageFile != null) Image(image: FileImage(File(_imageFile!.path)), height: 90,width: 50,),
-                  if(_imageFile1 != null) Image(image: FileImage(File(_imageFile1!.path)), height: 90,width: 50,),
-                  if(_imageFile2 != null) Image(image: FileImage(File(_imageFile2!.path)), height: 90,width: 50,),
-                ],),
+                    ElevatedButton(
+                      onPressed: () async {
+                        _showBottomSheet();
+                      },
+                      child: Text(AppLocalizations.of(context)!.images),
+                    ),
+                  ],
+                ),
+                showImage(),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -324,18 +347,25 @@ class _DynamicFormState extends State<DynamicForm> {
                     children: [
                       ElevatedButton(
                         onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            if(await checkInternetConnectivity()) {
-                              /**
-                               * SEND TO THE API IF IT HAS INTERNET
-                               *
-                               */
-                              print(_formValues);
-                            }else{
-                              /**
-                               *  SAVE LOCALLY IF IT DOESN'T HAVE INTERNET
-                               *
-                               */
+                          if (_imageFiles.isEmpty) {
+
+                          } else {
+                            if (_formKey.currentState!.validate()) {
+                              if (await checkInternetConnectivity()) {
+                                /**
+                                 * SEND TO THE API IF IT HAS INTERNET
+                                 *
+                                 */
+                                print(_formValues);
+                              } else {
+
+                                _saveFormLocally(widget.marker.toString(), _formValues, _imageFiles);
+                                print(_formValues);
+                                /**
+                                 *  SAVE LOCALLY IF IT DOESN'T HAVE INTERNET
+                                 *
+                                 */
+                              }
                             }
                           }
                         },
@@ -352,55 +382,87 @@ class _DynamicFormState extends State<DynamicForm> {
     );
   }
 
-  Widget image(){
-    return Column(
-      children:  <Widget>[
-        const Text("Image 1"),
-      GestureDetector(
-        onTap: () {
-          takePhoto(ImageSource.camera);
-        },
-        child: const Icon(Icons.camera_alt, color: Colors.teal, size: 28.0,),
-        ),
-        const Text("Image 2"),
+  Widget showImage() {
+    if (_imageFiles.isEmpty) {
+      return Text(AppLocalizations.of(context)!.selectOne);
+    } else {
+      return Container(margin: const EdgeInsets.symmetric(horizontal: 100)  , height: 80,
+        child: Row(children: [
+              ..._imageWidgets,
+            ]),
+      );
+    }
+  }
 
-        GestureDetector(
-          onTap: () {
-            takePhoto1(ImageSource.camera);
-          },
-          child: const Icon(Icons.camera_alt, color: Colors.teal, size: 28.0,),
-        ),
-        const Text("Image 3"),
-        GestureDetector(
-          onTap: () {
-            takePhoto2(ImageSource.camera);
-          },
-          child: const Icon(Icons.camera_alt, color: Colors.teal, size: 28.0,),
-        ),
-      ]
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 90.0,
+          color: Colors.black.withOpacity(0.8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                onPressed: pickImageGallery,
+                icon: const Icon(
+                  Icons.photo_library,
+                  color: Colors.white,
+                  size: 60,
+                ),
+                tooltip: AppLocalizations.of(context)!.gallery,
+              ),
+              IconButton(
+                onPressed: pickImageCam,
+                icon: const Icon(
+                  Icons.camera_alt_rounded,
+                  color: Colors.white,
+                  size: 60,
+                ),
+                tooltip: AppLocalizations.of(context)!.camera,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  void takePhoto(ImageSource source) async{
-    final pickedFile = await _picker.pickImage(source: source);
-    setState(() {
-      _imageFile = pickedFile!;
-    });
+  pickImageGallery() async {
+    List<XFile> images = [];
+    final picker = ImagePicker();
+    for (int i = 0; i < 3; i++) {
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) break;
+      images.add(pickedFile);
+    }
+    if (images != null) {
+      setState(() {
+        _imageFiles = images;
+        _imageWidgets =
+            _imageFiles.map((image) => Image.file(File(image.path))).toList();
+      });
+    }
   }
 
-  void takePhoto1(ImageSource source) async{
-    final pickedFile = await _picker.pickImage(source: source);
-    setState(() {
-      _imageFile1 = pickedFile!;
-    });
+  pickImageCam() async {
+    List<XFile> images = [];
+    final picker = ImagePicker();
+    for (int i = 0; i < 3; i++) {
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      if (pickedFile == null) break;
+      images.add(pickedFile);
+    }
+    if (images != null) {
+      setState(() {
+        _imageFiles = images;
+        _imageWidgets =
+            _imageFiles.map((image) => Image.file(File(image.path))).toList();
+      });
+    }
   }
 
-  void takePhoto2(ImageSource source) async{
-    final pickedFile = await _picker.pickImage(source: source);
-    setState(() {
-      _imageFile2 = pickedFile!;
-    });
-  }
   Future<bool> checkInternetConnectivity() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
@@ -410,4 +472,3 @@ class _DynamicFormState extends State<DynamicForm> {
     }
   }
 }
-
