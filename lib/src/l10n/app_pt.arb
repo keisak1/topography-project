@@ -72,6 +72,13 @@
   "inclined_ceramic": "Inclinado cerâmico",
   "inclined_sandwich": "Inclinado sanduíche",
   "oth": "Outro",
-  "close": "Edíficio mais próximo a:"
+  "close": "Edíficio mais próximo a:",
+  "gallery": "Galeria",
+  "camera": "Câmara",
+  "images": "Selecionar Imagens",
+  "selectOne": "Escolha pelo menos uma imagem.",
+  "noInternet": "Formulário guardado localmente (Sem ligação à Internet)",
+  "selectDelete": "Itens eliminados"
+
 
 }

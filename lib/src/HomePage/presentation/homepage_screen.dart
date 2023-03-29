@@ -216,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         AppLocalizations.of(context)!.locallySavedMarkers,
                         style: const TextStyle(fontSize: 14),
                       ),
-                      onTap: () => Navigator.pushReplacement(
+                      onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
@@ -371,8 +371,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          DynamicForm(questions: questions)));
+                                      builder: (context) => DynamicForm(
+                                          // TODO: CHECK WHICH FORM IT HAS TO USE 
+                                          marker: 1 /*ID DO MARKER*/,
+                                          questions: questions)));
                             },
                             child: const Icon(
                               Icons.circle,
@@ -403,8 +405,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      DynamicForm(questions: questions)));
+                                  builder: (context) => DynamicForm(
+                                      marker: 1, questions: questions)));
                         },
                         child: const Icon(
                           Icons.circle,
