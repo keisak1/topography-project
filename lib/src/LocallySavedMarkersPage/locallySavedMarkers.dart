@@ -11,8 +11,9 @@ class MarkerData {
   String markerID;
   List<String> imagePaths;
   Map<String, dynamic> formData;
+  DateTime date;
 
-  MarkerData(this.markerID, this.imagePaths, this.formData);
+  MarkerData(this.markerID, this.imagePaths, this.formData, this.date);
 }
 
 class locallySavedMarkers extends StatefulWidget {
@@ -39,8 +40,9 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
       final formDataJson = prefs.getString(markerID);
       final formData = json.decode(formDataJson!);
       final imagePaths = prefs.getStringList('${markerID}_images');
-
-      final markerData = MarkerData(markerID, imagePaths!, formData);
+      final dateInt = prefs.getInt('${markerID}_date');
+      DateTime dt = DateTime.fromMillisecondsSinceEpoch(dateInt!);
+      final markerData = MarkerData(markerID, imagePaths!, formData, dt);
       markers.add(markerData);
       print(markers);
     }
@@ -53,7 +55,7 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
     // delete the form data and image file paths for the given marker ID
     await prefs.remove(markerID);
     await prefs.remove('${markerID}_images');
-
+    await prefs.remove('${markerID}_date');
     // remove the marker ID from the list of local forms
     final forms = prefs.getStringList('localForm') ?? [];
     forms.remove(markerID);
@@ -180,9 +182,9 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                       style: const TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
                   subtitle: Row(
-                    children: const <Widget>[
-                      Icon(Icons.linear_scale, color: Colors.yellowAccent),
-                      Text('Placeholder',
+                    children:  <Widget>[
+                      Icon(Icons.watch_later_outlined, color: Colors.yellowAccent),
+                      Text(' ${markerData.date.year}/${markerData.date.month}/${markerData.date.day} ${markerData.date.hour}:${markerData.date.minute}',
                           style: TextStyle(color: Colors.white)),
                     ],
                   ),

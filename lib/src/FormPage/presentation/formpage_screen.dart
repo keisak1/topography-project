@@ -71,6 +71,8 @@ class _DynamicFormState extends State<DynamicForm> {
       // save image file paths
       final imagePaths = imageFiles.map((file) => file.path).toList();
       await prefs.setStringList('${markerID}_images', imagePaths);
+
+      await prefs.setInt('${markerID}_date', DateTime.now().millisecondsSinceEpoch);
     } else {
       forms.add(markerID);
       await prefs.setStringList('localForm', forms);
@@ -79,6 +81,9 @@ class _DynamicFormState extends State<DynamicForm> {
       // save image file paths
       final imagePaths = imageFiles.map((file) => file.path).toList();
       await prefs.setStringList('${markerID}_images', imagePaths);
+      // save date
+      await prefs.setInt('${markerID}_date', DateTime.now().millisecondsSinceEpoch);
+
     }
   }
 
