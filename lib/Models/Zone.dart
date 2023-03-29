@@ -1,33 +1,38 @@
+import 'Bbox.dart';
+
 class Zone {
-  final String name;
+  final int id;
+  final String zoneLabel;
   final double centerLat;
   final double centerLong;
-  final double zoom;
-  final int form;
+  final List<Bbox> bbox;
 
   const Zone({
-    required this.name,
+    required this.id,
+    required this.zoneLabel,
     required this.centerLat,
     required this.centerLong,
-    required this.zoom,
-    required this.form,
+    required this.bbox,
   });
 
   factory Zone.fromJson(Map<String, dynamic> json){
+    final List<dynamic> bboxJson = json['bbox'] ?? [];
+    final List<Bbox> bbox = bboxJson.map((e) => Bbox.fromJson(e)).toList();
+
     return Zone(
-        name: json['name'],
+        id: json['id'],
+        zoneLabel: json['zone_label'],
         centerLat: json['center_lat'],
-        centerLong: json['center_long'],
-        zoom: json['zoom'],
-        form: json['form']
+        centerLong: json['center_lng'],
+        bbox: bbox,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'name': name,
-    'centerLat': centerLat,
-    'centerLong': centerLong,
-    'zoom': zoom,
-    'form': form,
+    'id': id,
+    'zone_label': zoneLabel,
+    'center_lat': centerLat,
+    'center_lng': centerLong,
+    'bbox': bbox.map((bbox) => bbox.toJson()).toList(),
   };
 }
