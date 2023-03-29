@@ -123,7 +123,7 @@ Future<void> fillMarkers(List<Markers> markersToFill) async {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DynamicForm(questions: questions)));
+                  builder: (context) => DynamicForm(questions: questions, marker: 1,)));
         },
         child: const Icon(
           Icons.circle,
@@ -138,7 +138,6 @@ Future<void> fillMarkers(List<Markers> markersToFill) async {
 
 Future<void> fetchMarkers() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
-
   if (connectivityResult == ConnectivityResult.none) {
     List<dynamic>? markersData = prefs.getStringList('markers');
     if (markersData != null) {

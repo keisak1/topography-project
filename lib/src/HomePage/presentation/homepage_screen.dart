@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late Future<Zone> zone;
 
   @override
-  Future<void> initState() async {
+  void initState() {
     _isLoading = true;
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
@@ -50,11 +50,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     user = fetchUser();
     project = fetchProject();
     zone = fetchZone();
-    await fetchMarkers();
+    initialize();
     loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
+  }
+
+  Future<void> initialize() async {
+    await fetchMarkers();
   }
 
   @override
@@ -152,83 +156,104 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       drawer: Drawer(
           backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
           child: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              children: <Widget>[
-                DrawerHeader(
-                  decoration: const BoxDecoration(
-                      color: Colors.white,
-                      image: DecorationImage(
-                          image: AssetImage(
-                              "./lib/resources/topographic_regions1.png"),
-                          fit: BoxFit.cover)),
-                  child: Text(
-                    AppLocalizations.of(context)!.projects,
-                    style: const TextStyle(color: Colors.white, fontSize: 20),
-                  ), //dar add ao file |10n
-                ),
-                FutureBuilder<User>(
-                  future: user,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final user = snapshot.data!;
-                      return Column(
-                        children: user.projects.map((project) {
-                          if (project.zones.isEmpty) {
-                            return ListTile(
-                              title: Text(project.name),
-                              onTap: () {
-                                _mapController.move(LatLng(project.centerLat, project.centerLong), project.zoom);
-                              },
-                            );
-                          } else {
-                            return ExpansionTile(
-                              title: Text(project.name),
-                              children: project.zones.map((zone) {
+            children: [
+              Expanded(
+                child: ListView(
+                  children: <Widget>[
+                    DrawerHeader(
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          image: DecorationImage(
+                              image: AssetImage(
+                                  "./lib/resources/topographic_regions1.png"),
+                              fit: BoxFit.cover)),
+                      child: Text(
+                        AppLocalizations.of(context)!.projects,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 20),
+                      ), //dar add ao file |10n
+                    ),
+                    FutureBuilder<User>(
+                      future: user,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          final user = snapshot.data!;
+                          return Column(
+                            children: user.projects.map((project) {
+                              if (project.zones.isEmpty) {
                                 return ListTile(
-                                  title: Text(zone.zoneLabel),
+                                  title: Text(
+                                    project.name,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
                                   onTap: () {
-                                    _mapController.move(LatLng(zone.centerLat, zone.centerLong), project.zoom);
+                                    _mapController.move(
+                                        LatLng(project.centerLat,
+                                            project.centerLong),
+                                        project.zoom);
                                   },
                                 );
-                              }).toList(),
-                            );
-                          }
-                        }).toList(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return const Text('Error loading user data');
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  },
+                              } else {
+                                return ExpansionTile(
+                                  backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                                  collapsedIconColor: Colors.white,
+                                  title: Text(project.name,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                  children: project.zones.map((zone) {
+                                    return ListTile(
+                                      title: Text(zone.zoneLabel,
+                                          style: const TextStyle(
+                                              color: Colors.white)),
+                                      onTap: () {
+                                        _mapController.move(
+                                            LatLng(zone.centerLat,
+                                                zone.centerLong),
+                                            project.zoom);
+                                      },
+                                    );
+                                  }).toList(),
+                                );
+                              }
+                            }).toList(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return const Text('Error loading user data');
+                        } else {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          Align(
-              alignment: FractionalOffset.bottomCenter,
-              // This container holds all the children that will be aligned
-              // on the bottom and should not scroll with the above ListView
-              child: Column(
-                children: <Widget>[
-                  ListTile(
-                      leading: const Icon(Icons.cloud_upload, color: Colors.white,),
-                      title: Text(
-                        AppLocalizations.of(context)!.locallySavedMarkers,
-                        style: const TextStyle(fontSize: 14, color: Colors.white),
-                      ),
-                      onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const locallySavedMarkers()),
-                          )),
-                ],
-              ))
-        ],
-      )),
+              ),
+              Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  // This container holds all the children that will be aligned
+                  // on the bottom and should not scroll with the above ListView
+                  child: Column(
+                    children: <Widget>[
+                      ListTile(
+                          leading: const Icon(
+                            Icons.cloud_upload,
+                            color: Colors.white,
+                          ),
+                          title: Text(
+                            AppLocalizations.of(context)!.locallySavedMarkers,
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.white),
+                          ),
+                          onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const locallySavedMarkers()),
+                              )),
+                    ],
+                  ))
+            ],
+          )),
       endDrawer: Drawer(
         backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
         child: Column(
@@ -256,7 +281,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         children: <Widget>[
                           Text(
                             isButtonOn ? 'GPS On' : 'GPS Off',
-                            style: const TextStyle(color: Colors.white,
+                            style: const TextStyle(
+                              color: Colors.white,
                               fontSize: 14,
                               //fontWeight: FontWeight.bold,
                             ),
@@ -268,9 +294,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               onButtonToggle(index);
                             },
                             children: [
-                              Icon(isButtonOn
-                                  ? Icons.location_on
-                                  : Icons.location_off, color: Colors.white,),
+                              Icon(
+                                isButtonOn
+                                    ? Icons.location_on
+                                    : Icons.location_off,
+                                color: Colors.white,
+                              ),
                             ],
                           ),
                         ],
@@ -293,10 +322,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 child: Column(
                   children: <Widget>[
                     ListTile(
-                        leading: const Icon(Icons.logout, color: Colors.white,),
+                        leading: const Icon(
+                          Icons.logout,
+                          color: Colors.white,
+                        ),
                         title: Text(
                           AppLocalizations.of(context)!.logout,
-                          style: const TextStyle(fontSize: 14, color: Colors.white),
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.white),
                         ),
                         onTap: () =>
                             Navigator.pushReplacementNamed(context, '/')),
@@ -376,7 +409,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DynamicForm(
-                                          // TODO: CHECK WHICH FORM IT HAS TO USE 
+                                          // TODO: CHECK WHICH FORM IT HAS TO USE
                                           marker: 1 /*ID DO MARKER*/,
                                           questions: questions)));
                             },
