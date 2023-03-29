@@ -53,8 +53,8 @@ class _DynamicFormState extends State<DynamicForm> {
     }
   }
 
-
-  Future<void> _saveFormLocally(String markerID, Map<int, dynamic> formData, List<XFile> imageFiles) async {
+  Future<void> _saveFormLocally(String markerID, Map<int, dynamic> formData,
+      List<XFile> imageFiles) async {
     // convert form data to Map<String, dynamic>
     final Map<String, dynamic> data = {};
     formData.forEach((key, value) {
@@ -64,13 +64,22 @@ class _DynamicFormState extends State<DynamicForm> {
     // save the form data, image file paths, and the given name to the shared preferences
     final prefs = await SharedPreferences.getInstance();
     final forms = prefs.getStringList('localForm') ?? [];
-    forms.add(markerID);
-    await prefs.setStringList('localForm', forms);
-    await prefs.setString(markerID, json.encode(data));
+    if (forms.contains(markerID)) {
+      await prefs.setStringList('localForm', forms);
+      await prefs.setString(markerID, json.encode(data));
 
-    // save image file paths
-    final imagePaths = imageFiles.map((file) => file.path).toList();
-    await prefs.setStringList('${markerID}_images', imagePaths);
+      // save image file paths
+      final imagePaths = imageFiles.map((file) => file.path).toList();
+      await prefs.setStringList('${markerID}_images', imagePaths);
+    } else {
+      forms.add(markerID);
+      await prefs.setStringList('localForm', forms);
+      await prefs.setString(markerID, json.encode(data));
+
+      // save image file paths
+      final imagePaths = imageFiles.map((file) => file.path).toList();
+      await prefs.setStringList('${markerID}_images', imagePaths);
+    }
   }
 
   Future<void> _addToFavorites(String name, Map<int, dynamic> formData) async {
@@ -230,6 +239,7 @@ class _DynamicFormState extends State<DynamicForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: Text(AppLocalizations.of(context)!.form),
         actions: [
           IconButton(
@@ -348,7 +358,6 @@ class _DynamicFormState extends State<DynamicForm> {
                       ElevatedButton(
                         onPressed: () async {
                           if (_imageFiles.isEmpty) {
-
                           } else {
                             if (_formKey.currentState!.validate()) {
                               if (await checkInternetConnectivity()) {
@@ -358,8 +367,15 @@ class _DynamicFormState extends State<DynamicForm> {
                                  */
                                 print(_formValues);
                               } else {
-
-                                _saveFormLocally(widget.marker.toString(), _formValues, _imageFiles);
+                                _saveFormLocally(widget.marker.toString(),
+                                    _formValues, _imageFiles);
+                                Navigator.of(context).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(AppLocalizations.of(context)!
+                                        .noInternet),
+                                  ),
+                                );
                                 print(_formValues);
                                 /**
                                  *  SAVE LOCALLY IF IT DOESN'T HAVE INTERNET
@@ -386,10 +402,12 @@ class _DynamicFormState extends State<DynamicForm> {
     if (_imageFiles.isEmpty) {
       return Text(AppLocalizations.of(context)!.selectOne);
     } else {
-      return Container(margin: const EdgeInsets.symmetric(horizontal: 100)  , height: 80,
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 100),
+        height: 80,
         child: Row(children: [
-              ..._imageWidgets,
-            ]),
+          ..._imageWidgets,
+        ]),
       );
     }
   }

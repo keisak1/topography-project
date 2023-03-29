@@ -76,7 +76,9 @@
   "gallery": "Galeria",
   "camera": "Câmara",
   "images": "Selecionar Imagens",
-  "selectOne": "Escolha pelo menos uma imagem."
+  "selectOne": "Escolha pelo menos uma imagem.",
+  "noInternet": "Formulário guardado localmente (Sem ligação à Internet)",
+  "selectDelete": "Itens eliminados"
 
 
 }

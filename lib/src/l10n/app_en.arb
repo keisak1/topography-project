@@ -76,5 +76,7 @@
   "gallery": "Gallery",
   "camera": "Camera",
   "images": "Select Images",
-  "selectOne": "Please select at least one image."
+  "selectOne": "Please select at least one image.",
+  "noInternet": "Form saved locally (No Internet Connection)",
+  "selectDelete": "Items deleted"
 }
