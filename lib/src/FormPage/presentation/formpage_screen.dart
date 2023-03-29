@@ -26,7 +26,7 @@ class Question {
 class DynamicForm extends StatefulWidget {
   final List<Question> questions;
 
-  const DynamicForm({super.key, required this.questions, required int marker});
+  const DynamicForm({super.key, required this.questions});
 
   @override
   _DynamicFormState createState() => _DynamicFormState();

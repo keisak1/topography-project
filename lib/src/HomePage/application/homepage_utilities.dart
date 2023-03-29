@@ -123,7 +123,7 @@ Future<void> fillMarkers(List<Markers> markersToFill) async {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DynamicForm(questions: questions, marker: markerData.id)));
+                  builder: (context) => DynamicForm(questions: questions)));
         },
         child: const Icon(
           Icons.circle,
