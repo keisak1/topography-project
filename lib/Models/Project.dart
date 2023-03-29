@@ -2,10 +2,18 @@ import 'Zone.dart';
 
 class Project {
   final String name;
+  final double centerLat;
+  final double centerLong;
+  final double zoom;
+  final int form;
   final List<Zone> zones;
 
   const Project({
     required this.name,
+    required this.centerLat,
+    required this.centerLong,
+    required this.zoom,
+    required this.form,
     required this.zones
   });
 
@@ -15,12 +23,20 @@ class Project {
 
     return Project(
       name: json['name'],
+      centerLat: json['center_lat'],
+      centerLong: json['center_long'],
+      zoom: json['zoom'],
+      form: json['form'],
       zones: zones
     );
   }
 
   Map<String, dynamic> toJson() => {
     'name': name,
+    'center_lat': centerLat,
+    'center_long': centerLong,
+    'zoom': zoom,
+    'form': form,
     'zones': zones.map((zone) => zone.toJson()).toList(),
   };
 }

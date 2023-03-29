@@ -7,6 +7,7 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:topography_project/Models/Bbox.dart';
 import '../../FormPage/application/form_request.dart';
 import '../../FormPage/presentation/formpage_screen.dart';
 import 'package:topography_project/Models/Project.dart';
@@ -206,14 +207,28 @@ Future<User> fetchUser() async {
   } else {
     throw Exception('Failed to load user');
   }*/
-  Zone zone1 = const Zone(name: "Zone 1", centerLat: 38.74032, centerLong: -9.13785, zoom: 13, form: 1);
-  Zone zone2 = const Zone(name: "Zone 2", centerLat: 38.756931, centerLong: -9.15358, zoom: 13, form: 1);
+  Bbox bbox1 = const Bbox(lat: 38.7482578437, lng: -9.1483937915);
+  Bbox bbox2 = const Bbox(lat: 38.7481068461, lng: -9.1483566982);
+  Bbox bbox3 = const Bbox(lat: 38.7479531886, lng: -9.1483189519);
+  Bbox bbox4 = const Bbox(lat: 38.7452319621, lng: -9.1476505235);
+  Bbox bbox5 = const Bbox(lat: 38.7452111444, lng: -9.1476454094);
+  Bbox bbox6 = const Bbox(lat: 38.7452045008, lng: -9.1476437786);
+  List<Bbox> bboxs = [];
+  bboxs.add(bbox1);
+  bboxs.add(bbox2);
+  bboxs.add(bbox3);
+  bboxs.add(bbox4);
+  bboxs.add(bbox5);
+  bboxs.add(bbox6);
+
+  Zone zone1 = Zone(id: 1, zoneLabel: "A.1", centerLat: 38.7479531886, centerLong: -9.1483189519, bbox: bboxs);
+  Zone zone2 = Zone(id: 2, zoneLabel: "A.2", centerLat: 38.7452319621, centerLong: -9.1476505235, bbox: bboxs);
   List<Zone> zones = [];
   zones.add(zone1);
   zones.add(zone2);
 
-  Project project1 = Project(name: "Areeiro", zones: zones);
-  Project project2 = Project(name: "Alvalade", zones: zones);
+  Project project1 = Project(name: "Areeiro", zones: zones, centerLat: 38.756931, centerLong: -9.15358, zoom: 1, form: 1);
+  Project project2 = Project(name: "Alvalade", zones: zones, centerLat: 38.74032, centerLong: -9.13785, zoom: 1, form: 1);
 
   List<Project> projects = [];
   projects.add(project1);
@@ -247,13 +262,27 @@ Future<Project> fetchProject() async {
     }
     return null;
   }*/
-  Zone zone1 = const Zone(name: "Zone 1", centerLat: 38.74032, centerLong: -9.13785, zoom: 13, form: 1);
-  Zone zone2 = const Zone(name: "Zone 2", centerLat: 38.756931, centerLong: -9.15358, zoom: 13, form: 1);
+  Bbox bbox1 = const Bbox(lat: 38.7482578437, lng: -9.1483937915);
+  Bbox bbox2 = const Bbox(lat: 38.7481068461, lng: -9.1483566982);
+  Bbox bbox3 = const Bbox(lat: 38.7479531886, lng: -9.1483189519);
+  Bbox bbox4 = const Bbox(lat: 38.7452319621, lng: -9.1476505235);
+  Bbox bbox5 = const Bbox(lat: 38.7452111444, lng: -9.1476454094);
+  Bbox bbox6 = const Bbox(lat: 38.7452045008, lng: -9.1476437786);
+  List<Bbox> bboxs = [];
+  bboxs.add(bbox1);
+  bboxs.add(bbox2);
+  bboxs.add(bbox3);
+  bboxs.add(bbox4);
+  bboxs.add(bbox5);
+  bboxs.add(bbox6);
+
+  Zone zone1 = Zone(id: 1, zoneLabel: "A.1", centerLat: 38.7479531886, centerLong: -9.1483189519, bbox: bboxs);
+  Zone zone2 = Zone(id: 2, zoneLabel: "A.2", centerLat: 38.7452319621, centerLong: -9.1476505235, bbox: bboxs);
   List<Zone> zones = [];
   zones.add(zone1);
   zones.add(zone2);
 
-  Project project = Project(name: "Areeiro", zones: zones);
+  Project project = Project(name: "Areeiro", zones: zones, centerLat: 38.756931, centerLong: -9.15358, zoom: 1, form: 1);
   return project;
 }
 
@@ -282,6 +311,20 @@ Future<Zone> fetchZone() async {
     return null;
   }*/
 
-  Zone zone = const Zone(name: "Areeiro", centerLat: 38.74032, centerLong: -9.13785, zoom: 13, form: 1);
+  Bbox bbox1 = const Bbox(lat: 38.7482578437, lng: -9.1483937915);
+  Bbox bbox2 = const Bbox(lat: 38.7481068461, lng: -9.1483566982);
+  Bbox bbox3 = const Bbox(lat: 38.7479531886, lng: -9.1483189519);
+  Bbox bbox4 = const Bbox(lat: 38.7452319621, lng: -9.1476505235);
+  Bbox bbox5 = const Bbox(lat: 38.7452111444, lng: -9.1476454094);
+  Bbox bbox6 = const Bbox(lat: 38.7452045008, lng: -9.1476437786);
+  List<Bbox> bboxs = [];
+  bboxs.add(bbox1);
+  bboxs.add(bbox2);
+  bboxs.add(bbox3);
+  bboxs.add(bbox4);
+  bboxs.add(bbox5);
+  bboxs.add(bbox6);
+
+  Zone zone = Zone(id: 1, zoneLabel: "A.1", centerLat: 38.7479531886, centerLong: -9.1483189519, bbox: bboxs);
   return zone;
 }

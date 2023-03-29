@@ -174,14 +174,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         children: user.projects.map((project) {
                           return ExpansionTile(
                             title: Text(project.name),
-                            children: project.zones.map((zone) {
+                            children: //if(){
+                              project.zones.map((zone) {
                               return ListTile(
-                                title: Text(zone.name),
+                                title: Text(zone.zoneLabel),
                                 onTap: () {
-                                  _mapController.move(LatLng(zone.centerLat, zone.centerLong), zone.zoom);
+                                  if(zone.centerLat != 0 && zone.centerLong != 0) {
+                                    _mapController.move(LatLng(zone.centerLat,
+                                        zone.centerLong), project.zoom);
+                                  }else{
+                                    _mapController.move(LatLng(project.centerLat,
+                                        project.centerLong), project.zoom);
+                                  }
                                 },
                               );
                             }).toList(),
+                            //}
                           );
                         }).toList(),
                       );
