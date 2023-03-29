@@ -75,44 +75,29 @@ Widget buildClosestMarkerWidget(
 
   return Positioned(
       bottom: 5,
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.green,
-              offset: Offset(
-                5.0,
-                5.0,
-              ),
-              blurRadius: 10.0,
-              spreadRadius: 2.0,
+      child: Card(
+          elevation: 8.0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(64, 75, 96, .9),
+              borderRadius: BorderRadius.circular(8),
             ),
-            BoxShadow(
-              color: Colors.white70,
-              offset: Offset(0.0, 0.0),
-              blurRadius: 0.0,
-              spreadRadius: 0.0,
+            child: Row(
+              children: [
+                Transform.rotate(
+                  angle: angle * pi / 180,
+                  child: const Icon(
+                    Icons.arrow_upward_rounded,
+                    color: Colors.lightGreenAccent,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km',
+                  style: const TextStyle(color: Colors.white70, fontSize: 20),
+                ),
+              ],
             ),
-          ],
-          color: Colors.black.withOpacity(0.4),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Transform.rotate(
-              angle: angle * pi / 180,
-              child: const Icon(
-                Icons.arrow_upward_rounded,
-                color: Colors.lightGreenAccent,
-                size: 30,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km',
-              style: const TextStyle(color: Colors.white70, fontSize: 20),
-            ),
-          ],
-        ),
-      ));
+          )));
 }

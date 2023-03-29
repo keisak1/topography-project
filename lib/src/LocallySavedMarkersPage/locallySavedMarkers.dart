@@ -188,7 +188,7 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                   ),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                     IconButton(
-                        onPressed: (){
+                        onPressed: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(

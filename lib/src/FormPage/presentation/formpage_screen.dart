@@ -150,13 +150,18 @@ class _DynamicFormState extends State<DynamicForm> {
                 value: item['value'],
                 child: Text(
                   getLocalizedValue(item['value'], context),
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             )
             .toList();
+
         return DropdownButtonFormField(
+          iconEnabledColor: Colors.white,
+          dropdownColor: Color.fromRGBO(58, 66, 86, 1.0),
+          style:
+          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           items: dropdownItems,
           value: _formValues[question.qid],
           onChanged: (value) {
@@ -165,15 +170,18 @@ class _DynamicFormState extends State<DynamicForm> {
             });
           },
           decoration: InputDecoration(
-            labelText: getLocalizedLabel(question.label, context),
+            label: Text(getLocalizedLabel(question.label, context), style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             border: const OutlineInputBorder(),
           ),
         );
+
       case "largetext":
         final controller =
             TextEditingController(text: _formValues[question.qid].toString());
         return TextFormField(
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           controller: controller,
           maxLines: null,
           onChanged: (value) {
@@ -182,7 +190,8 @@ class _DynamicFormState extends State<DynamicForm> {
             });
           },
           decoration: InputDecoration(
-            labelText: getLocalizedLabel(question.label, context),
+            label: Text(getLocalizedLabel(question.label, context), style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             border: const OutlineInputBorder(),
           ),
         );
@@ -190,7 +199,8 @@ class _DynamicFormState extends State<DynamicForm> {
         final controller =
             TextEditingController(text: _formValues[question.qid].toString());
         return TextFormField(
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           controller: controller,
           onChanged: (value) {
             setState(() {
@@ -207,7 +217,8 @@ class _DynamicFormState extends State<DynamicForm> {
             TextEditingController(text: _formValues[question.qid].toString());
 
         return TextFormField(
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           controller: controller,
           keyboardType: TextInputType.number,
           onChanged: (value) {
@@ -216,7 +227,8 @@ class _DynamicFormState extends State<DynamicForm> {
             });
           },
           decoration: InputDecoration(
-            labelText: getLocalizedLabel(question.label, context),
+            label: Text(getLocalizedLabel(question.label, context), style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             border: const OutlineInputBorder(),
           ),
           validator: (value) {
@@ -312,8 +324,8 @@ class _DynamicFormState extends State<DynamicForm> {
             DrawerHeader(
               child: Text(
                 AppLocalizations.of(context)!.savedForms,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
             Expanded(
@@ -336,7 +348,7 @@ class _DynamicFormState extends State<DynamicForm> {
                               child: ListTile(
                                 title: Text(
                                   form['name'],
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -396,32 +408,34 @@ class _DynamicFormState extends State<DynamicForm> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
                         width: MediaQuery.of(context).size.width,
                         child: ElevatedButton(
-
                           onPressed: () async {
                             _showBottomSheet();
                           },
                           style: ButtonStyle(
-                            backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.blueAccent),
                           ),
                           child: Text(
                             AppLocalizations.of(context)!.images,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ))
                   ],
                 ),
                 showImage(),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
+                Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.blueAccent),
+                        ),
                         onPressed: () async {
                           if (_imageFiles.isEmpty) {
                           } else {
@@ -440,13 +454,11 @@ class _DynamicFormState extends State<DynamicForm> {
                                   SnackBar(
                                     content: Text(
                                       AppLocalizations.of(context)!.noInternet,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                                      style:
+                                          const TextStyle(color: Colors.white),
                                     ),
                                   ),
                                 );
-                                print(_formValues);
                                 /**
                                  *  SAVE LOCALLY IF IT DOESN'T HAVE INTERNET
                                  *
@@ -457,12 +469,11 @@ class _DynamicFormState extends State<DynamicForm> {
                         },
                         child: Text(
                           AppLocalizations.of(context)!.submit,
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -474,7 +485,8 @@ class _DynamicFormState extends State<DynamicForm> {
 
   Widget showImage() {
     if (_imageFiles.isEmpty) {
-      return Text(AppLocalizations.of(context)!.selectOne);
+      return Text(AppLocalizations.of(context)!.selectOne,
+          style: const TextStyle(color: Colors.white));
     } else {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 100),
@@ -492,7 +504,7 @@ class _DynamicFormState extends State<DynamicForm> {
       builder: (BuildContext context) {
         return Container(
           height: 90.0,
-          color: Color.fromRGBO(58, 66, 86, 1.0).withOpacity(0.8),
+          color: const Color.fromRGBO(58, 66, 86, 1.0).withOpacity(0.8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

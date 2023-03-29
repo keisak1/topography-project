@@ -45,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         bottom: false,
@@ -98,17 +99,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Icon(Icons.flutter_dash,
-                                  size: 60, color: Color(0xff21579C)),
+                                  size: 60, color: Colors.grey),
                               SizedBox(height: 25),
                               Text(
                                 AppLocalizations.of(context)!.welcome,
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 35),
+                                    color: Colors.white, fontSize: 35),
                               ),
                               Text(
                                 AppLocalizations.of(context)!.sign,
                                 style: TextStyle(
-                                    color: Colors.black.withOpacity(0.7),
+                                    color: Colors.white.withOpacity(0.7),
                                     fontSize: 35),
                               ),
                             ],

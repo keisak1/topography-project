@@ -123,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   Icons.menu,
                   size: 40.0,
                 ),
-                color: Colors.black,
+                color: const Color.fromRGBO(48, 56, 76, 1.0),
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
                 },
@@ -138,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     Icons.settings_outlined,
                     size: 40.0,
                   ),
-                  color: Colors.black,
+                  color: const Color.fromRGBO(48, 56, 76, 1.0),
                   onPressed: () {
                     Scaffold.of(context).openEndDrawer();
                   },
@@ -149,6 +149,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           backgroundColor: Colors.transparent,
           elevation: 0.0),
       drawer: Drawer(
+          backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
           child: Column(
         children: [
           Expanded(
@@ -156,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: <Widget>[
                 DrawerHeader(
                   decoration: const BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.white,
                       image: DecorationImage(
                           image: AssetImage(
                               "./lib/resources/topographic_regions1.png"),
@@ -174,11 +175,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       return Column(
                         children: user.projects.map((project) {
                           return ExpansionTile(
-                            title: Text(project.name),
+                            backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                            collapsedIconColor: Colors.white,
+                            title: Text(project.name, style: const TextStyle(color: Colors.white),),
                             children: //if(){
                               project.zones.map((zone) {
                               return ListTile(
-                                title: Text(zone.zoneLabel),
+                                title: Text(zone.zoneLabel, style: const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   if(zone.centerLat != 0 && zone.centerLong != 0) {
                                     _mapController.move(LatLng(zone.centerLat,
@@ -211,10 +214,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               child: Column(
                 children: <Widget>[
                   ListTile(
-                      leading: const Icon(Icons.cloud_upload),
+                      leading: const Icon(Icons.cloud_upload, color: Colors.white,),
                       title: Text(
                         AppLocalizations.of(context)!.locallySavedMarkers,
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14, color: Colors.white),
                       ),
                       onTap: () => Navigator.push(
                             context,
@@ -227,6 +230,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ],
       )),
       endDrawer: Drawer(
+        backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
         child: Column(
           children: [
             Expanded(
@@ -234,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 children: <Widget>[
                   DrawerHeader(
                     decoration: const BoxDecoration(
-                        color: Colors.black,
+                        color: Color.fromRGBO(48, 56, 76, 1.0),
                         image: DecorationImage(
                             image: AssetImage(
                                 "./lib/resources/topographic_regions1.png"),
@@ -252,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         children: <Widget>[
                           Text(
                             isButtonOn ? 'GPS On' : 'GPS Off',
-                            style: const TextStyle(
+                            style: const TextStyle(color: Colors.white,
                               fontSize: 14,
                               //fontWeight: FontWeight.bold,
                             ),
@@ -266,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             children: [
                               Icon(isButtonOn
                                   ? Icons.location_on
-                                  : Icons.location_off),
+                                  : Icons.location_off, color: Colors.white,),
                             ],
                           ),
                         ],
@@ -289,10 +293,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 child: Column(
                   children: <Widget>[
                     ListTile(
-                        leading: const Icon(Icons.logout),
+                        leading: const Icon(Icons.logout, color: Colors.white,),
                         title: Text(
                           AppLocalizations.of(context)!.logout,
-                          style: const TextStyle(fontSize: 14),
+                          style: const TextStyle(fontSize: 14, color: Colors.white),
                         ),
                         onTap: () =>
                             Navigator.pushReplacementNamed(context, '/')),
@@ -426,7 +430,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         //label: Text(
         //AppLocalizations.of(context)!.buildings,
         //),
-        backgroundColor: Colors.black,
+        backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
         child: const Icon(Icons.my_location_outlined),
       ),
       //floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
