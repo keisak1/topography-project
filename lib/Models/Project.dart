@@ -18,7 +18,7 @@ class Project {
   });
 
   factory Project.fromJson(Map<String, dynamic> json){
-    final List<dynamic> zonesJson = json['zones'] ?? [];
+    final List<dynamic> zonesJson = json.containsKey('zones') ? json['zones'] : [];
     final List<Zone> zones = zonesJson.map((e) => Zone.fromJson(e)).toList();
 
     return Project(

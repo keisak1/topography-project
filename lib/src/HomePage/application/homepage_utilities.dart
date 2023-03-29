@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -12,6 +13,7 @@ import '../../FormPage/application/form_request.dart';
 import '../../FormPage/presentation/formpage_screen.dart';
 import 'package:topography_project/Models/Project.dart';
 import 'package:topography_project/Models/Zone.dart';
+import 'package:topography_project/Models/Markers.dart';
 import '../../../Models/User.dart';
 import 'package:http/http.dart' as http;
 
@@ -30,7 +32,6 @@ double? latitude;
 double? longitude;
 double heading = 0.0;
 LatLng savedLocation = LatLng(0.0, 0.0);
-
 
 
 final region = RectangleRegion(
@@ -102,84 +103,20 @@ Future<void> saveData(double? lat, double? longi) async {
 
 Future<void> loadPrefs() async {
   prefs = await SharedPreferences.getInstance();
-  if (prefs.getString("markers") != null) {
-    strMarkers = prefs.getString("markers")!;
-  }
   if (prefs.getDouble("latitude") != null &&
       prefs.getDouble("longitude") != null) {
     latitude = prefs.getDouble('latitude')!;
     longitude = prefs.getDouble('longitude')!;
   }
   savedLocation = LatLng(latitude!, longitude!);
-  if(strMarkers != "") {
-    Map<String, dynamic> markersMap = jsonDecode(strMarkers);
-    markersToJson(markersMap);
-  }
-  print("SAVED LOCATION : ");
-  print(savedLocation.latitude);
 }
 
-Future<void> markersToJson(Map<String, dynamic> savedMarkers) async {
-  /***************************************
-   *
-   *  SUBSTITUIR ISTO POR API CALL PARA
-   *  IR BUSCAR COORDENADAS E ESTADO DO
-   *  MARKER
-   *
-   ***************************************/
-  final jsonMarkers = <Marker>[
-    Marker(
-      width: 80,
-      height: 80,
-      point: LatLng(41.168517, -8.608559),
-      builder: (context) => GestureDetector(
-        onTap: () {
-          // Replace 123 with the actual ID of the marker
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DynamicForm(marker: 1, questions: questions)));
-        },
-        child: const Icon(
-          Icons.circle,
-          color: Colors.redAccent,
-          size: 20,
-        ),
-      ),
-    ),
-    Marker(
-      width: 80,
-      height: 80,
-      point: LatLng(41.17227747164333, -8.618397446786263),
-      builder: (context) => const Icon(
-        Icons.circle,
-        color: Colors.green,
-        size: 20,
-      ),
-    ),
-  ];
-
-  /*for (Marker marker in jsonMarkers) {
-    bool markersAdded = false;
-    //bool variavel = ... comparar os valores recebidos do json com os valores das shared preferences e dentro verificar se todos os markers existem nos ja guardados
-    //if(!variavel){
-    //  savedMarkers.add(marker);
-    //  markersAdded = true;
-    // }
-    //}
-  }
-
-  if(markersAdded){
-    await _prefs.setString('markers', jsonEncode(savedMarkers);
-  }
-
-
-  for (var markerData in savedMarkers['markers']) {
+Future<void> fillMarkers(List<Markers> markersToFill) async {
+  for (var markerData in markersToFill) {
     markers.add(Marker(
       width: 20,
       height: 20,
-      point: LatLng(
-          markerData['point']['latitude'], markerData['point']['longitude']),
+      point: LatLng(markerData.yLat, markerData.xLong),
       builder: (context) => GestureDetector(
         onTap: () {
           // Replace 123 with the actual ID of the marker
@@ -196,7 +133,31 @@ Future<void> markersToJson(Map<String, dynamic> savedMarkers) async {
         ),
       ),
     ));
-  }*/
+  }
+}
+
+Future<void> fetchMarkers() async {
+  var connectivityResult = await (Connectivity().checkConnectivity());
+
+  if (connectivityResult == ConnectivityResult.none) {
+    List<dynamic>? markersData = prefs.getStringList('markers');
+    if (markersData != null) {
+      List<Markers> markersList = markersData.map((data) => Markers.fromJson(jsonDecode(data))).toList();
+      fillMarkers(markersList);
+    } else {
+      throw Exception('Failed to load markers');
+    }
+  } else {
+    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/markers/1'));
+    if (response.statusCode == 200) {
+      List<Markers> markersList = (jsonDecode(response.body)['markers'] as List).map((data) => Markers.fromJson(data)).toList();
+      fillMarkers(markersList);
+      List<String> markersData = markersList.map((marker) => jsonEncode(marker.toJson())).toList();
+      await prefs.setStringList('markers', markersData);
+    } else {
+      throw Exception('Failed to load markers');
+    }
+  }
 }
 
 Future<User> fetchUser() async {
@@ -242,25 +203,23 @@ Future<Project> fetchProject() async {
   /*var connectivityResult = await (Connectivity().checkConnectivity());
 
   if (connectivityResult == ConnectivityResult.none) {
-    // no internet connection, load data from shared preferences
-    List<dynamic> projectsData = prefs.getStringList('projects');
+    List<dynamic>? projectsData = prefs.getStringList('projects');
     if (projectsData != null) {
       List<Project> projects = projectsData.map((data) => Project.fromJson(jsonDecode(data))).toList();
       return projects;
+    } else {
+      throw Exception('Failed to load projects');
     }
-    return null;
   } else {
-    // internet connection available, load data from API
-    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/projects/1'));
+    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/project/1'));
     if (response.statusCode == 200) {
-      List<Project> projects = Project.fromJson(jsonDecode(response.body));
+      List<Project> projects = (jsonDecode(response.body)['projects'] as List).map((data) => Project.fromJson(data)).toList();
       List<String> projectsData = projects.map((project) => jsonEncode(project.toJson())).toList();
       await prefs.setStringList('projects', projectsData);
       return projects;
     } else {
-      throw Exception('Failed to load project');
+      throw Exception('Failed to load projects');
     }
-    return null;
   }*/
   Bbox bbox1 = const Bbox(lat: 38.7482578437, lng: -9.1483937915);
   Bbox bbox2 = const Bbox(lat: 38.7481068461, lng: -9.1483566982);
@@ -290,25 +249,23 @@ Future<Zone> fetchZone() async {
   /*var connectivityResult = await (Connectivity().checkConnectivity());
 
   if (connectivityResult == ConnectivityResult.none) {
-    // no internet connection, load data from shared preferences
-    List<dynamic> zonesData = prefs.getStringList('zones');
-    if (projectsData != null) {
+    List<dynamic>? zonesData = prefs.getStringList('zones');
+    if (zonesData != null) {
       List<Zone> zones = zonesData.map((data) => Zone.fromJson(jsonDecode(data))).toList();
       return zones;
+    } else {
+      throw Exception('Failed to load zones');
     }
-    return null;
   } else {
-    // internet connection available, load data from API
-    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/zones/1'));
+    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/project/1'));
     if (response.statusCode == 200) {
-      List<Zone> zones = Zone.fromJson(jsonDecode(response.body));
+      List<Zone> zones = (jsonDecode(response.body)['zones'] as List).map((data) => Zone.fromJson(data)).toList();
       List<String> zonesData = zones.map((zone) => jsonEncode(zone.toJson())).toList();
       await prefs.setStringList('zones', zonesData);
       return zones;
     } else {
-      throw Exception('Failed to load project');
+      throw Exception('Failed to load zones');
     }
-    return null;
   }*/
 
   Bbox bbox1 = const Bbox(lat: 38.7482578437, lng: -9.1483937915);

@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late Future<Zone> zone;
 
   @override
-  void initState() {
+  Future<void> initState() async {
     _isLoading = true;
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     user = fetchUser();
     project = fetchProject();
     zone = fetchZone();
+    await fetchMarkers();
     loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
@@ -174,27 +175,26 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       final user = snapshot.data!;
                       return Column(
                         children: user.projects.map((project) {
-                          return ExpansionTile(
-                            backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
-                            collapsedIconColor: Colors.white,
-                            title: Text(project.name, style: const TextStyle(color: Colors.white),),
-                            children: //if(){
-                              project.zones.map((zone) {
-                              return ListTile(
-                                title: Text(zone.zoneLabel, style: const TextStyle(color: Colors.white)),
-                                onTap: () {
-                                  if(zone.centerLat != 0 && zone.centerLong != 0) {
-                                    _mapController.move(LatLng(zone.centerLat,
-                                        zone.centerLong), project.zoom);
-                                  }else{
-                                    _mapController.move(LatLng(project.centerLat,
-                                        project.centerLong), project.zoom);
-                                  }
-                                },
-                              );
-                            }).toList(),
-                            //}
-                          );
+                          if (project.zones.isEmpty) {
+                            return ListTile(
+                              title: Text(project.name),
+                              onTap: () {
+                                _mapController.move(LatLng(project.centerLat, project.centerLong), project.zoom);
+                              },
+                            );
+                          } else {
+                            return ExpansionTile(
+                              title: Text(project.name),
+                              children: project.zones.map((zone) {
+                                return ListTile(
+                                  title: Text(zone.zoneLabel),
+                                  onTap: () {
+                                    _mapController.move(LatLng(zone.centerLat, zone.centerLong), project.zoom);
+                                  },
+                                );
+                              }).toList(),
+                            );
+                          }
                         }).toList(),
                       );
                     } else if (snapshot.hasError) {
