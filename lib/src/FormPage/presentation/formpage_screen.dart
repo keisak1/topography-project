@@ -148,7 +148,11 @@ class _DynamicFormState extends State<DynamicForm> {
               (item) => DropdownMenuItem<String>(
                 key: UniqueKey(),
                 value: item['value'],
-                child: Text(getLocalizedValue(item['value'], context)),
+                child: Text(
+                  getLocalizedValue(item['value'], context),
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ),
             )
             .toList();
@@ -169,6 +173,7 @@ class _DynamicFormState extends State<DynamicForm> {
         final controller =
             TextEditingController(text: _formValues[question.qid].toString());
         return TextFormField(
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           controller: controller,
           maxLines: null,
           onChanged: (value) {
@@ -185,6 +190,7 @@ class _DynamicFormState extends State<DynamicForm> {
         final controller =
             TextEditingController(text: _formValues[question.qid].toString());
         return TextFormField(
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           controller: controller,
           onChanged: (value) {
             setState(() {
@@ -201,6 +207,7 @@ class _DynamicFormState extends State<DynamicForm> {
             TextEditingController(text: _formValues[question.qid].toString());
 
         return TextFormField(
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           controller: controller,
           keyboardType: TextInputType.number,
           onChanged: (value) {
@@ -238,45 +245,76 @@ class _DynamicFormState extends State<DynamicForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(AppLocalizations.of(context)!.form),
-        actions: [
-          IconButton(
-            icon: _isFavorite
-                ? const Icon(Icons.star, color: Colors.yellow)
-                : const Icon(Icons.star_border),
-            onPressed: () {
-              setState(() {
-                _isFavorite = !_isFavorite;
-                if (_isFavorite) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => SaveFormPopup(
-                      onConfirm: (String value) {
-                        _addToFavorites(value, _formValues);
-                        setState(() {});
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                AppLocalizations.of(context)!.savedLocally +
-                                    value),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                }
-              });
-            },
+      backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
+      bottomNavigationBar: Container(
+        height: 55.0,
+        child: BottomAppBar(
+          color: const Color.fromRGBO(58, 66, 86, 1.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              IconButton(
+                  icon: const Icon(Icons.home, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+              IconButton(
+                icon: const Icon(Icons.circle_outlined, color: Colors.white),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: _isFavorite
+                    ? const Icon(Icons.star, color: Colors.yellow)
+                    : const Icon(
+                        Icons.star_border,
+                        color: Colors.white,
+                      ),
+                onPressed: () {
+                  setState(() {
+                    _isFavorite = !_isFavorite;
+                    if (_isFavorite) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => SaveFormPopup(
+                          onConfirm: (String value) {
+                            _addToFavorites(value, _formValues);
+                            setState(() {});
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor:
+                                    const Color.fromRGBO(58, 66, 86, 1.0),
+                                content: Text(
+                                    AppLocalizations.of(context)!.savedLocally +
+                                        value),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  });
+                },
+              ),
+            ],
           ),
-        ],
+        ),
+      ),
+      appBar: AppBar(
+        centerTitle: true,
+        elevation: 0.1,
+        backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
+        title: Text(AppLocalizations.of(context)!.form),
       ),
       drawer: Drawer(
+        backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
         child: Column(
           children: [
             DrawerHeader(
-              child: Text(AppLocalizations.of(context)!.savedForms),
+              child: Text(
+                AppLocalizations.of(context)!.savedForms,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
             ),
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
@@ -288,30 +326,46 @@ class _DynamicFormState extends State<DynamicForm> {
                       itemCount: forms.length,
                       itemBuilder: (context, index) {
                         final form = forms[index];
-                        return ListTile(
-                          title: Text(form['name']),
-                          onTap: () async {
-                            final formData =
-                                await _loadFormLocally(form['name']);
-                            setState(() {
-                              _formValues = formData!;
-                              _updateFormValues(_formValues);
-                            });
-                            Navigator.of(context).pop();
-                          },
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              _deleteSavedForm(form['name']);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content:
-                                      Text('Form "${form['name']}" deleted'),
+                        return Card(
+                            elevation: 8.0,
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 6.0),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                  color: Color.fromRGBO(64, 75, 96, .9)),
+                              child: ListTile(
+                                title: Text(
+                                  form['name'],
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                              );
-                            },
-                          ),
-                        );
+                                onTap: () async {
+                                  final formData =
+                                      await _loadFormLocally(form['name']);
+                                  setState(() {
+                                    _formValues = formData!;
+                                    _updateFormValues(_formValues);
+                                  });
+                                  Navigator.of(context).pop();
+                                },
+                                trailing: IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    _deleteSavedForm(form['name']);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Form "${form['name']}" deleted'),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ));
                       },
                     );
                   } else if (snapshot.hasError) {
@@ -341,12 +395,24 @@ class _DynamicFormState extends State<DynamicForm> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        _showBottomSheet();
-                      },
-                      child: Text(AppLocalizations.of(context)!.images),
-                    ),
+                    Container(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        width: MediaQuery.of(context).size.width,
+                        child: ElevatedButton(
+
+                          onPressed: () async {
+                            _showBottomSheet();
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.images,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ))
                   ],
                 ),
                 showImage(),
@@ -372,8 +438,12 @@ class _DynamicFormState extends State<DynamicForm> {
                                 Navigator.of(context).pop();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(AppLocalizations.of(context)!
-                                        .noInternet),
+                                    content: Text(
+                                      AppLocalizations.of(context)!.noInternet,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 );
                                 print(_formValues);
@@ -385,7 +455,11 @@ class _DynamicFormState extends State<DynamicForm> {
                             }
                           }
                         },
-                        child: Text(AppLocalizations.of(context)!.submit),
+                        child: Text(
+                          AppLocalizations.of(context)!.submit,
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   ),
@@ -418,7 +492,7 @@ class _DynamicFormState extends State<DynamicForm> {
       builder: (BuildContext context) {
         return Container(
           height: 90.0,
-          color: Colors.black.withOpacity(0.8),
+          color: Color.fromRGBO(58, 66, 86, 1.0).withOpacity(0.8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
