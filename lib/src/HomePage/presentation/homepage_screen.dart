@@ -9,7 +9,6 @@ import 'package:location/location.dart';
 import 'package:topography_project/src/HomePage/presentation/widgets/distance_direction.dart';
 import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarkers.dart';
 import 'dart:async';
-import '../../../Models/Markers.dart';
 import '../../FormPage/application/form_request.dart';
 import '../../FormPage/presentation/formpage_screen.dart';
 import '../../../Models/Project.dart';
@@ -97,6 +96,30 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           currentLocationGlobal!.latitude!, currentLocationGlobal!.longitude!);
       locationSubscription?.cancel();
     }
+  }
+
+  List<Polygon> getPolygonsList(User userData) {
+    final projects = userData.projects;
+    List<Polygon> polygons = [];
+    for (final project in projects) {
+      for (final zone in project.zones) {
+        final bboxList = zone.bbox.toList();
+        List<LatLng> latLngList = [];
+
+        for (var bbox in bboxList) {
+          latLngList.add(LatLng(bbox.lat, bbox.lng));
+        }
+        final polygon = Polygon(
+          points: latLngList,
+          color: Colors.redAccent.withOpacity(0.5),
+          isFilled: shouldHideHighlight(currentZoom),
+          isDotted: false,
+        );
+        print(polygon.points);
+        polygons.add(polygon);
+      }
+    }
+    return polygons;
   }
 
   @override
@@ -193,7 +216,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 );
                               } else {
                                 return ExpansionTile(
-                                  backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                                  backgroundColor:
+                                      const Color.fromRGBO(48, 56, 76, 1.0),
                                   collapsedIconColor: Colors.white,
                                   title: Text(project.name,
                                       style:
@@ -364,7 +388,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         userAgentPackageName:
                             'dev.fleaflet.flutter_map.example',
                       ),
-                      if (currentLatLng != null)
                         AnimatedMarkerLayer(
                           options: AnimatedMarkerLayerOptions(
                             duration: const Duration(
@@ -385,59 +408,37 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             ),
                           ),
                         ),
-                      PolygonLayer(
-                        polygonCulling: false,
-                        polygons: [
-                          Polygon(
-                              points: polygonPoints,
-                              color: Colors.redAccent.withOpacity(0.5),
-                              isFilled: shouldHideHighlight(currentZoom),
-                              isDotted: false),
-                        ],
+                      FutureBuilder<User>(
+                        future: user,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final userData = snapshot.data!;
+
+                            final polygons = getPolygonsList(userData);
+                            return PolygonLayer(
+                              polygonCulling: false,
+                              polygons: polygons,
+                            );
+                          } else {
+                            // Show a loading indicator or an error message
+                            return const CircularProgressIndicator();
+                          }
+                        },
                       ),
                       FutureBuilder<List<Marker>>(
                         future: markers,
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return MarkerLayer(
-                              markers: shouldShowMarker(currentZoom) ? snapshot.data! : []
-                            );
-                          }else{
-                            return Text('Error loading markers: ${snapshot.error}');
+                                markers: shouldShowMarker(currentZoom)
+                                    ? snapshot.data!
+                                    : []);
+                          } else {
+                            return Text(
+                                'Error loading markers: ${snapshot.error}');
                           }
                         },
                       ),
-                      /*[
-                        Marker(
-                          width: 80,
-                          height: 80,
-                          point: LatLng(41.168517, -8.608559),
-                          builder: (context) => GestureDetector(
-                            onTap: () {
-                              // Replace 123 with the actual ID of the marker
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => DynamicForm(
-                                          // TODO: CHECK WHICH FORM IT HAS TO USE
-                                          marker: 1 /*ID DO MARKER*/,
-                                          questions: questions)));
-                            },
-                            child: const Icon(
-                              Icons.circle,
-                              color: Colors.redAccent,
-                              size: 20,
-                            ),
-                          ),
-                        )
-                      ]*/
-                          /**
-                       * //shouldShowMarker(currentZoom) ? markers : [],
-                       */
-
-
-                      //MarkerLayerOptions(markers: [userMarker]),
-                      //flutterMapLocation,
                     ]),
                 ClosestMarkerWidget(
                   userLocation: currentLatLng,

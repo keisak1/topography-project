@@ -17,7 +17,7 @@ class _EmailFieldState extends State<EmailField>
     with SingleTickerProviderStateMixin {
   double bottomAnimationValue = 0;
   double opacityAnimationValue = 0;
-  EdgeInsets paddingAnimationValue = EdgeInsets.only(top: 22);
+  EdgeInsets paddingAnimationValue = const EdgeInsets.only(top: 22);
 
   late TextEditingController emailController;
   late AnimationController _animationController;
@@ -29,7 +29,7 @@ class _EmailFieldState extends State<EmailField>
   void initState() {
     emailController = widget.emailController;
     _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     final tween = ColorTween(begin: Colors.grey.withOpacity(0), end: blueColor);
 
     _animation = tween.animate(_animationController)
@@ -56,11 +56,12 @@ class _EmailFieldState extends State<EmailField>
     return Stack(
       children: [
         TweenAnimationBuilder<double>(
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           tween: Tween(begin: 0, end: widget.fadeEmail ? 0 : 1),
           builder: ((_, value, __) => Opacity(
                 opacity: value,
                 child: TextFormField(
+                  style: TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return AppLocalizations.of(context)!.emptyEmail;
@@ -69,7 +70,7 @@ class _EmailFieldState extends State<EmailField>
                   },
                   controller: emailController,
                   focusNode: node,
-                  decoration: InputDecoration(hintText: "Email"),
+                  decoration: const InputDecoration(hintText: "Email", helperStyle: TextStyle(color: Colors.white)),
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) async {
                     if (value.isNotEmpty) {
@@ -77,7 +78,7 @@ class _EmailFieldState extends State<EmailField>
                         setState(() {
                           bottomAnimationValue = 0;
                           opacityAnimationValue = 1;
-                          paddingAnimationValue = EdgeInsets.only(top: 0);
+                          paddingAnimationValue = const EdgeInsets.only(top: 0);
                         });
                         _animationController.forward();
                       } else {
@@ -85,7 +86,7 @@ class _EmailFieldState extends State<EmailField>
                         setState(() {
                           bottomAnimationValue = 1;
                           opacityAnimationValue = 0;
-                          paddingAnimationValue = EdgeInsets.only(top: 22);
+                          paddingAnimationValue = const EdgeInsets.only(top: 22);
                         });
                       }
                     } else {
@@ -101,16 +102,16 @@ class _EmailFieldState extends State<EmailField>
           child: Align(
             alignment: Alignment.bottomCenter,
             child: AnimatedContainer(
-              duration: Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 500),
               width: widget.fadeEmail ? 0 : 300,
               child: TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: bottomAnimationValue),
                 curve: Curves.easeIn,
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 builder: ((context, value, child) => LinearProgressIndicator(
                       value: value,
                       backgroundColor: Colors.grey.withOpacity(0.5),
-                      color: Colors.black,
+                      color: Colors.white,
                     )),
               ),
             ),
@@ -119,17 +120,17 @@ class _EmailFieldState extends State<EmailField>
         Positioned.fill(
           child: AnimatedPadding(
             curve: Curves.easeIn,
-            duration: Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 500),
             padding: paddingAnimationValue,
             child: TweenAnimationBuilder<double>(
               tween: Tween(begin: 0, end: widget.fadeEmail ? 0 : 1),
-              duration: Duration(milliseconds: 700),
+              duration: const Duration(milliseconds: 700),
               builder: ((context, value, child) => Opacity(
                     opacity: value,
                     child: Align(
                       alignment: AlignmentDirectional.centerEnd,
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.0)
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0)
                             .copyWith(bottom: 0),
                         child: Icon(Icons.check_rounded,
                             size: 27,
