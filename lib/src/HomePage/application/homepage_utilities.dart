@@ -24,7 +24,6 @@ List<LatLng> polygonPoints = [
   LatLng(41.174702746609, -8.608401561850052)
 ];
 String strMarkers = "";
-List<Marker> markers = [];
 late SharedPreferences prefs;
 LocationData? currentLocationGlobal;
 final Location locationService = Location();
@@ -32,6 +31,7 @@ double? latitude;
 double? longitude;
 double heading = 0.0;
 LatLng savedLocation = LatLng(0.0, 0.0);
+List<Marker> markers = [];
 
 
 final region = RectangleRegion(
@@ -111,39 +111,89 @@ Future<void> loadPrefs() async {
   savedLocation = LatLng(latitude!, longitude!);
 }
 
-Future<void> fillMarkers(List<Markers> markersToFill) async {
-  for (var markerData in markersToFill) {
-    markers.add(Marker(
-      width: 20,
-      height: 20,
-      point: LatLng(markerData.yLat, markerData.xLong),
-      builder: (context) => GestureDetector(
-        onTap: () {
-          // Replace 123 with the actual ID of the marker
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DynamicForm(questions: questions)));
-        },
-        child: const Icon(
-          Icons.circle,
-          color: Colors.redAccent,
-          //replace color with the color or specification from API
-          size: 20,
-        ),
-      ),
-    ));
-  }
-}
 
-Future<void> fetchMarkers() async {
-  var connectivityResult = await (Connectivity().checkConnectivity());
+Future<List<Marker>> fetchMarkers() async {
+  /*var connectivityResult = await (Connectivity().checkConnectivity());
 
   if (connectivityResult == ConnectivityResult.none) {
     List<dynamic>? markersData = prefs.getStringList('markers');
     if (markersData != null) {
-      List<Markers> markersList = markersData.map((data) => Markers.fromJson(jsonDecode(data))).toList();
-      fillMarkers(markersList);
+      List<Markers> markersList = markersData.map((data) =>
+          Markers.fromJson(jsonDecode(data))).toList();
+
+      for (var markerData in markersList) {
+        if (markerData.status == 0) {
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) =>
+                GestureDetector(
+                  onTap: () {
+                    // Replace 123 with the actual ID of the marker
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DynamicForm(questions: questions,
+                                  marker: markerData.id,)));
+                  },
+                  child: const Icon(
+                    Icons.circle,
+                    color: Colors.redAccent,
+                    //replace color with the color or specification from API
+                    size: 20,
+                  ),
+                ),
+          ));
+        } else if (markerData.status == 1) {
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) =>
+                GestureDetector(
+                  onTap: () {
+                    // Replace 123 with the actual ID of the marker
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DynamicForm(questions: questions,
+                                  marker: markerData.id,)));
+                  },
+                  child: const Icon(
+                    Icons.circle,
+                    color: Colors.orangeAccent,
+                    //replace color with the color or specification from API
+                    size: 20,
+                  ),
+                ),
+          ));
+        } else if(markerData.status == 2){
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) => GestureDetector(
+              /*onTap: () {
+                // Replace 123 with the actual ID of the marker
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DynamicForm(questions: questions, marker: markerData.id,)));
+              },*/
+              child: const Icon(
+                Icons.circle,
+                color: Colors.greenAccent,
+                //replace color with the color or specification from API
+                size: 20,
+              ),
+            ),
+          ));
+        }
+    }
+    return markers;
     } else {
       throw Exception('Failed to load markers');
     }
@@ -151,13 +201,174 @@ Future<void> fetchMarkers() async {
     final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/markers/1'));
     if (response.statusCode == 200) {
       List<Markers> markersList = (jsonDecode(response.body)['markers'] as List).map((data) => Markers.fromJson(data)).toList();
-      fillMarkers(markersList);
+
+      for (var markerData in markersList) {
+        if (markerData.status == 0) {
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) =>
+                GestureDetector(
+                  onTap: () {
+                    // Replace 123 with the actual ID of the marker
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DynamicForm(questions: questions,
+                                  marker: markerData.id,)));
+                  },
+                  child: const Icon(
+                    Icons.circle,
+                    color: Colors.redAccent,
+                    //replace color with the color or specification from API
+                    size: 20,
+                  ),
+                ),
+          ));
+        } else if (markerData.status == 1) {
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) =>
+                GestureDetector(
+                  onTap: () {
+                    // Replace 123 with the actual ID of the marker
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DynamicForm(questions: questions,
+                                  marker: markerData.id,)));
+                  },
+                  child: const Icon(
+                    Icons.circle,
+                    color: Colors.orangeAccent,
+                    //replace color with the color or specification from API
+                    size: 20,
+                  ),
+                ),
+          ));
+        } else if(markerData.status == 2){
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) => GestureDetector(
+              /*onTap: () {
+                // Replace 123 with the actual ID of the marker
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DynamicForm(questions: questions, marker: markerData.id,)));
+              },*/
+              child: const Icon(
+                Icons.circle,
+                color: Colors.greenAccent,
+                //replace color with the color or specification from API
+                size: 20,
+              ),
+            ),
+          ));
+        }
+    }
+
       List<String> markersData = markersList.map((marker) => jsonEncode(marker.toJson())).toList();
       await prefs.setStringList('markers', markersData);
+      return markers;
     } else {
       throw Exception('Failed to load markers');
     }
+  }*/
+
+  List<Markers> markersList = [];
+  Markers markers1 = const Markers(fullID: "r11050205", osmID: 11050205, id: 21, yLat: 38.7475644, xLong: -9.1350445, mainZoneID: 1, subZoneID: 1, status: 0);
+  Markers markers2 = const Markers(fullID: "w31730499", osmID: 31730499, id: 22, yLat: 38.747934, xLong: -9.135595, mainZoneID: 1, subZoneID: 1, status: 1);
+  Markers markers3 = const Markers(fullID: "w31731372", osmID: 31731372, id: 23, yLat: 38.7465131, xLong: -9.1368064, mainZoneID: 1, subZoneID: 1, status: 2);
+  Markers markers4 = const Markers(fullID: "w31731373", osmID: 31731373, id: 24, yLat: 38.7464782, xLong: -9.1372773, mainZoneID: 1, subZoneID: 1, status: 0);
+  Markers markers5 = const Markers(fullID: "w31731374", osmID: 31731374, id: 25, yLat: 38.7464433, xLong: -9.1377495, mainZoneID: 1, subZoneID: 1, status: 1);
+  Markers markers6 = const Markers(fullID: "w31731375", osmID: 31731375, id: 26, yLat: 38.7461413, xLong: -9.1381216, mainZoneID: 1, subZoneID: 1, status: 2);
+  markersList.add(markers1);
+  markersList.add(markers2);
+  markersList.add(markers3);
+  markersList.add(markers4);
+  markersList.add(markers5);
+  markersList.add(markers6);
+  for (var markerData in markersList) {
+    if (markerData.status == 0) {
+      markers.add(Marker(
+        width: 20,
+        height: 20,
+        point: LatLng(markerData.yLat, markerData.xLong),
+        builder: (context) =>
+            GestureDetector(
+              onTap: () {
+                // Replace 123 with the actual ID of the marker
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            DynamicForm(questions: questions,
+                              marker: markerData.id,)));
+              },
+              child: const Icon(
+                Icons.circle,
+                color: Colors.redAccent,
+                //replace color with the color or specification from API
+                size: 20,
+              ),
+            ),
+      ));
+    } else if (markerData.status == 1) {
+      markers.add(Marker(
+        width: 20,
+        height: 20,
+        point: LatLng(markerData.yLat, markerData.xLong),
+        builder: (context) =>
+            GestureDetector(
+              onTap: () {
+                // Replace 123 with the actual ID of the marker
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            DynamicForm(questions: questions,
+                              marker: markerData.id,)));
+              },
+              child: const Icon(
+                Icons.circle,
+                color: Colors.orangeAccent,
+                //replace color with the color or specification from API
+                size: 20,
+              ),
+            ),
+      ));
+    } else if(markerData.status == 2){
+      markers.add(Marker(
+        width: 20,
+        height: 20,
+        point: LatLng(markerData.yLat, markerData.xLong),
+        builder: (context) => GestureDetector(
+          /*onTap: () {
+                // Replace 123 with the actual ID of the marker
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DynamicForm(questions: questions, marker: markerData.id,)));
+              },*/
+          child: const Icon(
+            Icons.circle,
+            color: Colors.greenAccent,
+            //replace color with the color or specification from API
+            size: 20,
+          ),
+        ),
+      ));
+    }
   }
+  return markers;
 }
 
 Future<User> fetchUser() async {
@@ -188,8 +399,8 @@ Future<User> fetchUser() async {
   zones.add(zone1);
   zones.add(zone2);
 
-  Project project1 = Project(name: "Areeiro", zones: zones, centerLat: 38.756931, centerLong: -9.15358, zoom: 1, form: 1);
-  Project project2 = Project(name: "Alvalade", zones: zones, centerLat: 38.74032, centerLong: -9.13785, zoom: 1, form: 1);
+  Project project1 = Project(name: "Areeiro", zones: zones, centerLat: 38.756931, centerLong: -9.15358, zoom: 16, form: 1);
+  Project project2 = Project(name: "Alvalade", zones: zones, centerLat: 38.74032, centerLong: -9.13785, zoom: 16, form: 1);
 
   List<Project> projects = [];
   projects.add(project1);

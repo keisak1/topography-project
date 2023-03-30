@@ -9,6 +9,7 @@ import 'package:location/location.dart';
 import 'package:topography_project/src/HomePage/presentation/widgets/distance_direction.dart';
 import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarkers.dart';
 import 'dart:async';
+import '../../../Models/Markers.dart';
 import '../../FormPage/application/form_request.dart';
 import '../../FormPage/presentation/formpage_screen.dart';
 import '../../../Models/Project.dart';
@@ -37,9 +38,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late Future<Project> project;
   late Future<User> user;
   late Future<Zone> zone;
+  late Future<List<Marker>> markers;
 
   @override
-  Future<void> initState() async {
+  void initState() {
     _isLoading = true;
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
@@ -50,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     user = fetchUser();
     project = fetchProject();
     zone = fetchZone();
-    await fetchMarkers();
+    markers = fetchMarkers();
     loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
@@ -314,7 +316,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-                      center: LatLng(41.17209721775161, -8.611916195059322),
+                      center: LatLng(41.171667, -8.611916195059322),
                       zoom: 10,
                       maxZoom: 18.499999,
                       minZoom: 0,
@@ -364,7 +366,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               isDotted: false),
                         ],
                       ),
-                      MarkerLayer(markers: [
+                      FutureBuilder<List<Marker>>(
+                        future: markers,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return MarkerLayer(markers: snapshot.data!);
+                          }else{
+                            return Text('Error loading markers: ${snapshot.error}');
+                          }
+                        },
+                      ),
+                      /*[
                         Marker(
                           width: 80,
                           height: 80,
@@ -387,11 +399,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             ),
                           ),
                         )
-                      ]
+                      ]*/
                           /**
                        * //shouldShowMarker(currentZoom) ? markers : [],
                        */
-                          ),
+
 
                       //MarkerLayerOptions(markers: [userMarker]),
                       //flutterMapLocation,

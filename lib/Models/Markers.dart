@@ -1,5 +1,5 @@
 class Markers {
-  final double fullID;
+  final String fullID;
   final double osmID;
   final int id;
   final double yLat;
