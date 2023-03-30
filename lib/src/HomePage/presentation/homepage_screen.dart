@@ -399,7 +399,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         future: markers,
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
-                            return MarkerLayer(markers: snapshot.data!);
+                            return MarkerLayer(
+                              markers: shouldShowMarker(currentZoom) ? snapshot.data! : []
+                            );
                           }else{
                             return Text('Error loading markers: ${snapshot.error}');
                           }
