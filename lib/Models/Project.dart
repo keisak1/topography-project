@@ -4,7 +4,7 @@ class Project {
   final String name;
   final double centerLat;
   final double centerLong;
-  final double zoom;
+  final int zoom;
   final int form;
   final List<Zone> zones;
 

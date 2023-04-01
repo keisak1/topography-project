@@ -23,7 +23,7 @@ class Zone {
         id: json['id'],
         zoneLabel: json['zone_label'],
         centerLat: json['center_lat'],
-        centerLong: json['center_lng'],
+        centerLong: json['center_long'],
         bbox: bbox,
     );
   }
@@ -32,7 +32,7 @@ class Zone {
     'id': id,
     'zone_label': zoneLabel,
     'center_lat': centerLat,
-    'center_lng': centerLong,
+    'center_long': centerLong,
     'bbox': bbox.map((bbox) => bbox.toJson()).toList(),
   };
 }

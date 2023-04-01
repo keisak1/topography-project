@@ -34,9 +34,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final Location _locationService = Location();
   StreamSubscription<LocationData>? locationSubscription;
 
-  late Future<Project> project;
   late Future<User> user;
-  late Future<Zone> zone;
   late Future<List<Marker>> markers;
 
   @override
@@ -48,9 +46,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       });
     });
     super.initState();
-    user = fetchUser();
-    project = fetchProject();
-    zone = fetchZone();
+    user = fetchData();
     markers = fetchMarkers();
     loadPrefs();
     _mapController = MapController();
@@ -211,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                     _mapController.move(
                                         LatLng(project.centerLat,
                                             project.centerLong),
-                                        project.zoom);
+                                        (project.zoom * 16.0));
                                   },
                                 );
                               } else {
@@ -231,7 +227,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                         _mapController.move(
                                             LatLng(zone.centerLat,
                                                 zone.centerLong),
-                                            project.zoom);
+                                            (project.zoom * 16.0));
                                       },
                                     );
                                   }).toList(),
@@ -369,7 +365,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-                      center: LatLng(41.171667, -8.611916195059322),
+                      center: LatLng(38.756931, -9.15358),
                       zoom: 10,
                       maxZoom: 18.499999,
                       minZoom: 0,
