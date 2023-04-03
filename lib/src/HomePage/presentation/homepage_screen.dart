@@ -106,12 +106,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           latLngList.add(LatLng(bbox.lat, bbox.lng));
         }
         final polygon = Polygon(
+          borderStrokeWidth: 4.0,
           points: latLngList,
           color: Colors.redAccent.withOpacity(0.5),
           isFilled: shouldHideHighlight(currentZoom),
           isDotted: false,
         );
-        print(polygon.points);
         polygons.add(polygon);
       }
     }
@@ -412,6 +412,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
                             final polygons = getPolygonsList(userData);
                             return PolygonLayer(
+
                               polygonCulling: false,
                               polygons: polygons,
                             );
