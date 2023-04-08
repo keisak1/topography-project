@@ -22,7 +22,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
-
   var scaffoldKey = GlobalKey<ScaffoldState>();
   late bool _isLoading;
   late final MapController _mapController;
@@ -34,7 +33,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late Future<User> user;
   late Future<List<Marker>> markers;
 
-
   @override
   void initState() {
     _isLoading = true;
@@ -45,22 +43,25 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
     super.initState();
     user = fetchData();
+    fetchMarker();
     loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
   }
-  void refreshPage(){
+
+  void fetchMarker() async {
+    // code to fetch markers and update the state
     setState(() {
-      refresh = true;
+      markers = fetchMarkers(fetchMarker);
     });
   }
+
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
     downloadZones();
   }
-
 
   @override
   void dispose() {
@@ -118,6 +119,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
     }
     return polygons;
+  }
+
+  void _updateMarkers(Future<List<Marker>> updatedMarkers) {
+    setState(() {
+      markers = updatedMarkers;
+    });
   }
 
   @override
@@ -335,7 +342,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ],
               ),
             ),
-
             Align(
                 alignment: FractionalOffset.bottomCenter,
                 // This container holds all the children that will be aligned
@@ -387,26 +393,26 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         userAgentPackageName:
                             'dev.fleaflet.flutter_map.example',
                       ),
-                        AnimatedMarkerLayer(
-                          options: AnimatedMarkerLayerOptions(
-                            duration: const Duration(
-                              milliseconds: 1000,
-                            ),
-                            marker: Marker(
-                              width: 80.0,
-                              height: 80.0,
-                              point: currentLatLng,
-                              builder: (context) => Transform.rotate(
-                                angle: heading * (pi / 180),
-                                child: const Icon(
-                                  Icons.navigation,
-                                  color: Colors.blue,
-                                  size: 30,
-                                ),
+                      AnimatedMarkerLayer(
+                        options: AnimatedMarkerLayerOptions(
+                          duration: const Duration(
+                            milliseconds: 1000,
+                          ),
+                          marker: Marker(
+                            width: 80.0,
+                            height: 80.0,
+                            point: currentLatLng,
+                            builder: (context) => Transform.rotate(
+                              angle: heading * (pi / 180),
+                              child: const Icon(
+                                Icons.navigation,
+                                color: Colors.blue,
+                                size: 30,
                               ),
                             ),
                           ),
                         ),
+                      ),
                       FutureBuilder<User>(
                         future: user,
                         builder: (context, snapshot) {
@@ -415,7 +421,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
                             final polygons = getPolygonsList(userData);
                             return PolygonLayer(
-
                               polygonCulling: false,
                               polygons: polygons,
                             );
@@ -426,7 +431,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         },
                       ),
                       FutureBuilder<List<Marker>>(
-                        future: fetchMarkers(refreshPage),
+                        future: markers,
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return MarkerLayer(
@@ -441,7 +446,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       ),
                     ]),
                 FutureBuilder<List<Marker>>(
-                  future: fetchMarkers(refreshPage),
+                  future: markers,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<Marker>? markersList = snapshot.data;

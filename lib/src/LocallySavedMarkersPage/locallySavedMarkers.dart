@@ -154,7 +154,10 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
             // display the first image if available
             final image = markerData.imagePaths.isNotEmpty
                 ? Image.file(File(markerData.imagePaths[0]))
-                : const Icon(Icons.terrain, size: 50,);
+                : const Icon(
+                    Icons.terrain,
+                    size: 50,
+                  );
 
             return Card(
               elevation: 8.0,
@@ -180,9 +183,11 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                       style: const TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
                   subtitle: Row(
-                    children:  <Widget>[
-                      const Icon(Icons.watch_later_outlined, color: Colors.yellowAccent),
-                      Text(' ${markerData.date.year}/${markerData.date.month}/${markerData.date.day} ${markerData.date.hour}:${markerData.date.minute}',
+                    children: <Widget>[
+                      const Icon(Icons.watch_later_outlined,
+                          color: Colors.yellowAccent),
+                      Text(
+                          ' ${markerData.date.year}/${markerData.date.month}/${markerData.date.day} ${markerData.date.hour}:${markerData.date.minute}',
                           style: const TextStyle(color: Colors.white)),
                     ],
                   ),
@@ -193,9 +198,10 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => DynamicForm(
-                                      marker: int.parse(markerData.markerID) /*ID DO MARKER*/,
+                                      marker: int.parse(
+                                          markerData.markerID) /*ID DO MARKER*/,
                                       questions: questions,
-                                  values: markerData.formData, onRefresh: null,)));
+                                      values: markerData.formData)));
                         },
                         icon: const Icon(Icons.edit_document,
                             color: Colors.white, size: 30.0)),

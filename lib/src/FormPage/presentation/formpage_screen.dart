@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:topography_project/Models/Markers.dart';
 import 'package:topography_project/src/FormPage/presentation/widgets/save_form_popup.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:topography_project/src/HomePage/application/homepage_utilities.dart';
 import 'widgets/dynamic_translation.dart';
 
 class Question {
@@ -25,12 +28,12 @@ class Question {
 }
 
 class DynamicForm extends StatefulWidget {
-  final Function? onRefresh;
+  final Function? fetchMarkers;
   final List<Question> questions;
   final int marker;
   final Map<String, dynamic> values;
 
-  const DynamicForm({super.key, required this.questions, required this.marker, this.values = const {}, required this.onRefresh  });
+  const DynamicForm({super.key, required this.questions, required this.marker, this.values = const {}, this.fetchMarkers});
 
   @override
   _DynamicFormState createState() => _DynamicFormState();
@@ -457,6 +460,7 @@ class _DynamicFormState extends State<DynamicForm> {
                                 // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
                                 _saveFormLocally(widget.marker.toString(),
                                     _formValues, _imageFiles);
+                                widget.fetchMarkers;
                                 Navigator.of(context).pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -471,6 +475,7 @@ class _DynamicFormState extends State<DynamicForm> {
                               } else {
                                 _saveFormLocally(widget.marker.toString(),
                                     _formValues, _imageFiles);
+                                widget.fetchMarkers;
                                 Navigator.of(context).pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(

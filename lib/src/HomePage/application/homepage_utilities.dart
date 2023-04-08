@@ -117,7 +117,7 @@ Future<void> loadPrefs() async {
   savedLocation = LatLng(latitude!, longitude!);
 }
 
-Future<List<Marker>> fetchMarkers(void Function() refreshPage) async {
+Future<List<Marker>> fetchMarkers(Function fetchMarkers) async {
   /*var connectivityResult = await (Connectivity().checkConnectivity());
 
   if (connectivityResult == ConnectivityResult.none) {
@@ -376,18 +376,15 @@ Future<List<Marker>> fetchMarkers(void Function() refreshPage) async {
           builder: (context) => GestureDetector(
             onTap: () async {
               // Replace 123 with the actual ID of the marker
-              bool refresh = await Navigator.push(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => DynamicForm(
-                            onRefresh: refreshPage,
+                            fetchMarkers: fetchMarkers,
                             questions: questions,
                             marker: markerData.id,
                             values: markersData[index].formData,
                           )));
-              if (refresh == true) {
-                refreshPage();
-              }
             },
             child: const Icon(
               Icons.circle,
@@ -405,17 +402,14 @@ Future<List<Marker>> fetchMarkers(void Function() refreshPage) async {
           builder: (context) => GestureDetector(
             onTap: () async {
               // Replace 123 with the actual ID of the marker
-              bool refresh = await Navigator.push(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => DynamicForm(
-                            onRefresh: refreshPage,
+                            fetchMarkers: fetchMarkers,
                             questions: questions,
                             marker: markerData.id,
                           )));
-              if (refresh == true) {
-                refreshPage();
-              }
             },
             child: const Icon(
               Icons.circle,
@@ -442,7 +436,7 @@ Future<List<Marker>> fetchMarkers(void Function() refreshPage) async {
                   context,
                   MaterialPageRoute(
                       builder: (context) => DynamicForm(
-                            onRefresh: refreshPage,
+                            fetchMarkers: fetchMarkers,
                             questions: questions,
                             marker: markerData.id,
                             values: markersData[index].formData,
@@ -468,7 +462,7 @@ Future<List<Marker>> fetchMarkers(void Function() refreshPage) async {
                   context,
                   MaterialPageRoute(
                       builder: (context) => DynamicForm(
-                            onRefresh: refreshPage,
+                            fetchMarkers: fetchMarkers,
                             questions: questions,
                             marker: markerData.id,
                           )));
