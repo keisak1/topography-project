@@ -25,11 +25,12 @@ class Question {
 }
 
 class DynamicForm extends StatefulWidget {
+  final Function? onRefresh;
   final List<Question> questions;
   final int marker;
   final Map<String, dynamic> values;
 
-  const DynamicForm({super.key, required this.questions, required this.marker, this.values = const {}  });
+  const DynamicForm({super.key, required this.questions, required this.marker, this.values = const {}, required this.onRefresh  });
 
   @override
   _DynamicFormState createState() => _DynamicFormState();
@@ -146,6 +147,7 @@ class _DynamicFormState extends State<DynamicForm> {
     setState(() {});
   }
 
+  
   Widget _buildQuestion(Question question) {
 
     switch (question.type) {
@@ -444,19 +446,32 @@ class _DynamicFormState extends State<DynamicForm> {
                               MaterialStateProperty.all(Colors.blueAccent),
                         ),
                         onPressed: () async {
-                          if (_imageFiles.isEmpty) {
-                          } else {
                             if (_formKey.currentState!.validate()) {
                               if (await checkInternetConnectivity()) {
-                                /**
-                                 * SEND TO THE API IF IT HAS INTERNET
-                                 *
-                                 */
+
+                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                                _saveFormLocally(widget.marker.toString(),
+                                    _formValues, _imageFiles);
+                                Navigator.of(context).pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      AppLocalizations.of(context)!.noInternet,
+                                      style:
+                                      const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                );
                                 print(_formValues);
                               } else {
                                 _saveFormLocally(widget.marker.toString(),
                                     _formValues, _imageFiles);
-                                Navigator.of(context).pop();
+                                Navigator.of(context).pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
@@ -472,8 +487,7 @@ class _DynamicFormState extends State<DynamicForm> {
                                  */
                               }
                             }
-                          }
-                        },
+                          },
                         child: Text(
                           AppLocalizations.of(context)!.submit,
                           style: const TextStyle(color: Colors.white),

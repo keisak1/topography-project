@@ -9,11 +9,7 @@ import 'package:location/location.dart';
 import 'package:topography_project/src/HomePage/presentation/widgets/distance_direction.dart';
 import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarkers.dart';
 import 'dart:async';
-import '../../FormPage/application/form_request.dart';
-import '../../FormPage/presentation/formpage_screen.dart';
-import '../../../Models/Project.dart';
 import '../../../Models/User.dart';
-import '../../../Models/Zone.dart';
 import '../application/homepage_utilities.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -26,6 +22,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+
   var scaffoldKey = GlobalKey<ScaffoldState>();
   late bool _isLoading;
   late final MapController _mapController;
@@ -37,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late Future<User> user;
   late Future<List<Marker>> markers;
 
+
   @override
   void initState() {
     _isLoading = true;
@@ -47,18 +45,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
     super.initState();
     user = fetchData();
-    markers = fetchMarkers();
     loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
   }
-
+  void refreshPage(){
+    setState(() {
+      refresh = true;
+    });
+  }
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
     downloadZones();
   }
+
 
   @override
   void dispose() {
@@ -333,6 +335,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 ],
               ),
             ),
+
             Align(
                 alignment: FractionalOffset.bottomCenter,
                 // This container holds all the children that will be aligned
@@ -423,7 +426,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         },
                       ),
                       FutureBuilder<List<Marker>>(
-                        future: markers,
+                        future: fetchMarkers(refreshPage),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return MarkerLayer(
@@ -437,30 +440,25 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         },
                       ),
                     ]),
-                ClosestMarkerWidget(
-                  userLocation: currentLatLng,
-                  markers: [
-                    Marker(
-                      width: 80,
-                      height: 80,
-                      point: LatLng(41.168517, -8.608559),
-                      builder: (context) => GestureDetector(
-                        onTap: () {
-                          // Replace 123 with the actual ID of the marker
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DynamicForm(
-                                      marker: 1, questions: questions)));
-                        },
-                        child: const Icon(
-                          Icons.circle,
-                          color: Colors.redAccent,
-                          size: 20,
-                        ),
-                      ),
-                    )
-                  ],
+                FutureBuilder<List<Marker>>(
+                  future: fetchMarkers(refreshPage),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<Marker>? markersList = snapshot.data;
+                      if (markersList != null) {
+                        return ClosestMarkerWidget(
+                          userLocation: currentLatLng,
+                          markers: markersList,
+                        );
+                      } else {
+                        return const Text('Error: markers is null');
+                      }
+                    } else if (snapshot.hasError) {
+                      return Text('Error loading markers: ${snapshot.error}');
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
                 ),
               ],
             ),

@@ -151,11 +151,10 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
           itemBuilder: (context, index) {
             final markerData = markers[index];
             final isSelected = selectedItems.contains(markerData);
-            print(markerData.formData);
             // display the first image if available
             final image = markerData.imagePaths.isNotEmpty
                 ? Image.file(File(markerData.imagePaths[0]))
-                : Container();
+                : const Icon(Icons.terrain, size: 50,);
 
             return Card(
               elevation: 8.0,
@@ -182,9 +181,9 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                           color: Colors.white, fontWeight: FontWeight.bold)),
                   subtitle: Row(
                     children:  <Widget>[
-                      Icon(Icons.watch_later_outlined, color: Colors.yellowAccent),
+                      const Icon(Icons.watch_later_outlined, color: Colors.yellowAccent),
                       Text(' ${markerData.date.year}/${markerData.date.month}/${markerData.date.day} ${markerData.date.hour}:${markerData.date.minute}',
-                          style: TextStyle(color: Colors.white)),
+                          style: const TextStyle(color: Colors.white)),
                     ],
                   ),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -196,7 +195,7 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                                   builder: (context) => DynamicForm(
                                       marker: int.parse(markerData.markerID) /*ID DO MARKER*/,
                                       questions: questions,
-                                  values: markerData.formData)));
+                                  values: markerData.formData, onRefresh: null,)));
                         },
                         icon: const Icon(Icons.edit_document,
                             color: Colors.white, size: 30.0)),
