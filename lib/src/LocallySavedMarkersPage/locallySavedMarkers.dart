@@ -35,7 +35,6 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
   Future<void> loadMarkers() async {
     final prefs = await SharedPreferences.getInstance();
     final markerIDs = prefs.getStringList('localForm') ?? [];
-    print(markerIDs);
     for (final markerID in markerIDs) {
       final formDataJson = prefs.getString(markerID);
       final formData = json.decode(formDataJson!);
@@ -44,7 +43,6 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
       DateTime dt = DateTime.fromMillisecondsSinceEpoch(dateInt!);
       final markerData = MarkerData(markerID, imagePaths!, formData, dt);
       markers.add(markerData);
-      print(markers);
     }
     setState(() {});
   }
@@ -153,6 +151,7 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
           itemBuilder: (context, index) {
             final markerData = markers[index];
             final isSelected = selectedItems.contains(markerData);
+            print(markerData.formData);
             // display the first image if available
             final image = markerData.imagePaths.isNotEmpty
                 ? Image.file(File(markerData.imagePaths[0]))
@@ -195,8 +194,9 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => DynamicForm(
-                                      marker: 1 /*ID DO MARKER*/,
-                                      questions: questions)));
+                                      marker: int.parse(markerData.markerID) /*ID DO MARKER*/,
+                                      questions: questions,
+                                  values: markerData.formData)));
                         },
                         icon: const Icon(Icons.edit_document,
                             color: Colors.white, size: 30.0)),

@@ -27,8 +27,9 @@ class Question {
 class DynamicForm extends StatefulWidget {
   final List<Question> questions;
   final int marker;
+  final Map<String, dynamic> values;
 
-  const DynamicForm({super.key, required this.questions, required this.marker});
+  const DynamicForm({super.key, required this.questions, required this.marker, this.values = const {}  });
 
   @override
   _DynamicFormState createState() => _DynamicFormState();
@@ -146,6 +147,7 @@ class _DynamicFormState extends State<DynamicForm> {
   }
 
   Widget _buildQuestion(Question question) {
+
     switch (question.type) {
       case "dropdown":
         List<DropdownMenuItem<String>> dropdownItems = question.items
@@ -164,11 +166,11 @@ class _DynamicFormState extends State<DynamicForm> {
 
         return DropdownButtonFormField(
           iconEnabledColor: Colors.white,
-          dropdownColor: Color.fromRGBO(58, 66, 86, 1.0),
+          dropdownColor: const Color.fromRGBO(58, 66, 86, 1.0),
           style:
           const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           items: dropdownItems,
-          value: _formValues[question.qid],
+          value: widget.values[question.qid.toString()] ?? _formValues[question.qid],
           onChanged: (value) {
             setState(() {
               _formValues[question.qid] = value;
@@ -183,7 +185,7 @@ class _DynamicFormState extends State<DynamicForm> {
 
       case "largetext":
         final controller =
-            TextEditingController(text: _formValues[question.qid].toString());
+            TextEditingController(text: widget.values[question.qid.toString()]?.toString() ?? _formValues[question.qid]?.toString());
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -202,7 +204,7 @@ class _DynamicFormState extends State<DynamicForm> {
         );
       case "smalltext":
         final controller =
-            TextEditingController(text: _formValues[question.qid].toString());
+            TextEditingController(text: widget.values[question.qid.toString()]?.toString() ?? _formValues[question.qid]?.toString());
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -219,7 +221,7 @@ class _DynamicFormState extends State<DynamicForm> {
         );
       case "number":
         final controller =
-            TextEditingController(text: _formValues[question.qid].toString());
+            TextEditingController(text: widget.values[question.qid.toString()]?.toString() ?? _formValues[question.qid]?.toString());
 
         return TextFormField(
           style:
