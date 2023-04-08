@@ -13,23 +13,6 @@ import '../../../Models/User.dart';
 import '../application/homepage_utilities.dart';
 
 
-class MarkerFetch extends InheritedWidget {
-  MarkerFetch({
-    required Key key,
-    required Widget child,
-  }) : super(key: key, child: child);
-
-  Future<List<Marker>> markers = fetchMarkers();
-
-  static MarkerFetch? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<MarkerFetch>();
-  }
-
-  @override
-  bool updateShouldNotify(MarkerFetch oldWidget) =>
-      markers != oldWidget.markers;
-}
-
 class MyHomePage extends StatefulWidget {
   static const String route = '/live_location';
 
@@ -61,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
     super.initState();
     user = fetchData();
-    markers = MarkerFetch.of(context)!.markers;
+    markers = fetchMarkers();
     loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
