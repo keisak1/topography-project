@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:topography_project/src/HomePage/presentation/homepage_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -13,8 +14,20 @@ Future<void> login(String username, String password, context) async {
   final response = await http.post(url, headers: headers, body: body);
   print(response.statusCode);
   if (response.statusCode == 200) {
-    print('POST request successful');
-    print(response.body);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Save the current date to shared preferences
+    DateTime currentDate = DateTime.now();
+    await prefs.setInt('startTimestamp', currentDate.millisecondsSinceEpoch);
+    // Check if 30 days have passed since the start date
+    int? startTimestamp = prefs.getInt('startTimestamp');
+    if (startTimestamp != null) {
+      DateTime startDate = DateTime.fromMillisecondsSinceEpoch(startTimestamp);
+      Duration difference = currentDate.difference(startDate);
+      if (difference.inDays >= 30) {
+        await prefs.clear();
+      }
+    }
+
     Navigator.pushReplacement(
       context!,
       MaterialPageRoute(builder: (context) => MyHomePage()),
