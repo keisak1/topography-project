@@ -117,7 +117,7 @@ Future<void> loadPrefs() async {
   savedLocation = LatLng(latitude!, longitude!);
 }
 
-Future<List<Marker>> fetchMarkers(Function fetchMarkers) async {
+Future<List<Marker>> fetchMarkers() async {
   /*var connectivityResult = await (Connectivity().checkConnectivity());
 
   if (connectivityResult == ConnectivityResult.none) {
@@ -380,7 +380,6 @@ Future<List<Marker>> fetchMarkers(Function fetchMarkers) async {
                   context,
                   MaterialPageRoute(
                       builder: (context) => DynamicForm(
-                            fetchMarkers: fetchMarkers,
                             questions: questions,
                             marker: markerData.id,
                             values: markersData[index].formData,
@@ -406,7 +405,6 @@ Future<List<Marker>> fetchMarkers(Function fetchMarkers) async {
                   context,
                   MaterialPageRoute(
                       builder: (context) => DynamicForm(
-                            fetchMarkers: fetchMarkers,
                             questions: questions,
                             marker: markerData.id,
                           )));
@@ -436,7 +434,6 @@ Future<List<Marker>> fetchMarkers(Function fetchMarkers) async {
                   context,
                   MaterialPageRoute(
                       builder: (context) => DynamicForm(
-                            fetchMarkers: fetchMarkers,
                             questions: questions,
                             marker: markerData.id,
                             values: markersData[index].formData,
@@ -462,7 +459,6 @@ Future<List<Marker>> fetchMarkers(Function fetchMarkers) async {
                   context,
                   MaterialPageRoute(
                       builder: (context) => DynamicForm(
-                            fetchMarkers: fetchMarkers,
                             questions: questions,
                             marker: markerData.id,
                           )));

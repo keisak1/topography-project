@@ -9,6 +9,7 @@ import 'package:topography_project/Models/Markers.dart';
 import 'package:topography_project/src/FormPage/presentation/widgets/save_form_popup.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:topography_project/src/HomePage/application/homepage_utilities.dart';
+import '../../HomePage/presentation/homepage_screen.dart';
 import 'widgets/dynamic_translation.dart';
 
 class Question {
@@ -28,12 +29,11 @@ class Question {
 }
 
 class DynamicForm extends StatefulWidget {
-  final Function? fetchMarkers;
   final List<Question> questions;
   final int marker;
   final Map<String, dynamic> values;
 
-  const DynamicForm({super.key, required this.questions, required this.marker, this.values = const {}, this.fetchMarkers});
+  const DynamicForm({super.key, required this.questions, required this.marker, this.values = const {}});
 
   @override
   _DynamicFormState createState() => _DynamicFormState();
@@ -460,7 +460,8 @@ class _DynamicFormState extends State<DynamicForm> {
                                 // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
                                 _saveFormLocally(widget.marker.toString(),
                                     _formValues, _imageFiles);
-                                widget.fetchMarkers;
+                                MarkerFetch.of(context)!.markers;
+
                                 Navigator.of(context).pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -475,7 +476,7 @@ class _DynamicFormState extends State<DynamicForm> {
                               } else {
                                 _saveFormLocally(widget.marker.toString(),
                                     _formValues, _imageFiles);
-                                widget.fetchMarkers;
+                                MarkerFetch.of(context)!.markers;
                                 Navigator.of(context).pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
