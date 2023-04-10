@@ -32,7 +32,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   StreamSubscription<LocationData>? locationSubscription;
 
   late Future<User> user;
-  late Future<List<Marker>> markers;
+  late Future<List<Marker>> allMarkersFuture;
+  late Future<List<Marker>> Markers;
+  bool _isChecked = false;
+  String _selectedOption = 'All markers';
+  final List<String> _options = [
+    'Incomplete',
+    'Semi-complete',
+    'Complete',
+    'All markers',
+  ];
 
   @override
   void initState() {
@@ -44,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
     super.initState();
     user = fetchData();
-    markers = fetchMarkers();
+    allMarkersFuture = fetchMarkers();
     loadPrefs();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
@@ -116,10 +125,28 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return polygons;
   }
 
-  void _updateMarkers(Future<List<Marker>> updatedMarkers) {
+  /*void _updateMarkers(Future<List<Marker>> updatedMarkers) {
     setState(() {
       markers = updatedMarkers;
     });
+  }*/
+
+  Future<List<Marker>> getMarkersToShow(Future<List<Marker>> allMarkersFuture, String option) async {
+    List<Marker> allMarkers = await allMarkersFuture;
+    List<Marker> markersToShow = [];
+    _selectedOption = option;
+
+    if (_selectedOption == 'Incomplete') {
+      for(Marker marker in allMarkers){
+        if(marker == '')
+      }
+    } else if (_selectedOption == 'Semi-complete') {
+      return allMarkers.where((marker) => marker.formStatus == 'semi-complete').toList();
+    } else if (_selectedOption == 'Complete') {
+      return allMarkers.where((marker) => marker.formStatus == 'complete').toList();
+    } else {
+      return allMarkers;
+    }
   }
 
   @override
@@ -332,12 +359,57 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           ),
                         ),
                       ),
-                      ListTile(
-                        title: const Text('Something'),
-                        onTap: () {
-                          Navigator.pop(context);
+                      CheckboxListTile(
+                        title: Text('Checkbox'),
+                        value: _isChecked,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _isChecked = value!;
+                          });
                         },
                       ),
+                      ListTile(
+                        title: Text(_options[0]),
+                        selected: _selectedOption == _options[0],
+                        onTap: () {
+                          setState(() {
+                            _selectedOption = _options[0];
+                            Markers = getMarkersToShow(allMarkers, _selectedOption);
+                          });
+                        },
+                      ),
+                      ListTile(
+                        title: Text(_options[1]),
+                        selected: _selectedOption == _options[1],
+                        onTap: () {
+                          setState(() {
+                            _selectedOption = _options[1];
+                            Markers = getMarkersToShow(allMarkers, _selectedOption);
+                          });
+                        },
+                      ),
+                      ListTile(
+                        title: Text(_options[2]),
+                        selected: _selectedOption == _options[2],
+                        onTap: () {
+                          setState(() {
+                            _selectedOption = _options[2];
+                            Markers = getMarkersToShow(allMarkers, _selectedOption);
+                          });
+                        },
+                      ),
+                      ListTile(
+                        title: Text(_options[3]),
+                        selected: _selectedOption == _options[3],
+                        onTap: () {
+                          setState(() {
+                            _selectedOption = _options[3];
+                            Markers = getMarkersToShow(allMarkers, _selectedOption);
+                          });
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      Text('Selected option: $_selectedOption'),
                     ],
                   ),
                 ),
@@ -431,7 +503,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       },
                     ),
                     FutureBuilder<List<Marker>>(
-                      future: markers,
+                      future: Markers,
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           return MarkerLayer(
@@ -446,7 +518,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     ),
                   ]),
               FutureBuilder<List<Marker>>(
-                future: markers,
+                future: Markers,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     List<Marker>? markersList = snapshot.data;
