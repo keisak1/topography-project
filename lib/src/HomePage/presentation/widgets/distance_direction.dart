@@ -51,28 +51,58 @@ double calculateDistance(lat1, lon1, lat2, lon2) {
 Widget buildClosestMarkerWidget(
     LatLng userLocation, List<Marker> markers, BuildContext context) {
   // Find the closest marker to the user
-  Marker closestMarker = markers.first;
-  double minDistance = double.infinity;
-  for (Marker marker in markers) {
-    double distance = calculateDistance(
-      userLocation.latitude,
-      userLocation.longitude,
-      marker.point.latitude,
-      marker.point.longitude,
-    );
-    if (distance < minDistance) {
-      closestMarker = marker;
-      minDistance = distance;
+  if (markers.isNotEmpty) {
+    Marker closestMarker = markers.first;
+    double minDistance = double.infinity;
+    for (Marker marker in markers) {
+      double distance = calculateDistance(
+        userLocation.latitude,
+        userLocation.longitude,
+        marker.point.latitude,
+        marker.point.longitude,
+      );
+      if (distance < minDistance) {
+        closestMarker = marker;
+        minDistance = distance;
+      }
     }
+
+    // Calculate the angle between the user's location and the closest marker
+    double angle = atan2(
+      closestMarker.point.longitude - userLocation.longitude,
+      closestMarker.point.latitude - userLocation.latitude,
+    );
+    angle = angle * 180 / pi;
+
+    return Positioned(
+        bottom: 5,
+        child: Card(
+            elevation: 8.0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(64, 75, 96, .9),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Transform.rotate(
+                    angle: angle * pi / 180,
+                    child: const Icon(
+                      Icons.arrow_upward_rounded,
+                      color: Colors.lightGreenAccent,
+                      size: 30,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${AppLocalizations.of(context)!.close} ${minDistance
+                        .toStringAsFixed(2)} km',
+                    style: const TextStyle(color: Colors.white70, fontSize: 20),
+                  ),
+                ],
+              ),
+            )));
   }
-
-  // Calculate the angle between the user's location and the closest marker
-  double angle = atan2(
-    closestMarker.point.longitude - userLocation.longitude,
-    closestMarker.point.latitude - userLocation.latitude,
-  );
-  angle = angle * 180 / pi;
-
   return Positioned(
       bottom: 5,
       child: Card(
@@ -85,7 +115,7 @@ Widget buildClosestMarkerWidget(
             child: Row(
               children: [
                 Transform.rotate(
-                  angle: angle * pi / 180,
+                  angle: 0 * pi / 180,
                   child: const Icon(
                     Icons.arrow_upward_rounded,
                     color: Colors.lightGreenAccent,
@@ -93,9 +123,9 @@ Widget buildClosestMarkerWidget(
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  '${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km',
-                  style: const TextStyle(color: Colors.white70, fontSize: 20),
+                const Text(
+                  'Not found',
+                  style: TextStyle(color: Colors.white70, fontSize: 20),
                 ),
               ],
             ),
