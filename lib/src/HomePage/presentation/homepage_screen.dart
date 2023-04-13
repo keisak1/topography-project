@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topography_project/src/HomePage/presentation/widgets/distance_direction.dart';
 import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarkers.dart';
 import 'package:topography_project/src/styles/colors.dart';
@@ -49,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
   }
+
 
   @override
   Future<void> didChangeDependencies() async {
@@ -135,6 +139,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+
     LatLng currentLatLng;
     const tag1 = 'button1';
     const tag2 = 'button2';
@@ -363,7 +368,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             children: [
                               ListTile(
                                 title: Text(AppLocalizations.of(context)!.incomplete,
-                                    style: TextStyle(color: Colors.white)),
+                                    style: const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   isSelecting = true;
                                   setState(() {
@@ -400,7 +405,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               ),
                               ListTile(
                                 title: Text(AppLocalizations.of(context)!.semicomplete,
-                                    style: TextStyle(color: Colors.white)),
+                                    style: const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   isSelecting = true;
                                   setState(() {
@@ -437,7 +442,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               ),
                               ListTile(
                                 title: Text(AppLocalizations.of(context)!.complete,
-                                    style: TextStyle(color: Colors.white)),
+                                    style: const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   isSelecting = true;
                                   setState(() {
@@ -476,7 +481,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               ),
                               ListTile(
                                 title: Text(AppLocalizations.of(context)!.allMarkers,
-                                    style: TextStyle(color: Colors.white)),
+                                    style: const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   isSelecting = true;
                                   setState(() {
@@ -624,6 +629,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 markers: markersList,
                               );
                             },
+
                             heroTag: null,
                             backgroundColor:
                                 const Color.fromRGBO(48, 56, 76, 1.0),

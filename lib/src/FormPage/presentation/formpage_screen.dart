@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,18 +28,25 @@ class Question {
   });
 }
 
-class DynamicForm extends StatefulWidget {
+class DynamicForm<T extends State<StatefulWidget>> extends StatefulWidget {
+  final Function()? onResultUpdated;
   final List<Question> questions;
   final int marker;
   final Map<String, dynamic> values;
 
-  const DynamicForm({super.key, required this.questions, required this.marker, this.values = const {}});
+  const DynamicForm(
+      {super.key,
+      required this.questions,
+      required this.marker,
+      this.values = const {},
+      this.onResultUpdated});
 
   @override
   _DynamicFormState createState() => _DynamicFormState();
 }
 
 class _DynamicFormState extends State<DynamicForm> {
+  String? currentUpdate;
   List<XFile> _imageFiles = [];
   List<Widget> _imageWidgets = [];
 
@@ -76,7 +84,8 @@ class _DynamicFormState extends State<DynamicForm> {
       final imagePaths = imageFiles.map((file) => file.path).toList();
       await prefs.setStringList('${markerID}_images', imagePaths);
 
-      await prefs.setInt('${markerID}_date', DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt(
+          '${markerID}_date', DateTime.now().millisecondsSinceEpoch);
     } else {
       forms.add(markerID);
       await prefs.setStringList('localForm', forms);
@@ -86,8 +95,8 @@ class _DynamicFormState extends State<DynamicForm> {
       final imagePaths = imageFiles.map((file) => file.path).toList();
       await prefs.setStringList('${markerID}_images', imagePaths);
       // save date
-      await prefs.setInt('${markerID}_date', DateTime.now().millisecondsSinceEpoch);
-
+      await prefs.setInt(
+          '${markerID}_date', DateTime.now().millisecondsSinceEpoch);
     }
   }
 
@@ -144,14 +153,21 @@ class _DynamicFormState extends State<DynamicForm> {
       // Update the value for the current question
       _formValues[question.qid] = savedFormData[question.qid];
     }
-    print(_formValues);
     // Trigger a rebuild of the form with the updated values
     setState(() {});
+    currentUpdate = "fav";
+    print("here");
+    print(_formValues);
   }
 
-  
   Widget _buildQuestion(Question question) {
-
+    var currentValue;
+    print(currentUpdate);
+    if (currentUpdate == "fav") {
+      currentValue = _formValues[question.qid];
+    } else {
+      currentValue = widget.values[question.qid.toString()];
+    }
     switch (question.type) {
       case "dropdown":
         List<DropdownMenuItem<String>> dropdownItems = question.items
@@ -172,24 +188,27 @@ class _DynamicFormState extends State<DynamicForm> {
           iconEnabledColor: Colors.white,
           dropdownColor: const Color.fromRGBO(58, 66, 86, 1.0),
           style:
-          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           items: dropdownItems,
-          value: widget.values[question.qid.toString()] ?? _formValues[question.qid],
+          value: _formValues[question.qid] = currentValue,
           onChanged: (value) {
             setState(() {
+              print("value");
+              print(value);
               _formValues[question.qid] = value;
             });
           },
           decoration: InputDecoration(
-            label: Text(getLocalizedLabel(question.label, context), style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            label: Text(getLocalizedLabel(question.label, context),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
             border: const OutlineInputBorder(),
           ),
         );
 
       case "largetext":
-        final controller =
-            TextEditingController(text: widget.values[question.qid.toString()]?.toString() ?? _formValues[question.qid]?.toString());
+        final controller = TextEditingController(
+            text: _formValues[question.qid] = currentValue);
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -197,18 +216,20 @@ class _DynamicFormState extends State<DynamicForm> {
           maxLines: null,
           onChanged: (value) {
             setState(() {
+
               _formValues[question.qid] = value;
             });
           },
           decoration: InputDecoration(
-            label: Text(getLocalizedLabel(question.label, context), style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            label: Text(getLocalizedLabel(question.label, context),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
             border: const OutlineInputBorder(),
           ),
         );
       case "smalltext":
-        final controller =
-            TextEditingController(text: widget.values[question.qid.toString()]?.toString() ?? _formValues[question.qid]?.toString());
+        final controller = TextEditingController(
+            text: _formValues[question.qid] = currentValue);
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -224,22 +245,24 @@ class _DynamicFormState extends State<DynamicForm> {
           ),
         );
       case "number":
-        final controller =
-            TextEditingController(text: widget.values[question.qid.toString()]?.toString() ?? _formValues[question.qid]?.toString());
+        final controller = TextEditingController(
+            text: _formValues[question.qid] = currentValue.toString());
 
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           controller: controller,
           keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) {
             setState(() {
-              _formValues[question.qid] = int.parse(value);
+              _formValues[question.qid] = value;
             });
           },
           decoration: InputDecoration(
-            label: Text(getLocalizedLabel(question.label, context), style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            label: Text(getLocalizedLabel(question.label, context),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
             border: const OutlineInputBorder(),
           ),
           validator: (value) {
@@ -279,6 +302,7 @@ class _DynamicFormState extends State<DynamicForm> {
               IconButton(
                   icon: const Icon(Icons.home, color: Colors.white),
                   onPressed: () {
+                    currentUpdate = null;
                     Navigator.pop(context);
                   }),
               IconButton(
@@ -370,7 +394,8 @@ class _DynamicFormState extends State<DynamicForm> {
                                     _formValues = formData!;
                                     _updateFormValues(_formValues);
                                   });
-                                  Navigator.of(context).pop();
+                                  Navigator.pop(context,
+                                      true); // pass true as the boolean value
                                 },
                                 trailing: IconButton(
                                   icon: const Icon(
@@ -448,48 +473,53 @@ class _DynamicFormState extends State<DynamicForm> {
                               MaterialStateProperty.all(Colors.blueAccent),
                         ),
                         onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              if (await checkInternetConnectivity()) {
-
-                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
-                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
-                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
-                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
-                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
-                                // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
-                                _saveFormLocally(widget.marker.toString(),
-                                    _formValues, _imageFiles);
-                                Navigator.of(context).pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      AppLocalizations.of(context)!.noInternet,
-                                      style:
-                                      const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                );
-                                print(_formValues);
-                              } else {
-                                _saveFormLocally(widget.marker.toString(),
-                                    _formValues, _imageFiles);
-                                Navigator.of(context).pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      AppLocalizations.of(context)!.noInternet,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                );
-                                /**
-                                 *  SAVE LOCALLY IF IT DOESN'T HAVE INTERNET
-                                 *
-                                 */
+                          if (_formKey.currentState!.validate()) {
+                            if (await checkInternetConnectivity()) {
+                              // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                              // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                              // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                              // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                              // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                              // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                              _saveFormLocally(widget.marker.toString(),
+                                  _formValues, _imageFiles);
+                              if (widget.onResultUpdated != null) {
+                                widget.onResultUpdated!.call();
                               }
+                              currentUpdate = null;
+                              print(_formValues);
+                              Navigator.of(context).pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    AppLocalizations.of(context)!.noInternet,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              _saveFormLocally(widget.marker.toString(),
+                                  _formValues, _imageFiles);
+                              if (widget.onResultUpdated != null) {
+                                widget.onResultUpdated!.call();
+                              }
+                              currentUpdate = null;
+                              Navigator.of(context).pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    AppLocalizations.of(context)!.noInternet,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                              /**
+                               *  SAVE LOCALLY IF IT DOESN'T HAVE INTERNET
+                               *
+                               */
                             }
-                          },
+                          }
+                        },
                         child: Text(
                           AppLocalizations.of(context)!.submit,
                           style: const TextStyle(color: Colors.white),
