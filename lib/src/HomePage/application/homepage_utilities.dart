@@ -14,6 +14,8 @@ import '../../FormPage/application/form_request.dart';
 import '../../FormPage/presentation/formpage_screen.dart';
 import 'package:topography_project/Models/Project.dart';
 import 'package:topography_project/Models/Zone.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:topography_project/Models/Markers.dart';
 import '../../../Models/User.dart';
 import 'package:http/http.dart' as http;
@@ -159,7 +161,6 @@ class _FilterMarkersState extends State<FilterMarkers> {
   }
 
   void reloadMarkers() {
-    print("aaaaa");
     setState(() {
       markers = loadMarkers();
     });
@@ -451,7 +452,6 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
         markerzData.markerID == markerData.id.toString())) {
           int index = markersData.indexWhere(
                   (marker) => marker.markerID == markerData.id.toString());
-          print("tou aqui");
           markers.add(Marker(
             width: 20,
             height: 20,
