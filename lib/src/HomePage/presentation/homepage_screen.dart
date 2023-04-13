@@ -114,6 +114,24 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return polygons;
   }
 
+  /*void show_Icon_Flushbar(BuildContext context) {
+    Flushbar(
+      icon: const Icon(
+        Icons.email_outlined,
+        color: Colors.white,
+        size: 30,
+      ),
+      backgroundColor: Color(0xFF0277BD),
+      duration: Duration(seconds: 4),
+      message: "This email is already registered.",
+      messageSize: 18,
+      titleText: const Text("Flushbar with Icon.",
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.bold,
+              color: Colors.white)),
+    ).show(context);
+  }*/
+
   @override
   Widget build(BuildContext context) {
     LatLng currentLatLng;
@@ -541,40 +559,41 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       ),
                       FilterMarkers(currentZoom)
                     ]),
-                FutureBuilder<List<Marker>>(
-                  future: filterMarkers(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      List<Marker>? markersList = snapshot.data;
-                      if (markersList != null) {
-                        return ClosestMarkerWidget(
-                          userLocation: currentLatLng,
-                          markers: markersList,
-                        );
-                      } else {
-                        return const Text('Error: markers is null');
-                      }
-                    } else if (snapshot.hasError) {
-                      return Text('Error loading markers: ${snapshot.error}');
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
-                  },
-                ),
               ],
             ),
       floatingActionButton: Stack(
         children: [
-          Positioned(
-            bottom: 60,
-            right: 0,
-            child:
-            FloatingActionButton(
-              onPressed: () {
-              },
-              backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
-              child: const Icon(Icons.notifications),
-            ),
+          FutureBuilder<List<Marker>>(
+            future: filterMarkers(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List<Marker>? markersList = snapshot.data;
+                if (markersList != null) {
+                  return Positioned(
+                    bottom: 60,
+                    right: 0,
+                    child:
+                    FloatingActionButton(
+                      onPressed: () {
+                        ClosestMarkerWidget(
+                          userLocation: currentLatLng,
+                          markers: markersList,
+                        );
+                      },
+                      heroTag: null,
+                      backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                      child: const Icon(Icons.notifications),
+                    ),
+                  );
+                } else {
+                  return const Text('Error: markers is null');
+                }
+              } else if (snapshot.hasError) {
+                return Text('Error loading markers: ${snapshot.error}');
+              } else {
+                return const CircularProgressIndicator();
+              }
+            },
           ),
           Positioned(
             bottom: 0,
@@ -584,6 +603,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               onPressed: () {
                 _mapController.move(currentLatLng, 17);
               },
+              heroTag: null,
               //label: Text(
               //AppLocalizations.of(context)!.buildings,
               //),

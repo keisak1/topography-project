@@ -51,7 +51,7 @@ dependencies:
   uuid: ^3.0.7
   image_picker: ^0.8.7
   connectivity: ^3.0.6
-  fluttertoast: ^6.0.0
+  another_flushbar: ^1.12.29
 
 dev_dependencies:
   flutter_test:
