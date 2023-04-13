@@ -97,8 +97,7 @@ Widget buildClosestMarkerWidget(
     angle = angle * 180 / pi;
 
     return
-
-      /*Positioned(
+      Positioned(
         bottom: 5,
         child: Card(
             elevation: 8.0,
@@ -125,7 +124,7 @@ Widget buildClosestMarkerWidget(
                   ),
                 ],
               ),
-            )));*/
+            )));
   }
   return Positioned(
       bottom: 5,

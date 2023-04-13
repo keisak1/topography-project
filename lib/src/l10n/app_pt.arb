@@ -78,7 +78,11 @@
   "images": "Selecionar Imagens",
   "selectOne": "Escolha pelo menos uma imagem.",
   "noInternet": "Formulário guardado localmente (Sem ligação à Internet)",
-  "selectDelete": "Itens eliminados"
-
-
+  "selectDelete": "Itens eliminados",
+  "optionsSelected": "Sem opções selecionadas",
+  "filters": "Filtros",
+  "incomplete": "Markers incompletos",
+  "semicomplete": "Markers semi-completos",
+  "complete": "Markers completos",
+  "allMarkers": "Todos os markers"
 }

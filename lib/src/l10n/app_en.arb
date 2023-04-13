@@ -78,5 +78,11 @@
   "images": "Select Images",
   "selectOne": "Please select at least one image.",
   "noInternet": "Form saved locally (No Internet Connection)",
-  "selectDelete": "Items deleted"
+  "selectDelete": "Items deleted",
+  "optionsSelected": "No options selected",
+  "filters": "Filters",
+  "incomplete": "Incomplete markers",
+  "semicomplete": "Semi-complete markers",
+  "complete": "Complete markers",
+  "allMarkers": "All markers"
 }
