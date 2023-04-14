@@ -86,6 +86,7 @@ class _DynamicFormState extends State<DynamicForm> {
 
       await prefs.setInt(
           '${markerID}_date', DateTime.now().millisecondsSinceEpoch);
+
     } else {
       forms.add(markerID);
       await prefs.setStringList('localForm', forms);
@@ -156,17 +157,22 @@ class _DynamicFormState extends State<DynamicForm> {
     // Trigger a rebuild of the form with the updated values
     setState(() {});
     currentUpdate = "fav";
-    print("here");
     print(_formValues);
   }
 
   Widget _buildQuestion(Question question) {
     var currentValue;
-    print(currentUpdate);
     if (currentUpdate == "fav") {
       currentValue = _formValues[question.qid];
     } else {
-      currentValue = widget.values[question.qid.toString()];
+      if(widget.values[question.qid.toString()]!=null){
+        currentValue = widget.values[question.qid.toString()];
+        print(currentValue);
+      }else{
+        currentValue = _formValues[question.qid];
+        print(currentValue);
+      }
+
     }
     switch (question.type) {
       case "dropdown":
@@ -190,7 +196,7 @@ class _DynamicFormState extends State<DynamicForm> {
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           items: dropdownItems,
-          value: _formValues[question.qid] = currentValue,
+          value: currentValue,
           onChanged: (value) {
             setState(() {
               print("value");
@@ -208,7 +214,7 @@ class _DynamicFormState extends State<DynamicForm> {
 
       case "largetext":
         final controller = TextEditingController(
-            text: _formValues[question.qid] = currentValue);
+            text: currentValue ?? '');
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -216,7 +222,7 @@ class _DynamicFormState extends State<DynamicForm> {
           maxLines: null,
           onChanged: (value) {
             setState(() {
-
+              print(controller.text);
               _formValues[question.qid] = value;
             });
           },
@@ -229,14 +235,14 @@ class _DynamicFormState extends State<DynamicForm> {
         );
       case "smalltext":
         final controller = TextEditingController(
-            text: _formValues[question.qid] = currentValue);
+            text: currentValue);
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           controller: controller,
           onChanged: (value) {
             setState(() {
-              _formValues[question.qid] = value;
+              _formValues[question.qid] = controller.text;
             });
           },
           decoration: InputDecoration(
@@ -246,7 +252,7 @@ class _DynamicFormState extends State<DynamicForm> {
         );
       case "number":
         final controller = TextEditingController(
-            text: _formValues[question.qid] = currentValue.toString());
+            text: currentValue.toString() ?? '');
 
         return TextFormField(
           style:
@@ -256,7 +262,8 @@ class _DynamicFormState extends State<DynamicForm> {
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) {
             setState(() {
-              _formValues[question.qid] = value;
+              _formValues[question.qid] = controller.text;
+              print(_formValues[question.qid]);
             });
           },
           decoration: InputDecoration(
@@ -274,9 +281,9 @@ class _DynamicFormState extends State<DynamicForm> {
                 intVal < question.range[0] ||
                 intVal > question.range[1]) {
               return AppLocalizations.of(context)!.valueBetween +
-                  '${question.range[0]}' +
+                  ' ${question.range[0]}' +
                   AppLocalizations.of(context)!.and +
-                  '${question.range[1]}';
+                  ' ${question.range[1]}';
             }
             return null;
           },
@@ -484,6 +491,7 @@ class _DynamicFormState extends State<DynamicForm> {
                               _saveFormLocally(widget.marker.toString(),
                                   _formValues, _imageFiles);
                               if (widget.onResultUpdated != null) {
+                                print("é diferente de null");
                                 widget.onResultUpdated!.call();
                               }
                               currentUpdate = null;

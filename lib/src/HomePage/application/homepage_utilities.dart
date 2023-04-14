@@ -161,6 +161,7 @@ class _FilterMarkersState extends State<FilterMarkers> {
   }
 
   void reloadMarkers() {
+    print("I'M RELOADING");
     setState(() {
       markers = loadMarkers();
     });
@@ -286,6 +287,8 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
   final markerIDs = prefs.getStringList('localForm') ?? [];
   for (final markerID in markerIDs) {
     final formDataJson = prefs.getString(markerID);
+    print("json");
+    print(formDataJson);
     final formData = json.decode(formDataJson!);
     final imagePaths = prefs.getStringList('${markerID}_images');
     final dateInt = prefs.getInt('${markerID}_date');
