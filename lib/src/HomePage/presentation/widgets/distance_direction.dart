@@ -18,11 +18,13 @@ class ClosestMarkerWidget extends StatefulWidget {
 
 class _ClosestMarkerWidget extends State<ClosestMarkerWidget> {
   late LatLng _userLocation;
+  late List<Marker> _markers;
 
   @override
   void initState() {
     super.initState();
     _userLocation = widget.userLocation;
+    _markers = widget.markers;
   }
 
   @override
@@ -33,11 +35,16 @@ class _ClosestMarkerWidget extends State<ClosestMarkerWidget> {
         _userLocation = widget.userLocation;
       });
     }
+    if (widget.markers != oldWidget.markers) {
+      setState(() {
+        _markers = widget.markers;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return buildClosestMarkerWidget(_userLocation, widget.markers, context);
+    return buildClosestMarkerWidget(_userLocation, _markers, context);
   }
 }
 
@@ -49,9 +56,7 @@ double calculateDistance(lat1, lon1, lat2, lon2) {
   return 12742 * asin(sqrt(a));
 }
 
-Widget buildClosestMarkerWidget(
-    LatLng userLocation, List<Marker> markers, BuildContext context) {
-  // Find the closest marker to the user
+Widget buildClosestMarkerWidget(LatLng userLocation, List<Marker> markers, BuildContext context) {
   if (markers.isNotEmpty) {
     Marker closestMarker = markers.first;
     double minDistance = double.infinity;
@@ -76,60 +81,55 @@ Widget buildClosestMarkerWidget(
     angle = angle * 180 / pi;
 
     return Positioned(
-        bottom: 5,
-        child: Card(
-            elevation: 8.0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(64, 75, 96, .9),
-                borderRadius: BorderRadius.circular(8),
+      bottom: 60,
+      right: 0,
+      child: FloatingActionButton(
+        onPressed: () {
+          Flushbar(
+            title: "Closest Building",
+            icon: Transform.rotate(
+              angle: angle * pi / 180,
+              child: const Icon(
+                Icons.arrow_upward_rounded,
+                color: Colors.lightGreenAccent,
               ),
-              child: Row(
-                children: [
-                  Transform.rotate(
-                    angle: angle * pi / 180,
-                    child: const Icon(
-                      Icons.arrow_upward_rounded,
-                      color: Colors.lightGreenAccent,
-                      size: 30,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${AppLocalizations.of(context)!.close} ${minDistance
-                        .toStringAsFixed(2)} km',
-                    style: const TextStyle(color: Colors.white70, fontSize: 20),
-                  ),
-                ],
-              ),
-            )));
+            ),
+            backgroundColor: Colors.blueGrey,
+            message: "${AppLocalizations.of(context)!.close} ${minDistance
+                .toStringAsFixed(2)} km",
+          ).show(context);
+          },
+        heroTag: null,
+        backgroundColor:
+        const Color.fromRGBO(48, 56, 76, 1.0),
+        child: const Icon(Icons.notifications),
+      ),
+    );
   }
 
   return Positioned(
-      bottom: 5,
-      child: Card(
-          elevation: 8.0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(64, 75, 96, .9),
-              borderRadius: BorderRadius.circular(8),
+    bottom: 60,
+    right: 0,
+    child: FloatingActionButton(
+      onPressed: () {
+        Flushbar(
+          title: "Closest Building",
+          icon: Transform.rotate(
+            angle: 0 * pi / 180,
+            child: const Icon(
+              Icons.arrow_upward_rounded,
+              color: Colors.lightGreenAccent,
             ),
-            child: Row(
-              children: [
-                Transform.rotate(
-                  angle: 0 * pi / 180,
-                  child: const Icon(
-                    Icons.arrow_upward_rounded,
-                    color: Colors.lightGreenAccent,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Not found',
-                  style: TextStyle(color: Colors.white70, fontSize: 20),
-                ),
-              ],
-            ),
-          )));
+          ),
+          backgroundColor: Colors.blueGrey,
+          message: "Closest Building not found",
+
+        ).show(context);
+        },
+      heroTag: null,
+      backgroundColor:
+      const Color.fromRGBO(48, 56, 76, 1.0),
+      child: const Icon(Icons.notifications),
+    ),
+  );
 }

@@ -607,23 +607,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     if (snapshot.hasData) {
                       List<Marker>? markersList = snapshot.data;
                       if (markersList != null) {
-                        return Positioned(
-                          bottom: 60,
-                          right: 0,
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              /*Flushbar flushbar = ClosestMarkerWidget(
-                                userLocation: currentLatLng,
-                                markers: markersList,
-                              );*/
-                              ClosestMarker(currentLatLng, markersList, context);
-                            },
-                            heroTag: null,
-                            backgroundColor:
-                                const Color.fromRGBO(48, 56, 76, 1.0),
-                            child: const Icon(Icons.notifications),
-                          ),
-                        );
+                        return ClosestMarkerWidget(userLocation: currentLatLng, markers: markersList);
                       } else {
                         return const Text('Error: markers is null');
                       }
