@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
@@ -115,23 +118,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return polygons;
   }
 
-  /*void show_Icon_Flushbar(BuildContext context) {
-    Flushbar(
-      icon: const Icon(
-        Icons.email_outlined,
-        color: Colors.white,
-        size: 30,
-      ),
-      backgroundColor: Color(0xFF0277BD),
-      duration: Duration(seconds: 4),
-      message: "This email is already registered.",
-      messageSize: 18,
-      titleText: const Text("Flushbar with Icon.",
-          style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.bold,
-              color: Colors.white)),
-    ).show(context);
-  }*/
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var a = 0.5 -
+        cos((lat2 - lat1) * p) / 2 +
+        cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -619,10 +612,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           right: 0,
                           child: FloatingActionButton(
                             onPressed: () {
-                              ClosestMarkerWidget(
+                              /*Flushbar flushbar = ClosestMarkerWidget(
                                 userLocation: currentLatLng,
                                 markers: markersList,
-                              );
+                              );*/
+                              ClosestMarker(currentLatLng, markersList, context);
                             },
                             heroTag: null,
                             backgroundColor:

@@ -49,27 +49,6 @@ double calculateDistance(lat1, lon1, lat2, lon2) {
   return 12742 * asin(sqrt(a));
 }
 
-void showIconFlushbar(BuildContext context) {
-  Flushbar(
-    title: "Test",
-
-    /*icon: const Icon(
-      Icons.email_outlined,
-      color: Colors.white,
-      size: 30,
-    ),
-    backgroundColor: Color(0xFF0277BD),
-    duration: Duration(seconds: 4),
-    message: "This email is already registered.",
-    messageSize: 18,
-    titleText: const Text("Flushbar with Icon.",
-        style: TextStyle(
-            fontSize: 16, fontWeight: FontWeight.bold,
-            color: Colors.white)),*/
-
-  ).show(context);
-}
-
 Widget buildClosestMarkerWidget(
     LatLng userLocation, List<Marker> markers, BuildContext context) {
   // Find the closest marker to the user
@@ -96,8 +75,7 @@ Widget buildClosestMarkerWidget(
     );
     angle = angle * 180 / pi;
 
-    return
-      Positioned(
+    return Positioned(
         bottom: 5,
         child: Card(
             elevation: 8.0,
@@ -126,6 +104,7 @@ Widget buildClosestMarkerWidget(
               ),
             )));
   }
+
   return Positioned(
       bottom: 5,
       child: Card(
