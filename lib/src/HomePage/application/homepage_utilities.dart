@@ -161,7 +161,6 @@ class _FilterMarkersState extends State<FilterMarkers> {
   }
 
   void reloadMarkers() {
-    print("I'M RELOADING");
     setState(() {
       markers = loadMarkers();
     });
@@ -287,8 +286,6 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
   final markerIDs = prefs.getStringList('localForm') ?? [];
   for (final markerID in markerIDs) {
     final formDataJson = prefs.getString(markerID);
-    print("json");
-    print(formDataJson);
     final formData = json.decode(formDataJson!);
     final imagePaths = prefs.getStringList('${markerID}_images');
     final dateInt = prefs.getInt('${markerID}_date');
@@ -319,6 +316,7 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
                                   questions: questions,
                                   marker: markerData.id,
                                   values: markersData[index].formData,
+                                  image: markersData[index].imagePaths,
                                   onResultUpdated: optionalParameter!,
                                 )));
                   },
@@ -379,6 +377,7 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
                                   questions: questions,
                                   marker: markerData.id,
                                   values: markersData[index].formData,
+                                  image: markersData[index].imagePaths,
                                   onResultUpdated: optionalParameter!,
                                 )));
                   },
@@ -471,6 +470,7 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
                                   questions: questions,
                                   marker: markerData.id,
                                   values: markersData[index].formData,
+                                  image: markersData[index].imagePaths,
                                   onResultUpdated: optionalParameter!,
                                 )));
                   },
@@ -535,6 +535,7 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
                                     questions: questions,
                                     marker: markerData.id,
                                     values: markersData[index].formData,
+                                    image: markersData[index].imagePaths,
                                     onResultUpdated: optionalParameter!,
                                   )));
                     },
@@ -632,6 +633,7 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
                                   questions: questions,
                                   marker: markerData.id,
                                   values: markersData[index].formData,
+                                  image: markersData[index].imagePaths,
                                   onResultUpdated: optionalParameter!,
                                 )));
                   },
@@ -696,6 +698,7 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
                                     questions: questions,
                                     marker: markerData.id,
                                     values: markersData[index].formData,
+                                    image: markersData[index].imagePaths,
                                     onResultUpdated: optionalParameter!,
                                   )));
                     },
@@ -773,32 +776,66 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
   } else if (selectedOption.contains('Complete markers')) {
     for (Markers markerData in markersList) {
       if (markerData.status == 2) {
-        markers.add(Marker(
-          width: 20,
-          height: 20,
-          point: LatLng(markerData.yLat, markerData.xLong),
-          builder: (context) =>
-              GestureDetector(
-                onTap: () {
-                  // Replace 123 with the actual ID of the marker
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              DynamicForm(
-                                questions: questions,
-                                marker: markerData.id,
-                                onResultUpdated: optionalParameter!,
-                              )));
-                },
-                child: const Icon(
-                  Icons.circle,
-                  color: Colors.greenAccent,
-                  //replace color with the color or specification from API
-                  size: 20,
+        if (markersData.any((markerzData) =>
+        markerzData.markerID == markerData.id.toString())) {
+          int index = markersData.indexWhere(
+                  (marker) => marker.markerID == markerData.id.toString());
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) =>
+                GestureDetector(
+                  onTap: () async {
+                    // Replace 123 with the actual ID of the marker
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DynamicForm(
+                                  questions: questions,
+                                  marker: markerData.id,
+                                  values: markersData[index].formData,
+                                  image: markersData[index].imagePaths,
+                                  onResultUpdated: optionalParameter!,
+                                )));
+                  },
+                  child: const Icon(
+                    Icons.circle,
+                    color: Colors.greenAccent,
+                    //replace color with the color or specification from API
+                    size: 20,
+                  ),
                 ),
-              ),
-        ));
+          ));
+        }else{
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) =>
+                GestureDetector(
+                  onTap: () async {
+                    // Replace 123 with the actual ID of the marker
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DynamicForm(
+                                  questions: questions,
+                                  marker: markerData.id,
+                                  onResultUpdated: optionalParameter!,
+                                )));
+                  },
+                  child: const Icon(
+                    Icons.circle,
+                    color: Colors.greenAccent,
+                    //replace color with the color or specification from API
+                    size: 20,
+                  ),
+                ),
+          ));
+        }
       }
     }
     if (selectedOption.contains('Incomplete markers')) {
@@ -824,6 +861,7 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
                                     questions: questions,
                                     marker: markerData.id,
                                     values: markersData[index].formData,
+                                    image: markersData[index].imagePaths,
                                     onResultUpdated: optionalParameter!,
                                   )));
                     },
@@ -888,6 +926,7 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
                                     questions: questions,
                                     marker: markerData.id,
                                     values: markersData[index].formData,
+                                    image: markersData[index].imagePaths,
                                     onResultUpdated: optionalParameter!,
                                   )));
                     },

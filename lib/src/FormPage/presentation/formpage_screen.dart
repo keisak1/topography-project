@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:full_screen_image/full_screen_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topography_project/Models/Markers.dart';
 import 'package:topography_project/src/FormPage/presentation/widgets/save_form_popup.dart';
@@ -30,6 +32,7 @@ class Question {
 
 class DynamicForm<T extends State<StatefulWidget>> extends StatefulWidget {
   final Function()? onResultUpdated;
+  final List<String>? image;
   final List<Question> questions;
   final int marker;
   final Map<String, dynamic> values;
@@ -39,7 +42,7 @@ class DynamicForm<T extends State<StatefulWidget>> extends StatefulWidget {
       required this.questions,
       required this.marker,
       this.values = const {},
-      this.onResultUpdated});
+      this.onResultUpdated, this.image});
 
   @override
   _DynamicFormState createState() => _DynamicFormState();
@@ -56,6 +59,10 @@ class _DynamicFormState extends State<DynamicForm> {
   @override
   void initState() {
     super.initState();
+    if(widget.image != null){
+      print("carregando imagens");
+      widget.image?.map((e) =>  _imageFiles.add(XFile(e)));
+    }
     for (var question in widget.questions) {
       if (question.type == 'number') {
         _formValues[question.qid] = question.range[0];
@@ -86,7 +93,6 @@ class _DynamicFormState extends State<DynamicForm> {
 
       await prefs.setInt(
           '${markerID}_date', DateTime.now().millisecondsSinceEpoch);
-
     } else {
       forms.add(markerID);
       await prefs.setStringList('localForm', forms);
@@ -157,7 +163,6 @@ class _DynamicFormState extends State<DynamicForm> {
     // Trigger a rebuild of the form with the updated values
     setState(() {});
     currentUpdate = "fav";
-    print(_formValues);
   }
 
   Widget _buildQuestion(Question question) {
@@ -165,14 +170,11 @@ class _DynamicFormState extends State<DynamicForm> {
     if (currentUpdate == "fav") {
       currentValue = _formValues[question.qid];
     } else {
-      if(widget.values[question.qid.toString()]!=null){
+      if (widget.values[question.qid.toString()] != null) {
         currentValue = widget.values[question.qid.toString()];
-        print(currentValue);
-      }else{
+      } else {
         currentValue = _formValues[question.qid];
-        print(currentValue);
       }
-
     }
     switch (question.type) {
       case "dropdown":
@@ -199,8 +201,7 @@ class _DynamicFormState extends State<DynamicForm> {
           value: currentValue,
           onChanged: (value) {
             setState(() {
-              print("value");
-              print(value);
+
               _formValues[question.qid] = value;
             });
           },
@@ -213,8 +214,7 @@ class _DynamicFormState extends State<DynamicForm> {
         );
 
       case "largetext":
-        final controller = TextEditingController(
-            text: currentValue ?? '');
+        final controller = TextEditingController(text: currentValue ?? '');
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -222,7 +222,6 @@ class _DynamicFormState extends State<DynamicForm> {
           maxLines: null,
           onChanged: (value) {
             setState(() {
-              print(controller.text);
               _formValues[question.qid] = value;
             });
           },
@@ -234,8 +233,7 @@ class _DynamicFormState extends State<DynamicForm> {
           ),
         );
       case "smalltext":
-        final controller = TextEditingController(
-            text: currentValue);
+        final controller = TextEditingController(text: currentValue);
         return TextFormField(
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -251,8 +249,8 @@ class _DynamicFormState extends State<DynamicForm> {
           ),
         );
       case "number":
-        final controller = TextEditingController(
-            text: currentValue.toString() ?? '');
+        final controller =
+            TextEditingController(text: currentValue.toString() ?? '');
 
         return TextFormField(
           style:
@@ -263,7 +261,6 @@ class _DynamicFormState extends State<DynamicForm> {
           onChanged: (value) {
             setState(() {
               _formValues[question.qid] = controller.text;
-              print(_formValues[question.qid]);
             });
           },
           decoration: InputDecoration(
@@ -491,11 +488,9 @@ class _DynamicFormState extends State<DynamicForm> {
                               _saveFormLocally(widget.marker.toString(),
                                   _formValues, _imageFiles);
                               if (widget.onResultUpdated != null) {
-                                print("é diferente de null");
                                 widget.onResultUpdated!.call();
                               }
                               currentUpdate = null;
-                              print(_formValues);
                               Navigator.of(context).pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -549,12 +544,40 @@ class _DynamicFormState extends State<DynamicForm> {
       return Text(AppLocalizations.of(context)!.selectOne,
           style: const TextStyle(color: Colors.white));
     } else {
-      return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 100),
-        height: 80,
-        child: Row(children: [
-          ..._imageWidgets,
-        ]),
+      return CarouselSlider(
+        options: CarouselOptions(enableInfiniteScroll: false, height: 400.0),
+        items: _imageFiles.map((i) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Stack(
+                children: [
+                  FullScreenWidget(
+                    disposeLevel: DisposeLevel.High,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: Image.file(File(i.path)),
+                    ),
+                  ),
+                  Positioned(
+                    top: 20,
+                    right: 20,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red.withAlpha(255),
+                      ),
+                      onPressed: () {
+                        _imageFiles.remove(i);
+                        setState(() {});
+                      },
+                      child: Icon(Icons.delete_outline),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        }).toList(),
       );
     }
   }
@@ -597,35 +620,31 @@ class _DynamicFormState extends State<DynamicForm> {
   pickImageGallery() async {
     List<XFile> images = [];
     final picker = ImagePicker();
-    for (int i = 0; i < 3; i++) {
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-      if (pickedFile == null) break;
-      images.add(pickedFile);
+    if (_imageFiles.length > 3) {
+      return;
     }
-    if (images != null) {
-      setState(() {
-        _imageFiles = images;
-        _imageWidgets =
-            _imageFiles.map((image) => Image.file(File(image.path))).toList();
-      });
-    }
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if(pickedFile != null){
+    setState(() {
+      _imageFiles.add(pickedFile);
+      _imageWidgets =
+          _imageFiles.map((image) => Image.file(File(image.path))).toList();
+    });}
   }
 
   pickImageCam() async {
     List<XFile> images = [];
     final picker = ImagePicker();
-    for (int i = 0; i < 3; i++) {
-      final pickedFile = await picker.pickImage(source: ImageSource.camera);
-      if (pickedFile == null) break;
-      images.add(pickedFile);
+    if (_imageFiles.length > 3) {
+      return;
     }
-    if (images != null) {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if(pickedFile != null){
       setState(() {
-        _imageFiles = images;
+        _imageFiles.add(pickedFile);
         _imageWidgets =
             _imageFiles.map((image) => Image.file(File(image.path))).toList();
-      });
-    }
+      });}
   }
 
   Future<bool> checkInternetConnectivity() async {
