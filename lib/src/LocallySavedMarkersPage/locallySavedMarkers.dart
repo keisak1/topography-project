@@ -201,7 +201,9 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                                       marker: int.parse(
                                           markerData.markerID) /*ID DO MARKER*/,
                                       questions: questions,
-                                      values: markerData.formData)));
+                                      values: markerData.formData,
+                                      image: markerData.imagePaths
+                                  )));
                         },
                         icon: const Icon(Icons.edit_document,
                             color: Colors.white, size: 30.0)),

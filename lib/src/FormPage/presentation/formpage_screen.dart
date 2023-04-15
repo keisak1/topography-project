@@ -60,8 +60,10 @@ class _DynamicFormState extends State<DynamicForm> {
   void initState() {
     super.initState();
     if(widget.image != null){
-      print("carregando imagens");
-      widget.image?.map((e) =>  _imageFiles.add(XFile(e)));
+      for (String imagePath in widget.image!) {
+        XFile imageFile = XFile(imagePath);
+        _imageFiles.add(imageFile);
+      }
     }
     for (var question in widget.questions) {
       if (question.type == 'number') {

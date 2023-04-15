@@ -418,32 +418,66 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
           ));
         }
       } else if (markerData.status == 2) {
-        markers.add(Marker(
-          width: 20,
-          height: 20,
-          point: LatLng(markerData.yLat, markerData.xLong),
-          builder: (context) =>
-              GestureDetector(
-                onTap: () {
-                  // Replace 123 with the actual ID of the marker
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              DynamicForm(
-                                questions: questions,
-                                marker: markerData.id,
-                                onResultUpdated: optionalParameter!,
-                              )));
-                },
-                child: const Icon(
-                  Icons.circle,
-                  color: Colors.greenAccent,
-                  //replace color with the color or specification from API
-                  size: 20,
+        if (markersData.any((markerzData) =>
+        markerzData.markerID == markerData.id.toString())) {
+          int index = markersData.indexWhere(
+                  (marker) => marker.markerID == markerData.id.toString());
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) =>
+                GestureDetector(
+                  onTap: () {
+                    // Replace 123 with the actual ID of the marker
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DynamicForm(
+                                  questions: questions,
+                                  marker: markerData.id,
+                                  values: markersData[index].formData,
+                                  image: markersData[index].imagePaths,
+                                  onResultUpdated: optionalParameter!,
+                                )));
+                  },
+                  child: const Icon(
+                    Icons.circle,
+                    color: Colors.greenAccent,
+                    //replace color with the color or specification from API
+                    size: 20,
+                  ),
                 ),
-              ),
-        ));
+          ));
+        } else {
+          markers.add(Marker(
+            width: 20,
+            height: 20,
+            point: LatLng(markerData.yLat, markerData.xLong),
+            builder: (context) =>
+                GestureDetector(
+                  onTap: () {
+                    // Replace 123 with the actual ID of the marker
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                DynamicForm(
+                                  questions: questions,
+                                  marker: markerData.id,
+                                  onResultUpdated: optionalParameter!,
+                                )));
+                  },
+                  child: const Icon(
+                    Icons.circle,
+                    color: Colors.greenAccent,
+                    //replace color with the color or specification from API
+                    size: 20,
+                  ),
+                ),
+          ));
+        }
       }
     }
     return markers;
@@ -580,32 +614,66 @@ Future<List<Marker>> filterMarkers({Function()? optionalParameter}) async {
     } else if (selectedOption.contains('Complete markers')) {
       for (Markers markerData in markersList) {
         if (markerData.status == 2) {
-          markers.add(Marker(
-            width: 20,
-            height: 20,
-            point: LatLng(markerData.yLat, markerData.xLong),
-            builder: (context) =>
-                GestureDetector(
-                  onTap: () {
-                    // Replace 123 with the actual ID of the marker
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                DynamicForm(
-                                  questions: questions,
-                                  marker: markerData.id,
-                                  onResultUpdated: optionalParameter!,
-                                )));
-                  },
-                  child: const Icon(
-                    Icons.circle,
-                    color: Colors.greenAccent,
-                    //replace color with the color or specification from API
-                    size: 20,
+          if (markersData.any((markerzData) =>
+          markerzData.markerID == markerData.id.toString())) {
+            int index = markersData.indexWhere(
+                    (marker) => marker.markerID == markerData.id.toString());
+            markers.add(Marker(
+              width: 20,
+              height: 20,
+              point: LatLng(markerData.yLat, markerData.xLong),
+              builder: (context) =>
+                  GestureDetector(
+                    onTap: () {
+                      // Replace 123 with the actual ID of the marker
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  DynamicForm(
+                                    questions: questions,
+                                    marker: markerData.id,
+                                    values: markersData[index].formData,
+                                    image: markersData[index].imagePaths,
+                                    onResultUpdated: optionalParameter!,
+                                  )));
+                    },
+                    child: const Icon(
+                      Icons.circle,
+                      color: Colors.greenAccent,
+                      //replace color with the color or specification from API
+                      size: 20,
+                    ),
                   ),
-                ),
-          ));
+            ));
+          }else {
+            markers.add(Marker(
+              width: 20,
+              height: 20,
+              point: LatLng(markerData.yLat, markerData.xLong),
+              builder: (context) =>
+                  GestureDetector(
+                    onTap: () {
+                      // Replace 123 with the actual ID of the marker
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  DynamicForm(
+                                    questions: questions,
+                                    marker: markerData.id,
+                                    onResultUpdated: optionalParameter!,
+                                  )));
+                    },
+                    child: const Icon(
+                      Icons.circle,
+                      color: Colors.greenAccent,
+                      //replace color with the color or specification from API
+                      size: 20,
+                    ),
+                  ),
+            ));
+          }
         }
       }
     }
