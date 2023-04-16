@@ -97,6 +97,9 @@ Widget buildClosestMarkerWidget(LatLng userLocation, List<Marker> markers, Build
             backgroundColor: Colors.blueGrey,
             message: "${AppLocalizations.of(context)!.close} ${minDistance
                 .toStringAsFixed(2)} km",
+            onTap: (flushbar){
+              flushbar.dismiss();
+              },
           ).show(context);
           },
         heroTag: null,
