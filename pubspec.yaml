@@ -52,6 +52,8 @@ dependencies:
   image_picker: ^0.8.7
   connectivity: ^3.0.6
   another_flushbar: ^1.12.29
+  carousel_slider: ^4.2.1
+  full_screen_image: ^2.0.0
 
 dev_dependencies:
   flutter_test:
