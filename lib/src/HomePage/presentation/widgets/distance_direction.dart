@@ -116,7 +116,7 @@ Widget buildClosestMarkerWidget(LatLng userLocation, List<Marker> markers, Build
     child: FloatingActionButton(
       onPressed: () {
         Flushbar(
-          title: "Closest Building",
+          title: "${AppLocalizations.of(context)!.building}",
           icon: Transform.rotate(
             angle: 0 * pi / 180,
             child: const Icon(
@@ -125,7 +125,7 @@ Widget buildClosestMarkerWidget(LatLng userLocation, List<Marker> markers, Build
             ),
           ),
           backgroundColor: Colors.blueGrey,
-          message: "Closest Building not found",
+          message: "${AppLocalizations.of(context)!.buildingNotFound}",
 
         ).show(context);
         },

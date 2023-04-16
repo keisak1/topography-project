@@ -73,6 +73,8 @@
   "inclined_sandwich": "Inclinado sanduíche",
   "oth": "Outro",
   "close": "Edíficio mais próximo a:",
+  "building": "Edíficio mais próximo",
+  "buildingNotFound": "Edíficio mais próximo não encontrado",
   "gallery": "Galeria",
   "camera": "Câmara",
   "images": "Selecionar Imagens",
