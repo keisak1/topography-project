@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
@@ -33,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late Future<User> user;
   final selectedItems = <String>{};
   bool isSelecting = false;
+  bool checkPressed = false;
 
   @override
   void initState() {
@@ -375,7 +377,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                     if (!selectedOption.contains(options[0])) {
                                       if (selectedOption.contains(options[3])) {
                                         selectedOption.clear();
-                                        selectedOption.add(options[2]);
+                                        selectedOption.add(options[0]);
                                       } else if (selectedOption.contains(options[1]) &&
                                           selectedOption.contains(options[2])) {
                                         selectedOption.clear();
@@ -613,13 +615,101 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   ),
             floatingActionButton: Stack(
               children: [
+                //ClosestMarkerWidget(userLocation: currentLatLng),
+
                 FutureBuilder<List<Marker>>(
                   future: filterMarkers(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<Marker>? markersList = snapshot.data;
                       if (markersList != null) {
-                        return ClosestMarkerWidget(userLocation: currentLatLng, markers: markersList);
+                        if (markersList.isNotEmpty) {
+                          Marker closestMarker = markersList.first;
+                          double minDistance = double.infinity;
+                          for (Marker marker in markersList) {
+                            double distance = calculateDistance(
+                              currentLatLng.latitude,
+                              currentLatLng.longitude,
+                              marker.point.latitude,
+                              marker.point.longitude,
+                            );
+                            if (distance < minDistance) {
+                              closestMarker = marker;
+                              minDistance = distance;
+                            }
+                          }
+
+                          // Calculate the angle between the user's location and the closest marker
+                          double angle = atan2(
+                            closestMarker.point.longitude - currentLatLng.longitude,
+                            closestMarker.point.latitude - currentLatLng.latitude,
+                          );
+                          angle = angle * 180 / pi;
+
+                          return Positioned(
+                            bottom: 60,
+                            right: 0,
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                if(checkPressed == false) {
+                                  checkPressed = true;
+                                  Flushbar(
+                                    title: "Closest Building",
+                                    icon: Transform.rotate(
+                                      angle: angle * pi / 180,
+                                      child: const Icon(
+                                        Icons.arrow_upward_rounded,
+                                        color: Colors.lightGreenAccent,
+                                      ),
+                                    ),
+                                    backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                                    message: "${AppLocalizations.of(context)!.close} ${minDistance
+                                        .toStringAsFixed(2)} km",
+                                    onTap: (flushbar) {
+                                      checkPressed = false;
+                                      flushbar.dismiss();
+                                    },
+                                  ).show(context);
+                                }
+                              },
+                              heroTag: null,
+                              backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                              child: const Icon(Icons.notifications),
+                            ),
+                          );
+                        }
+
+                        return Positioned(
+                          bottom: 60,
+                          right: 0,
+                          child: FloatingActionButton(
+                            onPressed: () {
+                              if(checkPressed == false) {
+                                checkPressed = true;
+                                Flushbar(
+                                  title: "${AppLocalizations.of(context)!.building}",
+                                  icon: Transform.rotate(
+                                    angle: 0 * pi / 180,
+                                    child: const Icon(
+                                      Icons.arrow_upward_rounded,
+                                      color: Colors.lightGreenAccent,
+                                    ),
+                                  ),
+                                  backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                                  message: "${AppLocalizations.of(context)!.buildingNotFound}",
+                                  onTap: (flushbar) {
+                                    checkPressed = false;
+                                    flushbar.dismiss();
+                                  },
+                                ).show(context);
+                              }
+                            },
+                            heroTag: null,
+                            backgroundColor:
+                            const Color.fromRGBO(48, 56, 76, 1.0),
+                            child: const Icon(Icons.notifications),
+                          ),
+                        );
                       } else {
                         return const Text('Error: markers is null');
                       }

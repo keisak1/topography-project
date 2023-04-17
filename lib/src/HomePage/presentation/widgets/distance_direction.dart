@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../../HomePage/application/homepage_utilities.dart';
+import '../../../LocallySavedMarkersPage/locallySavedMarkers.dart';
 
 class ClosestMarkerWidget extends StatefulWidget {
   final LatLng userLocation;
-  final List<Marker> markers;
 
   const ClosestMarkerWidget(
-      {super.key, required this.userLocation, required this.markers});
+      {super.key, required this.userLocation});
 
   @override
   State<ClosestMarkerWidget> createState() => _ClosestMarkerWidget();
@@ -18,33 +19,138 @@ class ClosestMarkerWidget extends StatefulWidget {
 
 class _ClosestMarkerWidget extends State<ClosestMarkerWidget> {
   late LatLng _userLocation;
-  late List<Marker> _markers;
+  late Future<List<Marker>> markers;
+  List<MarkerData> markersForm = [];
+  double minDistance = double.infinity;
+  bool checkPressed = false;
 
   @override
   void initState() {
     super.initState();
+    markers = filterMarkers();
     _userLocation = widget.userLocation;
-    _markers = widget.markers;
   }
 
-  @override
-  void didUpdateWidget(ClosestMarkerWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.userLocation != oldWidget.userLocation) {
-      setState(() {
-        _userLocation = widget.userLocation;
-      });
-    }
-    if (widget.markers != oldWidget.markers) {
-      setState(() {
-        _markers = widget.markers;
-      });
-    }
+  Future<List<Marker>> loadMarkers() async {
+    markers = filterMarkers(optionalParameter: reloadMarkers);
+    return markers;
+  }
+
+  void reloadMarkers() {
+    setState(() {
+      markers = loadMarkers();
+
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return buildClosestMarkerWidget(_userLocation, _markers, context);
+    return FutureBuilder<List<Marker>>(
+      future: loadMarkers(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<Marker>? markersList = snapshot.data;
+          if (markersList != null) {
+            if (markersList.isNotEmpty) {
+              Marker closestMarker = markersList.first;
+              //double minDistance = double.infinity;
+              for (Marker marker in markersList) {
+                double distance = calculateDistance(
+                  _userLocation.latitude,
+                  _userLocation.longitude,
+                  marker.point.latitude,
+                  marker.point.longitude,
+                );
+                if (distance < minDistance) {
+                  closestMarker = marker;
+                  minDistance = distance;
+                }
+              }
+
+              // Calculate the angle between the user's location and the closest marker
+              double angle = atan2(
+                closestMarker.point.longitude - _userLocation.longitude,
+                closestMarker.point.latitude - _userLocation.latitude,
+              );
+              angle = angle * 180 / pi;
+
+              return Positioned(
+                bottom: 60,
+                right: 0,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    if(checkPressed == false) {
+                      checkPressed = true;
+                      Flushbar(
+                        title: "Closest Building",
+                        icon: Transform.rotate(
+                          angle: angle * pi / 180,
+                          child: const Icon(
+                            Icons.arrow_upward_rounded,
+                            color: Colors.lightGreenAccent,
+                          ),
+                        ),
+                        backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                        message: "${AppLocalizations.of(context)!.close} ${minDistance
+                            .toStringAsFixed(2)} km",
+                        onTap: (flushbar) {
+                          checkPressed = false;
+                          flushbar.dismiss();
+                        },
+                      ).show(context);
+                    }
+                  },
+                  heroTag: null,
+                  backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                  child: const Icon(Icons.notifications),
+                ),
+              );
+            }
+
+            return Positioned(
+              bottom: 60,
+              right: 0,
+              child: FloatingActionButton(
+                onPressed: () {
+                  if(checkPressed == false) {
+                    checkPressed = true;
+                    Flushbar(
+                      title: "${AppLocalizations.of(context)!.building}",
+                      icon: Transform.rotate(
+                        angle: 0 * pi / 180,
+                        child: const Icon(
+                          Icons.arrow_upward_rounded,
+                          color: Colors.lightGreenAccent,
+                        ),
+                      ),
+                      backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                      message: "${AppLocalizations.of(context)!.buildingNotFound}",
+                      onTap: (flushbar) {
+                        checkPressed = false;
+                        flushbar.dismiss();
+                      },
+                    ).show(context);
+                  }
+                },
+                heroTag: null,
+                backgroundColor:
+                const Color.fromRGBO(48, 56, 76, 1.0),
+                child: const Icon(Icons.notifications),
+              ),
+            );
+          } else {
+            return const Text('Error: markers is null');
+          }
+        } else if (snapshot.hasError) {
+          return Text('Error loading markers: ${snapshot.error}');
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
+    );
+
+
+      //buildClosestMarkerWidget(_userLocation, markers, context);
   }
 }
 
@@ -57,6 +163,7 @@ double calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 Widget buildClosestMarkerWidget(LatLng userLocation, List<Marker> markers, BuildContext context) {
+  bool checkPressed = false;
   if (markers.isNotEmpty) {
     Marker closestMarker = markers.first;
     double minDistance = double.infinity;
@@ -85,26 +192,29 @@ Widget buildClosestMarkerWidget(LatLng userLocation, List<Marker> markers, Build
       right: 0,
       child: FloatingActionButton(
         onPressed: () {
-          Flushbar(
-            title: "Closest Building",
-            icon: Transform.rotate(
-              angle: angle * pi / 180,
-              child: const Icon(
-                Icons.arrow_upward_rounded,
-                color: Colors.lightGreenAccent,
+          if(checkPressed == false) {
+            checkPressed = true;
+            Flushbar(
+              title: "Closest Building",
+              icon: Transform.rotate(
+                angle: angle * pi / 180,
+                child: const Icon(
+                  Icons.arrow_upward_rounded,
+                  color: Colors.lightGreenAccent,
+                ),
               ),
-            ),
-            backgroundColor: Colors.blueGrey,
-            message: "${AppLocalizations.of(context)!.close} ${minDistance
-                .toStringAsFixed(2)} km",
-            onTap: (flushbar){
-              flushbar.dismiss();
+              backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+              message: "${AppLocalizations.of(context)!.close} ${minDistance
+                  .toStringAsFixed(2)} km",
+              onTap: (flushbar) {
+                checkPressed = false;
+                flushbar.dismiss();
               },
-          ).show(context);
+            ).show(context);
+          }
           },
         heroTag: null,
-        backgroundColor:
-        const Color.fromRGBO(48, 56, 76, 1.0),
+        backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
         child: const Icon(Icons.notifications),
       ),
     );
@@ -115,6 +225,8 @@ Widget buildClosestMarkerWidget(LatLng userLocation, List<Marker> markers, Build
     right: 0,
     child: FloatingActionButton(
       onPressed: () {
+      if(checkPressed == false) {
+        checkPressed = true;
         Flushbar(
           title: "${AppLocalizations.of(context)!.building}",
           icon: Transform.rotate(
@@ -124,10 +236,14 @@ Widget buildClosestMarkerWidget(LatLng userLocation, List<Marker> markers, Build
               color: Colors.lightGreenAccent,
             ),
           ),
-          backgroundColor: Colors.blueGrey,
+          backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
           message: "${AppLocalizations.of(context)!.buildingNotFound}",
-
+          onTap: (flushbar) {
+            checkPressed = false;
+            flushbar.dismiss();
+          },
         ).show(context);
+      }
         },
       heroTag: null,
       backgroundColor:

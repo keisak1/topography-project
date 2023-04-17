@@ -36,7 +36,6 @@ double? latitude;
 double? longitude;
 double heading = 0.0;
 LatLng savedLocation = LatLng(0.0, 0.0);
-List<Marker> markers = [];
 List<String> selectedOption = ['All markers'];
 final List<String> options = [
   'Incomplete markers',
