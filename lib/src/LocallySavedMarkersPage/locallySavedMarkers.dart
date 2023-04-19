@@ -9,7 +9,7 @@ import '../FormPage/presentation/formpage_screen.dart';
 
 class MarkerData {
   String markerID;
-  List<String> imagePaths;
+  List<String>? imagePaths;
   Map<String, dynamic> formData;
   DateTime date;
 
@@ -152,8 +152,8 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
             final markerData = markers[index];
             final isSelected = selectedItems.contains(markerData);
             // display the first image if available
-            final image = markerData.imagePaths.isNotEmpty
-                ? Image.file(File(markerData.imagePaths[0]))
+            final image = markerData.imagePaths!.isNotEmpty
+                ? Image.file(File(markerData.imagePaths![0]))
                 : const Icon(
                     Icons.terrain,
                     size: 50,
