@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:elegant_notification/elegant_notification.dart';
+import 'package:elegant_notification/resources/arrays.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:fmtc_plus_background_downloading/fmtc_plus_background_downloading.dart';
@@ -13,6 +15,7 @@ import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarke
 import 'dart:async';
 import '../../../Models/User.dart';
 import '../application/homepage_utilities.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class MyHomePage extends StatefulWidget {
   static const String route = '/live_location';
@@ -35,6 +38,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final selectedItems = <String>{};
   bool isSelecting = false;
   bool checkPressed = false;
+  double minDistance = double.infinity;
+  double angle = 0;
 
 
   @override
@@ -643,6 +648,50 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             ),
                             FilterMarkers(currentZoom)
                           ]),
+                      checkPressed
+                          ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 250),
+                              InkWell(
+                                  child: ElegantNotification(
+                                width: 360,
+                                notificationPosition: NotificationPosition.center,
+                                background:
+                                    const Color.fromRGBO(48, 56, 76, 1.0),
+                                animation: AnimationType.fromTop,
+                                title: Text(
+                                  "${AppLocalizations.of(context)!.building}",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                description: Text(
+                                  "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                icon: Transform.rotate(
+                                  angle: angle * pi / 180,
+                                  child: const Icon(
+                                    Icons.arrow_upward_rounded,
+                                    color: Colors.lightGreenAccent,
+                                  ),
+                                ),
+                                showProgressIndicator: false,
+                                autoDismiss: false,
+                                onDismiss: () {
+                                  checkPressed = false;
+                                  setState(() {});
+                                },
+                              ))
+                            ])
+                          : Container(),
                     ],
                   ),
             floatingActionButton: Stack(
@@ -657,7 +706,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       if (markersList != null) {
                         if (markersList.isNotEmpty) {
                           Marker closestMarker = markersList.first;
-                          double minDistance = double.infinity;
                           for (Marker marker in markersList) {
                             double distance = calculateDistance(
                               currentLatLng.latitude,
@@ -672,7 +720,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           }
 
                           // Calculate the angle between the user's location and the closest marker
-                          double angle = atan2(
+                          angle = atan2(
                             closestMarker.point.longitude -
                                 currentLatLng.longitude,
                             closestMarker.point.latitude -
@@ -681,22 +729,39 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           angle = angle * 180 / pi;
                           print(minDistance);
 
-                          if (checkPressed == true) {
-                            print("im in");
-                            FloatingActionButton(
-                                key: Key("fab"), onPressed: () {Flushbar(key: Key("flushbar"), message: "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",);});
-                          }
-                          return Positioned(
+                          return
+                              /*checkPressed ? MaterialBanner(
+                            /// need to set following properties for best effect of awesome_snackbar_content
+                            elevation: 0,
+                            backgroundColor: Colors.transparent,
+                                forceActionsBelow: true,
+                            content: AwesomeSnackbarContent(
+                              title: "${AppLocalizations.of(context)!.building}",
+                              message:
+                              "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
+
+                              contentType: ContentType("lib/resources/arrow.svg"),
+                              color: const Color.fromRGBO(48, 56, 76, 1.0),
+                              // to configure for material banner
+                              inMaterialBanner: true,
+                            ),
+                            actions: const [SizedBox.shrink()],
+                          ): Container(),*/
+                              Positioned(
                             bottom: 60,
                             right: 0,
+<<<<<<< Updated upstream
                             child:
                             FloatingActionButton(
                               key: Key("fab"),
+=======
+                            child: FloatingActionButton(
+>>>>>>> Stashed changes
                               onPressed: () {
                                 if (checkPressed == false) {
                                   checkPressed = true;
-                                  Flushbar(
-                                    key: Key("flushbar"),
+                                  setState(() {});
+                                  /*Flushbar(
                                     title:
                                         "${AppLocalizations.of(context)!.building}",
                                     icon: Transform.rotate(
@@ -710,15 +775,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                         const Color.fromRGBO(48, 56, 76, 1.0),
                                     message:
                                         "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
+                                    margin: EdgeInsets.all(8),
+                                    borderRadius: BorderRadius.circular(8),
                                     onTap: (flushbar) {
                                       checkPressed = false;
                                       flushbar.dismiss();
                                     },
-                                  ).show(context);
-                                }/*else{
-                                  print("foi");
-                                  Flushbar(key: Key("flushbar")).message;
-                                }*/
+                                  ).show(context);*/
+                                } else {
+                                  checkPressed = false;
+                                  setState(() {});
+                                }
                               },
                               heroTag: null,
                               backgroundColor:
@@ -728,40 +795,90 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           );
                         }
 
-                        return Positioned(
-                          bottom: 60,
-                          right: 0,
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              if (checkPressed == false) {
-                                checkPressed = true;
-                                Flushbar(
-                                  title:
+                        return Stack(children: [
+                          checkPressed
+                              ? Row(children: [
+                                  InkWell(
+                                      child: ElegantNotification(
+                                    width: 360,
+                                    notificationPosition:
+                                        NotificationPosition.bottomRight,
+                                    background:
+                                        const Color.fromRGBO(48, 56, 76, 1.0),
+                                    animation: AnimationType.fromBottom,
+                                    title: Text(
                                       "${AppLocalizations.of(context)!.building}",
-                                  icon: Transform.rotate(
-                                    angle: 0 * pi / 180,
-                                    child: const Icon(
-                                      Icons.arrow_upward_rounded,
-                                      color: Colors.lightGreenAccent,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        //fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  backgroundColor:
-                                      const Color.fromRGBO(48, 56, 76, 1.0),
-                                  message:
+                                    description: Text(
                                       "${AppLocalizations.of(context)!.buildingNotFound}",
-                                  onTap: (flushbar) {
-                                    checkPressed = false;
-                                    flushbar.dismiss();
-                                  },
-                                ).show(context);
-                              }
-                            },
-                            heroTag: null,
-                            backgroundColor:
-                                const Color.fromRGBO(48, 56, 76, 1.0),
-                            child: const Icon(Icons.notifications),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        //fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    icon: Transform.rotate(
+                                      angle: 0 * pi / 180,
+                                      child: const Icon(
+                                        Icons.arrow_upward_rounded,
+                                        color: Colors.lightGreenAccent,
+                                      ),
+                                    ),
+                                    showProgressIndicator: false,
+                                    autoDismiss: false,
+                                    onDismiss: () {
+                                      checkPressed = false;
+                                      setState(() {});
+                                    },
+                                  ))
+                                ])
+                              : Container(),
+                          Positioned(
+                            bottom: 60,
+                            right: 0,
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                if (checkPressed == false) {
+                                  checkPressed = true;
+                                  setState(() {});
+                                  /*Flushbar(
+                                    title:
+                                        "${AppLocalizations.of(context)!.building}",
+                                    icon: Transform.rotate(
+                                      angle: angle * pi / 180,
+                                      child: const Icon(
+                                        Icons.arrow_upward_rounded,
+                                        color: Colors.lightGreenAccent,
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        const Color.fromRGBO(48, 56, 76, 1.0),
+                                    message:
+                                        "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
+                                    margin: EdgeInsets.all(8),
+                                    borderRadius: BorderRadius.circular(8),
+                                    onTap: (flushbar) {
+                                      checkPressed = false;
+                                      flushbar.dismiss();
+                                    },
+                                  ).show(context);*/
+                                } else {
+                                  checkPressed = false;
+                                  setState(() {});
+                                }
+                              },
+                              heroTag: null,
+                              backgroundColor:
+                                  const Color.fromRGBO(48, 56, 76, 1.0),
+                              child: const Icon(Icons.notifications),
+                            ),
                           ),
-                        );
+                        ]);
                       } else {
                         return const Text('Error: markers is null');
                       }
@@ -772,6 +889,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     }
                   },
                 ),
+
                 Positioned(
                   bottom: 0,
                   right: 0,
