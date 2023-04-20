@@ -36,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool isSelecting = false;
   bool checkPressed = false;
 
+
   @override
   void initState() {
     _isLoading = true;
@@ -580,6 +581,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     child: const Center(child: CircularProgressIndicator()))
                 : Stack(
                     children: [
+
                       FlutterMap(
                           mapController: _mapController,
                           options: MapOptions(
@@ -687,7 +689,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           return Positioned(
                             bottom: 60,
                             right: 0,
-                            child: FloatingActionButton(
+                            child:
+                            FloatingActionButton(
                               key: Key("fab"),
                               onPressed: () {
                                 if (checkPressed == false) {

@@ -193,7 +193,10 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                   ),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                     IconButton(
-                        onPressed: () {
+                        onPressed: () async {
+                            final prefs = await SharedPreferences.getInstance();
+                            final formDataJson = prefs.getString(markerData.markerID);
+                            final formData = json.decode(formDataJson!);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -201,7 +204,7 @@ class _locallySavedMarkersState extends State<locallySavedMarkers> {
                                       marker: int.parse(
                                           markerData.markerID) /*ID DO MARKER*/,
                                       questions: questions,
-                                      values: markerData.formData,
+                                      values: formData,
                                       image: markerData.imagePaths
                                   )));
                         },
