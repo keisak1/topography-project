@@ -750,13 +750,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               Positioned(
                             bottom: 60,
                             right: 0,
-<<<<<<< Updated upstream
-                            child:
-                            FloatingActionButton(
-                              key: Key("fab"),
-=======
                             child: FloatingActionButton(
->>>>>>> Stashed changes
                               onPressed: () {
                                 if (checkPressed == false) {
                                   checkPressed = true;
