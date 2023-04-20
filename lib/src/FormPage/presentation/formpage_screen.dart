@@ -98,7 +98,9 @@ class _DynamicFormState extends State<DynamicForm> {
 
       await prefs.setInt(
           '${markerID}_date', DateTime.now().millisecondsSinceEpoch);
-      widget.onResultUpdated!.call();
+      if (widget.onResultUpdated != null) {
+        widget.onResultUpdated!.call();
+      }
     } else {
       forms.add(markerID);
       await prefs.setStringList('localForm', forms);
@@ -110,7 +112,9 @@ class _DynamicFormState extends State<DynamicForm> {
       // save date
       await prefs.setInt(
           '${markerID}_date', DateTime.now().millisecondsSinceEpoch);
-      widget.onResultUpdated!.call();
+      if (widget.onResultUpdated != null) {
+        widget.onResultUpdated!.call();
+      }
     }
   }
 
@@ -212,8 +216,8 @@ class _DynamicFormState extends State<DynamicForm> {
             print(value);
             _formValues[question.qid] = value;
           },
-          validator: (value){
-            if(value.toString() == currentValue){
+          validator: (value) {
+            if (value.toString() == currentValue) {
               _formValues[question.qid] = currentValue;
             }
             return null;
@@ -234,8 +238,8 @@ class _DynamicFormState extends State<DynamicForm> {
             print(value);
             _formValues[question.qid] = value;
           },
-          validator: (value){
-            if(value.toString() == currentValue){
+          validator: (value) {
+            if (value.toString() == currentValue) {
               _formValues[question.qid] = currentValue;
             }
             return null;
@@ -259,8 +263,8 @@ class _DynamicFormState extends State<DynamicForm> {
 
             _formValues[question.qid] = value;
           },
-          validator: (value){
-            if(value.toString() == currentValue){
+          validator: (value) {
+            if (value.toString() == currentValue) {
               _formValues[question.qid] = currentValue;
             }
             return null;
@@ -282,9 +286,8 @@ class _DynamicFormState extends State<DynamicForm> {
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) {
             print(value);
-              _formValues[question.qid] = value;
+            _formValues[question.qid] = value;
           },
-
           decoration: InputDecoration(
             label: Text(getLocalizedLabel(question.label, context),
                 style: const TextStyle(
@@ -292,7 +295,7 @@ class _DynamicFormState extends State<DynamicForm> {
             border: const OutlineInputBorder(),
           ),
           validator: (value) {
-            if(value.toString() == currentValue){
+            if (value.toString() == currentValue) {
               _formValues[question.qid] = currentValue;
             }
             if (value!.isEmpty) {
