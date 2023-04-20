@@ -52,7 +52,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     initLocationService();
   }
 
-
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
@@ -128,7 +127,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-
     LatLng currentLatLng;
     const tag1 = 'button1';
     const tag2 = 'button2';
@@ -341,27 +339,46 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         ExpansionTile(
                             subtitle: selectedOption.isNotEmpty
                                 ? Column(
-                              children: selectedOption.map((option) {
-                                if (option == 'Semi-complete markers') {
-                                  return Text(AppLocalizations.of(context)!.semicomplete,
-                                      style: const TextStyle(color: Colors.blueAccent));
-                                } else if(option == 'All markers'){
-                                  return Text(AppLocalizations.of(context)!.allMarkers,
-                                      style: const TextStyle(color: Colors.blueAccent));
-                                }else if(option == 'Complete markers'){
-                                  return Text(AppLocalizations.of(context)!.complete,
-                                      style: const TextStyle(color: Colors.blueAccent));
-                                }else if(option == 'Incomplete markers'){
-                                  return Text(AppLocalizations.of(context)!.incomplete,
-                                      style: const TextStyle(color: Colors.blueAccent));
-                                }
-                                else {
-                                 return Text(AppLocalizations.of(context)!.optionsSelected,
-                                      style: const TextStyle(color: Colors.blueAccent));
-                                }
-                              }).toList(),
-                            ) : Text(AppLocalizations.of(context)!.optionsSelected,
-                                style: const TextStyle(color: Colors.blueAccent)),
+                                    children: selectedOption.map((option) {
+                                      if (option == 'Semi-complete markers') {
+                                        return Text(
+                                            AppLocalizations.of(context)!
+                                                .semicomplete,
+                                            style: const TextStyle(
+                                                color: Colors.blueAccent));
+                                      } else if (option == 'All markers') {
+                                        return Text(
+                                            AppLocalizations.of(context)!
+                                                .allMarkers,
+                                            style: const TextStyle(
+                                                color: Colors.blueAccent));
+                                      } else if (option == 'Complete markers') {
+                                        return Text(
+                                            AppLocalizations.of(context)!
+                                                .complete,
+                                            style: const TextStyle(
+                                                color: Colors.blueAccent));
+                                      } else if (option ==
+                                          'Incomplete markers') {
+                                        return Text(
+                                            AppLocalizations.of(context)!
+                                                .incomplete,
+                                            style: const TextStyle(
+                                                color: Colors.blueAccent));
+                                      } else {
+                                        return Text(
+                                            AppLocalizations.of(context)!
+                                                .optionsSelected,
+                                            style: const TextStyle(
+                                                color: Colors.blueAccent));
+                                      }
+                                    }).toList(),
+                                  )
+                                : Text(
+                                    AppLocalizations.of(context)!
+                                        .optionsSelected,
+                                    style: const TextStyle(
+                                        color: Colors.blueAccent)),
                             backgroundColor:
                                 const Color.fromRGBO(48, 56, 76, 1.0),
                             collapsedIconColor: Colors.white,
@@ -369,8 +386,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 style: const TextStyle(color: Colors.white)),
                             children: [
                               ListTile(
-                                title: Text(AppLocalizations.of(context)!.incomplete,
-                                    style: const TextStyle(color: Colors.white)),
+                                title: Text(
+                                    AppLocalizations.of(context)!.incomplete,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   isSelecting = true;
                                   setState(() {
@@ -378,19 +397,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                       if (selectedOption.contains(options[3])) {
                                         selectedOption.clear();
                                         selectedOption.add(options[0]);
-                                      } else if (selectedOption.contains(options[1]) &&
+                                      } else if (selectedOption
+                                              .contains(options[1]) &&
                                           selectedOption.contains(options[2])) {
                                         selectedOption.clear();
                                         selectedOption.add(options[3]);
-                                      }
-                                      else {
+                                      } else {
                                         selectedOption.add(options[0]);
                                       }
                                     } else {
                                       selectedOption.remove(options[0]);
                                     }
                                   });
-                                  String markerData = AppLocalizations.of(context)!.incomplete;
+                                  String markerData =
+                                      AppLocalizations.of(context)!.incomplete;
                                   final isSelected =
                                       selectedItems.contains(markerData);
                                   if (isSelecting) {
@@ -406,8 +426,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 },
                               ),
                               ListTile(
-                                title: Text(AppLocalizations.of(context)!.semicomplete,
-                                    style: const TextStyle(color: Colors.white)),
+                                title: Text(
+                                    AppLocalizations.of(context)!.semicomplete,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   isSelecting = true;
                                   setState(() {
@@ -415,19 +437,21 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                       if (selectedOption.contains(options[3])) {
                                         selectedOption.clear();
                                         selectedOption.add(options[1]);
-                                      }else if (selectedOption.contains(options[0]) &&
+                                      } else if (selectedOption
+                                              .contains(options[0]) &&
                                           selectedOption.contains(options[2])) {
                                         selectedOption.clear();
                                         selectedOption.add(options[3]);
-                                      }
-                                      else {
+                                      } else {
                                         selectedOption.add(options[1]);
                                       }
                                     } else {
                                       selectedOption.remove(options[1]);
                                     }
                                   });
-                                  String markerData = AppLocalizations.of(context)!.semicomplete;
+                                  String markerData =
+                                      AppLocalizations.of(context)!
+                                          .semicomplete;
                                   final isSelected =
                                       selectedItems.contains(markerData);
                                   if (isSelecting) {
@@ -443,8 +467,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 },
                               ),
                               ListTile(
-                                title: Text(AppLocalizations.of(context)!.complete,
-                                    style: const TextStyle(color: Colors.white)),
+                                title: Text(
+                                    AppLocalizations.of(context)!.complete,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   isSelecting = true;
                                   setState(() {
@@ -464,7 +490,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                       selectedOption.remove(options[2]);
                                     }
                                   });
-                                  String markerData = AppLocalizations.of(context)!.complete;
+                                  String markerData =
+                                      AppLocalizations.of(context)!.complete;
                                   isSelecting = true;
                                   selectedItems.add(markerData);
                                   final isSelected =
@@ -482,8 +509,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 },
                               ),
                               ListTile(
-                                title: Text(AppLocalizations.of(context)!.allMarkers,
-                                    style: const TextStyle(color: Colors.white)),
+                                title: Text(
+                                    AppLocalizations.of(context)!.allMarkers,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
                                 onTap: () {
                                   isSelecting = true;
                                   setState(() {
@@ -500,7 +529,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                       selectedOption.remove(options[3]);
                                     }
                                   });
-                                  String markerData = AppLocalizations.of(context)!.allMarkers;
+                                  String markerData =
+                                      AppLocalizations.of(context)!.allMarkers;
                                   final isSelected =
                                       selectedItems.contains(markerData);
                                   if (isSelecting) {
@@ -641,20 +671,31 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
                           // Calculate the angle between the user's location and the closest marker
                           double angle = atan2(
-                            closestMarker.point.longitude - currentLatLng.longitude,
-                            closestMarker.point.latitude - currentLatLng.latitude,
+                            closestMarker.point.longitude -
+                                currentLatLng.longitude,
+                            closestMarker.point.latitude -
+                                currentLatLng.latitude,
                           );
                           angle = angle * 180 / pi;
+                          print(minDistance);
 
+                          if (checkPressed == true) {
+                            print("im in");
+                            FloatingActionButton(
+                                key: Key("fab"), onPressed: () {Flushbar(key: Key("flushbar"), message: "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",);});
+                          }
                           return Positioned(
                             bottom: 60,
                             right: 0,
                             child: FloatingActionButton(
+                              key: Key("fab"),
                               onPressed: () {
-                                if(checkPressed == false) {
+                                if (checkPressed == false) {
                                   checkPressed = true;
                                   Flushbar(
-                                    title: "Closest Building",
+                                    key: Key("flushbar"),
+                                    title:
+                                        "${AppLocalizations.of(context)!.building}",
                                     icon: Transform.rotate(
                                       angle: angle * pi / 180,
                                       child: const Icon(
@@ -662,18 +703,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                         color: Colors.lightGreenAccent,
                                       ),
                                     ),
-                                    backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
-                                    message: "${AppLocalizations.of(context)!.close} ${minDistance
-                                        .toStringAsFixed(2)} km",
+                                    backgroundColor:
+                                        const Color.fromRGBO(48, 56, 76, 1.0),
+                                    message:
+                                        "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
                                     onTap: (flushbar) {
                                       checkPressed = false;
                                       flushbar.dismiss();
                                     },
                                   ).show(context);
-                                }
+                                }/*else{
+                                  print("foi");
+                                  Flushbar(key: Key("flushbar")).message;
+                                }*/
                               },
                               heroTag: null,
-                              backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                              backgroundColor:
+                                  const Color.fromRGBO(48, 56, 76, 1.0),
                               child: const Icon(Icons.notifications),
                             ),
                           );
@@ -684,10 +730,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           right: 0,
                           child: FloatingActionButton(
                             onPressed: () {
-                              if(checkPressed == false) {
+                              if (checkPressed == false) {
                                 checkPressed = true;
                                 Flushbar(
-                                  title: "${AppLocalizations.of(context)!.building}",
+                                  title:
+                                      "${AppLocalizations.of(context)!.building}",
                                   icon: Transform.rotate(
                                     angle: 0 * pi / 180,
                                     child: const Icon(
@@ -695,8 +742,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                       color: Colors.lightGreenAccent,
                                     ),
                                   ),
-                                  backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
-                                  message: "${AppLocalizations.of(context)!.buildingNotFound}",
+                                  backgroundColor:
+                                      const Color.fromRGBO(48, 56, 76, 1.0),
+                                  message:
+                                      "${AppLocalizations.of(context)!.buildingNotFound}",
                                   onTap: (flushbar) {
                                     checkPressed = false;
                                     flushbar.dismiss();
@@ -706,7 +755,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             },
                             heroTag: null,
                             backgroundColor:
-                            const Color.fromRGBO(48, 56, 76, 1.0),
+                                const Color.fromRGBO(48, 56, 76, 1.0),
                             child: const Icon(Icons.notifications),
                           ),
                         );
