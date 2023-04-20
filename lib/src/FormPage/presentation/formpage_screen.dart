@@ -42,7 +42,8 @@ class DynamicForm<T extends State<StatefulWidget>> extends StatefulWidget {
       required this.questions,
       required this.marker,
       this.values = const {},
-      this.onResultUpdated, this.image});
+      this.onResultUpdated,
+      this.image});
 
   @override
   _DynamicFormState createState() => _DynamicFormState();
@@ -59,7 +60,7 @@ class _DynamicFormState extends State<DynamicForm> {
   @override
   void initState() {
     super.initState();
-    if(widget.image != null){
+    if (widget.image != null) {
       for (String imagePath in widget.image!) {
         XFile imageFile = XFile(imagePath);
         _imageFiles.add(imageFile);
@@ -85,8 +86,10 @@ class _DynamicFormState extends State<DynamicForm> {
     // save the form data, image file paths, and the given name to the shared preferences
     final prefs = await SharedPreferences.getInstance();
     final forms = prefs.getStringList('localForm') ?? [];
+    print(forms);
     if (forms.contains(markerID)) {
       await prefs.setStringList('localForm', forms);
+      await prefs.remove(markerID);
       await prefs.setString(markerID, json.encode(data));
 
       // save image file paths
@@ -95,6 +98,7 @@ class _DynamicFormState extends State<DynamicForm> {
 
       await prefs.setInt(
           '${markerID}_date', DateTime.now().millisecondsSinceEpoch);
+      widget.onResultUpdated!.call();
     } else {
       forms.add(markerID);
       await prefs.setStringList('localForm', forms);
@@ -106,6 +110,7 @@ class _DynamicFormState extends State<DynamicForm> {
       // save date
       await prefs.setInt(
           '${markerID}_date', DateTime.now().millisecondsSinceEpoch);
+      widget.onResultUpdated!.call();
     }
   }
 
@@ -165,6 +170,8 @@ class _DynamicFormState extends State<DynamicForm> {
     // Trigger a rebuild of the form with the updated values
     setState(() {});
     currentUpdate = "fav";
+
+    print(_formValues);
   }
 
   Widget _buildQuestion(Question question) {
@@ -202,10 +209,14 @@ class _DynamicFormState extends State<DynamicForm> {
           items: dropdownItems,
           value: currentValue,
           onChanged: (value) {
-            setState(() {
-
-              _formValues[question.qid] = value;
-            });
+            print(value);
+            _formValues[question.qid] = value;
+          },
+          validator: (value){
+            if(value.toString() == currentValue){
+              _formValues[question.qid] = currentValue;
+            }
+            return null;
           },
           decoration: InputDecoration(
             label: Text(getLocalizedLabel(question.label, context),
@@ -216,17 +227,22 @@ class _DynamicFormState extends State<DynamicForm> {
         );
 
       case "largetext":
-        final controller = TextEditingController(text: currentValue ?? '');
         return TextFormField(
+          key: Key(currentValue ?? ''),
+          initialValue: currentValue ?? '',
+          onChanged: (value) {
+            print(value);
+            _formValues[question.qid] = value;
+          },
+          validator: (value){
+            if(value.toString() == currentValue){
+              _formValues[question.qid] = currentValue;
+            }
+            return null;
+          },
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          controller: controller,
           maxLines: null,
-          onChanged: (value) {
-            setState(() {
-              _formValues[question.qid] = value;
-            });
-          },
           decoration: InputDecoration(
             label: Text(getLocalizedLabel(question.label, context),
                 style: const TextStyle(
@@ -235,36 +251,40 @@ class _DynamicFormState extends State<DynamicForm> {
           ),
         );
       case "smalltext":
-        final controller = TextEditingController(text: currentValue);
         return TextFormField(
+          key: Key(currentValue ?? ''),
+          initialValue: currentValue ?? '',
+          onChanged: (value) {
+            print(value);
+
+            _formValues[question.qid] = value;
+          },
+          validator: (value){
+            if(value.toString() == currentValue){
+              _formValues[question.qid] = currentValue;
+            }
+            return null;
+          },
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          controller: controller,
-          onChanged: (value) {
-            setState(() {
-              _formValues[question.qid] = controller.text;
-            });
-          },
           decoration: InputDecoration(
             labelText: getLocalizedLabel(question.label, context),
             border: const OutlineInputBorder(),
           ),
         );
       case "number":
-        final controller =
-            TextEditingController(text: currentValue.toString() ?? '');
-
         return TextFormField(
+          key: Key(currentValue.toString() ?? ''),
+          initialValue: currentValue.toString() ?? '',
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          controller: controller,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) {
-            setState(() {
-              _formValues[question.qid] = controller.text;
-            });
+            print(value);
+              _formValues[question.qid] = value;
           },
+
           decoration: InputDecoration(
             label: Text(getLocalizedLabel(question.label, context),
                 style: const TextStyle(
@@ -272,6 +292,9 @@ class _DynamicFormState extends State<DynamicForm> {
             border: const OutlineInputBorder(),
           ),
           validator: (value) {
+            if(value.toString() == currentValue){
+              _formValues[question.qid] = currentValue;
+            }
             if (value!.isEmpty) {
               return AppLocalizations.of(context)!.fieldRequired;
             }
@@ -487,12 +510,14 @@ class _DynamicFormState extends State<DynamicForm> {
                               // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
                               // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
                               // TODO: DELETE THE MARKERS ONCE THE STATUS IS GREEN
+                              print(_formValues);
                               _saveFormLocally(widget.marker.toString(),
                                   _formValues, _imageFiles);
                               if (widget.onResultUpdated != null) {
                                 widget.onResultUpdated!.call();
                               }
                               currentUpdate = null;
+
                               Navigator.of(context).pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -626,12 +651,13 @@ class _DynamicFormState extends State<DynamicForm> {
       return;
     }
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if(pickedFile != null){
-    setState(() {
-      _imageFiles.add(pickedFile);
-      _imageWidgets =
-          _imageFiles.map((image) => Image.file(File(image.path))).toList();
-    });}
+    if (pickedFile != null) {
+      setState(() {
+        _imageFiles.add(pickedFile);
+        _imageWidgets =
+            _imageFiles.map((image) => Image.file(File(image.path))).toList();
+      });
+    }
   }
 
   pickImageCam() async {
@@ -641,12 +667,13 @@ class _DynamicFormState extends State<DynamicForm> {
       return;
     }
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if(pickedFile != null){
+    if (pickedFile != null) {
       setState(() {
         _imageFiles.add(pickedFile);
         _imageWidgets =
             _imageFiles.map((image) => Image.file(File(image.path))).toList();
-      });}
+      });
+    }
   }
 
   Future<bool> checkInternetConnectivity() async {
