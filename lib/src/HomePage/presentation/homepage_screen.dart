@@ -38,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final selectedItems = <String>{};
   bool isSelecting = false;
   bool checkPressed = false;
+  bool markers = true;
   double minDistance = double.infinity;
   double angle = 0;
 
@@ -648,7 +649,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             ),
                             FilterMarkers(currentZoom)
                           ]),
-                      checkPressed
+                      checkPressed && markers
                           ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -692,6 +693,50 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               ))
                             ])
                           : Container(),
+                      checkPressed && !markers
+                          ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 250),
+                            InkWell(
+                                child: ElegantNotification(
+                                  width: 360,
+                                  notificationPosition: NotificationPosition.center,
+                                  background:
+                                  const Color.fromRGBO(48, 56, 76, 1.0),
+                                  animation: AnimationType.fromTop,
+                                  title: Text(
+                                    "${AppLocalizations.of(context)!.building}",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      //fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  description: Text(
+                                    "${AppLocalizations.of(context)!.buildingNotFound}",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      //fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  icon: Transform.rotate(
+                                    angle: 0 * pi / 180,
+                                    child: const Icon(
+                                      Icons.arrow_upward_rounded,
+                                      color: Colors.lightGreenAccent,
+                                    ),
+                                  ),
+                                  showProgressIndicator: false,
+                                  autoDismiss: false,
+                                  onDismiss: () {
+                                    checkPressed = false;
+                                    setState(() {});
+                                  },
+                                ))
+                          ])
+                          : Container(),
                     ],
                   ),
             floatingActionButton: Stack(
@@ -729,25 +774,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           angle = angle * 180 / pi;
                           print(minDistance);
 
-                          return
-                              /*checkPressed ? MaterialBanner(
-                            /// need to set following properties for best effect of awesome_snackbar_content
-                            elevation: 0,
-                            backgroundColor: Colors.transparent,
-                                forceActionsBelow: true,
-                            content: AwesomeSnackbarContent(
-                              title: "${AppLocalizations.of(context)!.building}",
-                              message:
-                              "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
-
-                              contentType: ContentType("lib/resources/arrow.svg"),
-                              color: const Color.fromRGBO(48, 56, 76, 1.0),
-                              // to configure for material banner
-                              inMaterialBanner: true,
-                            ),
-                            actions: const [SizedBox.shrink()],
-                          ): Container(),*/
-                              Positioned(
+                          return Positioned(
                             bottom: 60,
                             right: 0,
                             child: FloatingActionButton(
@@ -755,31 +782,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 if (checkPressed == false) {
                                   checkPressed = true;
                                   setState(() {});
-                                  /*Flushbar(
-                                    title:
-                                        "${AppLocalizations.of(context)!.building}",
-                                    icon: Transform.rotate(
-                                      angle: angle * pi / 180,
-                                      child: const Icon(
-                                        Icons.arrow_upward_rounded,
-                                        color: Colors.lightGreenAccent,
-                                      ),
-                                    ),
-                                    backgroundColor:
-                                        const Color.fromRGBO(48, 56, 76, 1.0),
-                                    message:
-                                        "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
-                                    margin: EdgeInsets.all(8),
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: (flushbar) {
-                                      checkPressed = false;
-                                      flushbar.dismiss();
-                                    },
-                                  ).show(context);*/
                                 } else {
                                   checkPressed = false;
                                   setState(() {});
                                 }
+                                markers = true;
+                                setState(() {});
                               },
                               heroTag: null,
                               backgroundColor:
@@ -789,50 +797,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                           );
                         }
 
-                        return Stack(children: [
-                          checkPressed
-                              ? Row(children: [
-                                  InkWell(
-                                      child: ElegantNotification(
-                                    width: 360,
-                                    notificationPosition:
-                                        NotificationPosition.bottomRight,
-                                    background:
-                                        const Color.fromRGBO(48, 56, 76, 1.0),
-                                    animation: AnimationType.fromBottom,
-                                    title: Text(
-                                      "${AppLocalizations.of(context)!.building}",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        //fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    description: Text(
-                                      "${AppLocalizations.of(context)!.buildingNotFound}",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        //fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    icon: Transform.rotate(
-                                      angle: 0 * pi / 180,
-                                      child: const Icon(
-                                        Icons.arrow_upward_rounded,
-                                        color: Colors.lightGreenAccent,
-                                      ),
-                                    ),
-                                    showProgressIndicator: false,
-                                    autoDismiss: false,
-                                    onDismiss: () {
-                                      checkPressed = false;
-                                      setState(() {});
-                                    },
-                                  ))
-                                ])
-                              : Container(),
-                          Positioned(
+                        return Positioned(
                             bottom: 60,
                             right: 0,
                             child: FloatingActionButton(
@@ -840,39 +805,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 if (checkPressed == false) {
                                   checkPressed = true;
                                   setState(() {});
-                                  /*Flushbar(
-                                    title:
-                                        "${AppLocalizations.of(context)!.building}",
-                                    icon: Transform.rotate(
-                                      angle: angle * pi / 180,
-                                      child: const Icon(
-                                        Icons.arrow_upward_rounded,
-                                        color: Colors.lightGreenAccent,
-                                      ),
-                                    ),
-                                    backgroundColor:
-                                        const Color.fromRGBO(48, 56, 76, 1.0),
-                                    message:
-                                        "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
-                                    margin: EdgeInsets.all(8),
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: (flushbar) {
-                                      checkPressed = false;
-                                      flushbar.dismiss();
-                                    },
-                                  ).show(context);*/
                                 } else {
                                   checkPressed = false;
                                   setState(() {});
                                 }
+                                markers = false;
+                                setState(() {});
                               },
                               heroTag: null,
                               backgroundColor:
                                   const Color.fromRGBO(48, 56, 76, 1.0),
                               child: const Icon(Icons.notifications),
                             ),
-                          ),
-                        ]);
+                          );
                       } else {
                         return const Text('Error: markers is null');
                       }
