@@ -647,7 +647,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             ),
                             FilterMarkers(currentZoom)
                           ]),
-                      checkPressed && markers
+                      checkPressed
                           ? FutureBuilder<List<Marker>>(
                               future: filterMarkers(),
                               builder: (context, snapshot) {
