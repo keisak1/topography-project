@@ -38,10 +38,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final selectedItems = <String>{};
   bool isSelecting = false;
   bool checkPressed = false;
-  bool markers = true;
+  bool markers = false;
   double minDistance = double.infinity;
   double angle = 0;
-
 
   @override
   void initState() {
@@ -587,7 +586,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     child: const Center(child: CircularProgressIndicator()))
                 : Stack(
                     children: [
-
                       FlutterMap(
                           mapController: _mapController,
                           options: MapOptions(
@@ -650,185 +648,163 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             FilterMarkers(currentZoom)
                           ]),
                       checkPressed && markers
-                          ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(height: 250),
-                              InkWell(
-                                  child: ElegantNotification(
-                                width: 360,
-                                notificationPosition: NotificationPosition.center,
-                                background:
-                                    const Color.fromRGBO(48, 56, 76, 1.0),
-                                animation: AnimationType.fromTop,
-                                title: Text(
-                                  "${AppLocalizations.of(context)!.building}",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    //fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                description: Text(
-                                  "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    //fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                icon: Transform.rotate(
-                                  angle: angle * pi / 180,
-                                  child: const Icon(
-                                    Icons.arrow_upward_rounded,
-                                    color: Colors.lightGreenAccent,
-                                  ),
-                                ),
-                                showProgressIndicator: false,
-                                autoDismiss: false,
-                                onDismiss: () {
-                                  checkPressed = false;
-                                  setState(() {});
-                                },
-                              ))
-                            ])
-                          : Container(),
-                      checkPressed && !markers
-                          ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(height: 250),
-                            InkWell(
-                                child: ElegantNotification(
-                                  width: 360,
-                                  notificationPosition: NotificationPosition.center,
-                                  background:
-                                  const Color.fromRGBO(48, 56, 76, 1.0),
-                                  animation: AnimationType.fromTop,
-                                  title: Text(
-                                    "${AppLocalizations.of(context)!.building}",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      //fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  description: Text(
-                                    "${AppLocalizations.of(context)!.buildingNotFound}",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      //fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  icon: Transform.rotate(
-                                    angle: 0 * pi / 180,
-                                    child: const Icon(
-                                      Icons.arrow_upward_rounded,
-                                      color: Colors.lightGreenAccent,
-                                    ),
-                                  ),
-                                  showProgressIndicator: false,
-                                  autoDismiss: false,
-                                  onDismiss: () {
-                                    checkPressed = false;
-                                    setState(() {});
-                                  },
-                                ))
-                          ])
+                          ? FutureBuilder<List<Marker>>(
+                              future: filterMarkers(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  List<Marker>? markersList = snapshot.data;
+
+                                  if (markersList != null &&
+                                      markersList.isNotEmpty) {
+                                    markers = true;
+                                    Marker closestMarker = markersList.first;
+                                    double minDistance = calculateDistance(
+                                      currentLatLng.latitude,
+                                      currentLatLng.longitude,
+                                      closestMarker.point.latitude,
+                                      closestMarker.point.longitude,
+                                    );
+                                    for (Marker marker in markersList) {
+                                      double distance = calculateDistance(
+                                        currentLatLng.latitude,
+                                        currentLatLng.longitude,
+                                        marker.point.latitude,
+                                        marker.point.longitude,
+                                      );
+                                      if (distance < minDistance) {
+                                        closestMarker = marker;
+                                        minDistance = distance;
+                                      }
+                                    }
+                                    // Calculate the angle between the user's location and the closest marker
+                                    double angle = atan2(
+                                          closestMarker.point.longitude -
+                                              currentLatLng.longitude,
+                                          closestMarker.point.latitude -
+                                              currentLatLng.latitude,
+                                        ) *
+                                        180 /
+                                        pi;
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(height: 250),
+                                        InkWell(
+                                          child: ElegantNotification(
+                                            width: 360,
+                                            notificationPosition:
+                                                NotificationPosition.center,
+                                            background: const Color.fromRGBO(
+                                                48, 56, 76, 1.0),
+                                            animation: AnimationType.fromTop,
+                                            title: Text(
+                                              "${AppLocalizations.of(context)!.building}",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                            description: Text(
+                                              "${AppLocalizations.of(context)!.close} ${minDistance.toStringAsFixed(2)} km",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            icon: Transform.rotate(
+                                              angle: angle * pi / 180,
+                                              child: const Icon(
+                                                Icons.arrow_upward_rounded,
+                                                color: Colors.lightGreenAccent,
+                                              ),
+                                            ),
+                                            showProgressIndicator: false,
+                                            autoDismiss: false,
+                                            onDismiss: () {
+                                              checkPressed = false;
+                                              setState(() {});
+                                            },
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  } else {
+                                    return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(height: 250),
+                                          InkWell(
+                                              child: ElegantNotification(
+                                            width: 360,
+                                            notificationPosition:
+                                                NotificationPosition.center,
+                                            background: const Color.fromRGBO(
+                                                48, 56, 76, 1.0),
+                                            animation: AnimationType.fromTop,
+                                            title: Text(
+                                              "${AppLocalizations.of(context)!.building}",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                                //fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            description: Text(
+                                              "${AppLocalizations.of(context)!.buildingNotFound}",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                //fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            icon: Transform.rotate(
+                                              angle: 0 * pi / 180,
+                                              child: const Icon(
+                                                Icons.arrow_upward_rounded,
+                                                color: Colors.lightGreenAccent,
+                                              ),
+                                            ),
+                                            showProgressIndicator: false,
+                                            autoDismiss: false,
+                                            onDismiss: () {
+                                              checkPressed = false;
+                                              setState(() {});
+                                            },
+                                          ))
+                                        ]);
+                                  }
+                                } else if (snapshot.hasError) {
+                                  return Text(
+                                      'Error loading markers: ${snapshot.error}');
+                                } else {
+                                  return const CircularProgressIndicator();
+                                }
+                              },
+                            )
                           : Container(),
                     ],
                   ),
             floatingActionButton: Stack(
               children: [
-                //ClosestMarkerWidget(userLocation: currentLatLng),
-
-                FutureBuilder<List<Marker>>(
-                  future: filterMarkers(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      List<Marker>? markersList = snapshot.data;
-                      if (markersList != null) {
-                        if (markersList.isNotEmpty) {
-                          Marker closestMarker = markersList.first;
-                          for (Marker marker in markersList) {
-                            double distance = calculateDistance(
-                              currentLatLng.latitude,
-                              currentLatLng.longitude,
-                              marker.point.latitude,
-                              marker.point.longitude,
-                            );
-                            if (distance < minDistance) {
-                              closestMarker = marker;
-                              minDistance = distance;
-                            }
-                          }
-
-                          // Calculate the angle between the user's location and the closest marker
-                          angle = atan2(
-                            closestMarker.point.longitude -
-                                currentLatLng.longitude,
-                            closestMarker.point.latitude -
-                                currentLatLng.latitude,
-                          );
-                          angle = angle * 180 / pi;
-                          print(minDistance);
-
-                          return Positioned(
-                            bottom: 60,
-                            right: 0,
-                            child: FloatingActionButton(
-                              onPressed: () {
-                                if (checkPressed == false) {
-                                  checkPressed = true;
-                                  setState(() {});
-                                } else {
-                                  checkPressed = false;
-                                  setState(() {});
-                                }
-                                markers = true;
-                                setState(() {});
-                              },
-                              heroTag: null,
-                              backgroundColor:
-                                  const Color.fromRGBO(48, 56, 76, 1.0),
-                              child: const Icon(Icons.notifications),
-                            ),
-                          );
-                        }
-
-                        return Positioned(
-                            bottom: 60,
-                            right: 0,
-                            child: FloatingActionButton(
-                              onPressed: () {
-                                if (checkPressed == false) {
-                                  checkPressed = true;
-                                  setState(() {});
-                                } else {
-                                  checkPressed = false;
-                                  setState(() {});
-                                }
-                                markers = false;
-                                setState(() {});
-                              },
-                              heroTag: null,
-                              backgroundColor:
-                                  const Color.fromRGBO(48, 56, 76, 1.0),
-                              child: const Icon(Icons.notifications),
-                            ),
-                          );
+                Positioned(
+                  bottom: 60,
+                  right: 0,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      if (checkPressed == false) {
+                        checkPressed = true;
                       } else {
-                        return const Text('Error: markers is null');
+                        checkPressed = false;
                       }
-                    } else if (snapshot.hasError) {
-                      return Text('Error loading markers: ${snapshot.error}');
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
-                  },
+                      setState(() {});
+                    },
+                    heroTag: null,
+                    backgroundColor: const Color.fromRGBO(48, 56, 76, 1.0),
+                    child: const Icon(Icons.notifications),
+                  ),
                 ),
-
                 Positioned(
                   bottom: 0,
                   right: 0,
