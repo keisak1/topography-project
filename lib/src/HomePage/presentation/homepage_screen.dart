@@ -10,10 +10,12 @@ import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 import 'package:topography_project/src/HomePage/presentation/widgets/distance_direction.dart';
 import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarkers.dart';
 import 'dart:async';
 import '../../../Models/User.dart';
+import '../../../main.dart';
 import '../application/homepage_utilities.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
@@ -121,6 +123,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
     }
     return polygons;
+  }
+
+  void _changeLocale(Locale locale) {
+    setState(() {
+      Provider.of<LocaleProvider>(context, listen: false).changeLocale(locale);
+    });
   }
 
   double calculateDistance(lat1, lon1, lat2, lon2) {
@@ -303,43 +311,94 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                   image: AssetImage(
                                       "./lib/resources/topographic_regions1.png"),
                                   fit: BoxFit.cover)),
-                          child: Text(
-                            AppLocalizations.of(context)!.settings,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 20),
-                          ), //dar add ao file |10n
-                        ),
-                        ListTile(
-                          title: Container(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              //crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
+                          child: Align(
+                              alignment: Alignment.topRight,
+                              child: Row(children: [
                                 Text(
-                                  isButtonOn ? 'GPS On' : 'GPS Off',
+                                  AppLocalizations.of(context)!.settings,
                                   style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    //fontWeight: FontWeight.bold,
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                const SizedBox(
+                                  width: 110,
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    if (Provider.of<LocaleProvider>(context,
+                                                listen: false)
+                                            .locale
+                                            .toString() ==
+                                        'en_EN') {
+                                      _changeLocale(const Locale('pt', 'PT'));
+                                    } else if (Provider.of<LocaleProvider>(
+                                                context,
+                                                listen: false)
+                                            .locale
+                                            .toString() ==
+                                        'pt_PT') {
+                                      _changeLocale(const Locale('en', 'EN'));
+                                    }
+                                    await AppLocalizations.delegate.load(
+                                        Provider.of<LocaleProvider>(context,
+                                                listen: false)
+                                            .locale);
+                                    setState(() {});
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)!.language,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          foreground: Paint()
+                                            ..style = PaintingStyle.stroke
+                                            ..strokeWidth = 2
+                                            ..color = Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        AppLocalizations.of(context)!.language,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                //const SizedBox(height: 8.0),
-                                ToggleButtons(
-                                  isSelected: [isButtonOn],
-                                  onPressed: (int index) {
-                                    onButtonToggle(index);
-                                  },
-                                  children: [
-                                    Icon(
-                                      isButtonOn
-                                          ? Icons.location_on
-                                          : Icons.location_off,
-                                      color: Colors.white,
-                                    ),
-                                  ],
+                              ])),
+                          //dar add ao file |10n
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            //crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                isButtonOn ? 'GPS On' : 'GPS Off',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  //fontWeight: FontWeight.bold,
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 8.0),
+                              ToggleButtons(
+                                isSelected: [isButtonOn],
+                                onPressed: (int index) {
+                                  onButtonToggle(index);
+                                },
+                                children: [
+                                  Icon(
+                                    isButtonOn
+                                        ? Icons.location_on
+                                        : Icons.location_off,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                         ExpansionTile(
@@ -575,6 +634,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                               ),
                               onTap: () =>
                                   Navigator.pushReplacementNamed(context, '/')),
+                          // add some spacing between text and button
                         ],
                       ))
                 ],
@@ -689,7 +749,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        SizedBox(height: 250),
+                                        const SizedBox(height: 250),
                                         InkWell(
                                           child: ElegantNotification(
                                             width: 360,
@@ -734,7 +794,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          SizedBox(height: 250),
+                                          const SizedBox(height: 250),
                                           InkWell(
                                               child: ElegantNotification(
                                             width: 360,
