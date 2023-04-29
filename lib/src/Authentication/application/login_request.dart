@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -15,6 +16,10 @@ Future<void> login(String username, String password, context) async {
   print(response.statusCode);
   if (response.statusCode == 200) {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    final responseBody = response.body;
+    final responseJson = json.decode(responseBody);
+    final token = responseJson['token'];
+    await prefs.setString('token', token);
     // Save the current date to shared preferences
     DateTime currentDate = DateTime.now();
     await prefs.setInt('startTimestamp', currentDate.millisecondsSinceEpoch);

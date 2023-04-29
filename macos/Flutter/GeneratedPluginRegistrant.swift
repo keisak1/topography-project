@@ -5,7 +5,7 @@
 import FlutterMacOS
 import Foundation
 
-import connectivity_macos
+import connectivity_plus
 import flutter_local_notifications
 import isar_flutter_libs
 import location
