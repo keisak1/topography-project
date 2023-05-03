@@ -12,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:topography_project/src/Authentication/presentation/login_screen.dart';
 import 'package:topography_project/src/HomePage/presentation/widgets/distance_direction.dart';
 import 'package:topography_project/src/LocallySavedMarkersPage/locallySavedMarkers.dart';
 import 'dart:async';
@@ -23,7 +24,10 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 class MyHomePage extends StatefulWidget {
   static const String route = '/live_location';
 
-  const MyHomePage({super.key, Locale? locale, void Function(dynamic newLocale)? onLocaleChange});
+  const MyHomePage(
+      {super.key,
+      Locale? locale,
+      void Function(dynamic newLocale)? onLocaleChange});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -634,10 +638,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                     fontSize: 14, color: Colors.white),
                               ),
                               onTap: () async {
-                                SharedPreferences prefs = await SharedPreferences.getInstance();
-                                await prefs.remove('token').then((value) {
-                                  Navigator.pushReplacementNamed(context, '/');
-                                });}),
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.remove('token');
+                                Navigator.pushReplacementNamed(context, '/');
+
+                              }),
                           // add some spacing between text and button
                         ],
                       ))
