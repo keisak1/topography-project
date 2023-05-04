@@ -3,3 +3,6 @@ workflows:
     scripts:
       - name: say hello
         script: echo "Hello Codemagician!"
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
