@@ -86,5 +86,12 @@
   "incomplete": "Markers incompletos",
   "semicomplete": "Markers semi-completos",
   "complete": "Markers completos",
-  "allMarkers": "Todos os markers"
+  "allMarkers": "Todos os markers",
+  "mapBox": "Mapbox Streets é um mapa abrangente e de uso geral que enfatiza o estilo exacto e legível das redes rodoviárias e de trânsito.",
+  "osm": "O OpenStreetMap é o mapa do mundo wiki gratuito",
+  "hot": "A Humanitarian OpenStreetMap Team (HOT) aplica os princípios da fonte aberta e da partilha de dados abertos à resposta humanitária e ao desenvolvimento económico.",
+  "otm": "OpenTopoMap (opentopomap.org) é um projecto que visa a apresentação de mapas topográficos a partir de dados OSM e SRTM.",
+  "selectMap": "Lista de Mapas",
+  "credits": "Alunos do terceiro ano de Engenharia Informática da Universidade Fernando Pessoa\n\n- Nuno Moutinho (41781@ufp.edu.pt)\n- Daniel Moreira (41786@ufp.edu.pt)\n\n Última atualização: 11/05/2023",
+  "createdBy": "Criado por"
 }

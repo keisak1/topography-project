@@ -85,5 +85,12 @@
   "incomplete": "Incomplete markers",
   "semicomplete": "Semi-complete markers",
   "complete": "Complete markers",
-  "allMarkers": "All markers"
+  "allMarkers": "All markers",
+  "mapBox": "Mapbox Streets is a comprehensive, general-purpose map that emphasizes accurate, legible styling of road and transit networks.",
+  "osm": "OpenStreetMap is the free wiki world map.",
+  "hot": "The Humanitarian OpenStreetMap Team (HOT) applies the principles of open source and open data sharing to humanitarian response and economic development.",
+  "otm": "OpenTopoMap (opentopomap.org) is a project aiming at rendering topographic maps from OSM and SRTM data.",
+  "selectMap": "Map List",
+  "credits": "Students of the third year of Computer Science in University Fernando Pessoa\n\n - Nuno Moutinho (41781@ufp.edu.pt)\n - Daniel Moreira (41786@ufp.edu.pt)\n\n Last update: 11/05/2023",
+  "createdBy": "Created by"
 }

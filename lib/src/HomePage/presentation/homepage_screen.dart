@@ -23,7 +23,10 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 class MyHomePage extends StatefulWidget {
   static const String route = '/live_location';
 
-  const MyHomePage({super.key, Locale? locale, void Function(dynamic newLocale)? onLocaleChange});
+  const MyHomePage(
+      {super.key,
+      Locale? locale,
+      void Function(dynamic newLocale)? onLocaleChange});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -45,6 +48,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   double minDistance = double.infinity;
   double angle = 0;
 
+  String mapAPI =
+      "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw";
+  final List<String> mapAPIs = [
+    "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw",
+    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+    "https://a.tile.opentopomap.org/{z}/{x}/{y}.png"
+  ];
+
+  final List<String> mapAPItitles = [
+    "Mapbox Streets",
+    "OpenStreetMap",
+    "Humanitarian focused OSM",
+    "OpenTopoMap"
+  ];
+
   @override
   void initState() {
     _isLoading = true;
@@ -59,6 +78,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
     initLocationService();
+  }
+
+  void _onAPISelected(int i) {
+    setState(() {
+      mapAPI = mapAPIs[i];
+    });
   }
 
   @override
@@ -142,6 +167,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> mapAPIsubtitles = [
+      AppLocalizations.of(context)!.mapBox,
+      AppLocalizations.of(context)!.osm,
+      AppLocalizations.of(context)!.hot,
+      AppLocalizations.of(context)!.otm,
+    ];
+    int selectedTile = 0; // initialize the selected tile index
+
     LatLng currentLatLng;
     const tag1 = 'button1';
     const tag2 = 'button2';
@@ -436,7 +469,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                             AppLocalizations.of(context)!
                                                 .optionsSelected,
                                             style: const TextStyle(
-                                                color: Colors.blueAccent));
+                                                color: Colors.orangeAccent));
                                       }
                                     }).toList(),
                                   )
@@ -614,6 +647,36 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                 },
                               ),
                             ]),
+                        ExpansionTile(
+                          backgroundColor:
+                              const Color.fromRGBO(48, 56, 76, 1.0),
+                          collapsedIconColor: Colors.white,
+                          title: Text(AppLocalizations.of(context)!.selectMap,
+                              style: const TextStyle(color: Colors.white)),
+                          children: [
+                            for (int i = 0; i < mapAPIs.length; i++)
+                              ListTile(
+                                splashColor: Colors.orangeAccent,
+                                title: Text(
+                                  mapAPItitles[i],
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    selectedTile =
+                                        i; // update the selected tile index
+                                    mapAPI = mapAPIs[
+                                        i]; // update the selected map API
+                                  });
+                                },
+                                subtitle: Text(
+                                  mapAPIsubtitles[i],
+                                  style: const TextStyle(
+                                      color: Colors.orangeAccent),
+                                ),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -623,6 +686,46 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       // on the bottom and should not scroll with the above ListView
                       child: Column(
                         children: <Widget>[
+                          ListTile(
+                            leading: const Icon(
+                              Icons.info_outline_rounded,
+                              color: Colors.white,
+                            ),
+                            title: const Text(
+                              "Info",
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor:
+                                        const Color.fromRGBO(48, 56, 76, 1.0),
+                                    title: Text(
+                                      AppLocalizations.of(context)!.createdBy,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                    content: Text(
+                                      AppLocalizations.of(context)!.credits,
+                                      style: const TextStyle(
+                                          color: Colors.orangeAccent),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
                           ListTile(
                               leading: const Icon(
                                 Icons.logout,
@@ -634,10 +737,24 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                     fontSize: 14, color: Colors.white),
                               ),
                               onTap: () async {
-                                SharedPreferences prefs = await SharedPreferences.getInstance();
-                                await prefs.remove('token').then((value) {
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  },
+                                );
+                                await prefs.remove('token');
+                                Navigator.pop(
+                                    context); // Close the loading dialog
+                                if (prefs.getString('token') == null) {
                                   Navigator.pushReplacementNamed(context, '/');
-                                });}),
+                                }
+                              }),
                           // add some spacing between text and button
                         ],
                       ))
@@ -667,8 +784,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             TileLayer(
                               tileProvider:
                                   FMTC.instance('savedTiles').getTileProvider(),
-                              urlTemplate:
-                                  'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2Vpc2FraSIsImEiOiJjbGV1NzV5ZXIwMWM2M3ltbGlneXphemtpIn0.htpiT-oaFiXGCw23sguJAw',
+                              urlTemplate: mapAPI,
                               userAgentPackageName:
                                   'dev.fleaflet.flutter_map.example',
                             ),
