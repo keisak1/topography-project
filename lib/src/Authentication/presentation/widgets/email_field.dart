@@ -70,7 +70,7 @@ class _EmailFieldState extends State<EmailField>
                   },
                   controller: emailController,
                   focusNode: node,
-                  decoration: const InputDecoration(hintText: "Email", helperStyle: TextStyle(color: Colors.white)),
+                  decoration: const InputDecoration(hintText: "Email", helperStyle: TextStyle(color: Colors.orangeAccent)),
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) async {
                     if (value.isNotEmpty) {

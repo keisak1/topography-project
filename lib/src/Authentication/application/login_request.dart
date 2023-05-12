@@ -20,6 +20,7 @@ Future<void> login(String username, String password, context) async {
     final responseJson = json.decode(responseBody);
     final token = responseJson['token'];
     await prefs.setString('token', token);
+    await prefs.setBool('loggedOut', false);
     // Save the current date to shared preferences
     DateTime currentDate = DateTime.now();
     await prefs.setInt('startTimestamp', currentDate.millisecondsSinceEpoch);

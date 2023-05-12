@@ -64,7 +64,7 @@ class _PasswordFieldState extends State<PasswordField> {
                   },
                   controller: passwordController,
                   focusNode: node,
-                  decoration: const InputDecoration(hintText: "Password", helperStyle: TextStyle(color: Colors.white)),
+                  decoration: const InputDecoration(hintText: "Password", helperStyle: TextStyle(color: Colors.orangeAccent)),
                   obscureText: obscure,
                   onChanged: (value) {
                     if (value.isEmpty) {

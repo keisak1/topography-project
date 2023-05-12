@@ -35,11 +35,7 @@ void main() async {
   );
 }
 
-Future<String> getToken() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token') ?? '';
-  return token;
-}
+
 
 class AppContainer extends StatelessWidget {
   const AppContainer({
@@ -62,7 +58,7 @@ class AppContainer extends StatelessWidget {
             Locale('pt'), // Portuguese
           ],
           locale: provider.locale,
-          home: FutureBuilder<String>(
+          home: FutureBuilder<bool>(
             future: _getToken(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -70,9 +66,9 @@ class AppContainer extends StatelessWidget {
                   child: CircularProgressIndicator(),
                 );
               }
-              final token = snapshot.data;
+              bool? token = snapshot.data;
               print(token);
-              if (token == null || token.isEmpty) {
+              if (token != null && !token) {
                 return LoginScreen(
                   locale: provider.locale,
                   onLocaleChange: (newLocale) =>
@@ -92,8 +88,9 @@ class AppContainer extends StatelessWidget {
     );
   }
 
-  Future<String> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token') ?? '';
+  Future<bool> _getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool loggedOut = prefs.getBool('loggedOut') ?? false;
+    return loggedOut;
   }
 }

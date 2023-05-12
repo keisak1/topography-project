@@ -748,12 +748,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                     );
                                   },
                                 );
-                                await prefs.remove('token');
+                                await prefs.setBool('loggedOut', true);
                                 Navigator.pop(
                                     context); // Close the loading dialog
-                                if (prefs.getString('token') == null) {
                                   Navigator.pushReplacementNamed(context, '/');
-                                }
                               }),
                           // add some spacing between text and button
                         ],
